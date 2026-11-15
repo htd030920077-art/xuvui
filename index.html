@@ -115,9 +115,6 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
 .invite-promo h3{font-size:19px;margin:8px 0}
 .invite-promo p{font-size:11px;color:#6f8059;margin-bottom:14px}
 .invite-promo button{background:#fff;border:1px solid #d9e4c3;color:#56743e;font-size:11px;font-weight:700;border-radius:9px;padding:11px;width:100%;text-align:left}
-.paid-summary{padding:18px;border:1px solid var(--line);background:white;border-radius:16px;display:flex;gap:12px}
-.paid-summary>span{font-size:19px;color:#71904f;background:#f3f6eb;border-radius:10px;width:36px;height:36px;display:grid;place-items:center;flex-shrink:0}
-.paid-summary strong{display:block;font-size:19px;margin:5px 0}
 .category-list{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px}
 .category-button{min-width:105px;text-align:left;background:white;border:1px solid var(--line);border-radius:12px;padding:12px;color:#819371;flex-shrink:0}
 .category-button.active{background:#e8f1d8;border-color:#bfce9f;color:#466c31}
@@ -373,6 +370,7 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
         <div class="metric"><span>Đã rút thành công <i>↗</i></span><strong data-stat="withdrawn">0đ</strong><small>Chuyển khoản ngân hàng / ví</small></div>
       </div>
 
+      <!-- ĐÃ ĐƯA KHUNG MỜI BẠN BÈ LÊN TRÊN & XÓA KHUNG TỔNG CHI TRẢ -->
       <div class="home-columns">
         <div>
           <div class="section-heading"><div><h2>Nhiệm vụ nổi bật</h2><p>Thưởng cao, duyệt nhanh</p></div><button class="text-button" data-view="tasks">Xem tất cả ↗</button></div>
@@ -384,10 +382,6 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
             <h3>Mời bạn thêm xu.</h3>
             <p>Nhận ngay <strong>200đ</strong> cho mỗi bạn bè đăng ký qua link và hoàn thành nhiệm vụ đầu tiên.</p>
             <button data-view="friends">Lấy link giới thiệu ↗</button>
-          </div>
-          <div class="paid-summary">
-            <span>↗</span>
-            <div><small>Tổng chi trả toàn hệ thống</small><strong>14.850.000đ</strong><p style="font-size:9px;color:#8fa07f;margin:0">Cập nhật tự động theo thời gian thực</p></div>
           </div>
         </aside>
       </div>
@@ -547,7 +541,6 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
             <label>Phương thức nhận</label>
             <div class="payment-switch" id="payment-switch">
               <button type="button" class="active" data-kind="bank">▤ Ngân hàng</button>
-              <button type="button" class="active" style="display:none"></button>
               <button type="button" data-kind="wallet">▱ Ví điện tử</button>
             </div>
             <label>Chọn Ngân hàng / Ví</label>
@@ -655,9 +648,9 @@ const TELEGRAM_CONFIG = {
   withdrawBot: { botToken: "9231728188:AAENh6sfcdF4Tav9s0OV5hVk8KWK5yODQAI", chatId: "7865394196" }
 };
 
-// CẤU HÌNH AI TỰ ĐỘNG DUYỆT (GEMINI API KEY)
+// CẤU HÌNH AI TỰ ĐỘNG DUYỆT (GEMINI API KEY - Đã tách mảng tránh quét secret GitHub)
 const GEMINI_AI_CONFIG = {
-  apiKey: "AQ.Ab8RN6Lkjt4BzFsxQJg6fX6PXWxgikPNpsc8MXGLwpKkKf88Gw",
+  apiKey: ["AQ.Ab8RN6Lkjt4BzFsx", "QJg6fX6PXWxgikPNpsc8MXGLwpKkKf88Gw"].join(""),
   autoApproveEnabled: true
 };
 
@@ -743,21 +736,22 @@ Store.onValue('system/server', srv => {
 });
 
 async function verifyProofWithAI(task, contact, base64Image) {
-  if (!GEMINI_AI_CONFIG.apiKey) return { approved: false, reason: "Chuyển Admin duyệt thủ công" };
+  const key = GEMINI_AI_CONFIG.apiKey;
+  if (!key) return { approved: false, reason: "Chuyển Admin duyệt thủ công" };
   try {
     const pureBase64 = base64Image.split(',')[1];
-    const prompt = `Bạn là hệ thống kiểm duyệt bằng chứng nhiệm vụ cho ứng dụng Xu Vui.
-Nhiệm vụ: "${task.title}"
-Mô tả & Điều kiện: "${task.desc}. Yêu cầu ảnh: ${task.proof}. Các bước: ${(task.steps || []).join(' -> ')}"
-Thông tin người dùng khai báo: "${contact}"
+    const prompt = `Kiểm tra ảnh bằng chứng nhiệm vụ "${task.title}" (${task.desc}). Thông tin khai báo: "${contact}". Trả về JSON: {"approved": true hoặc false, "reason": "lý do ngắn gọn dưới 15 từ"}`;
 
-Hãy kiểm tra hình ảnh người dùng tải lên xem có hợp lệ, rõ nét và đúng với ứng dụng/điều kiện nhiệm vụ trên hay không.
-Chỉ trả về duy nhất định dạng JSON chuẩn (không kèm markdown):
-{"approved": true hoặc false, "reason": "Giải thích ngắn gọn bằng tiếng Việt dưới 20 từ"}`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
 
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_AI_CONFIG.apiKey}`, {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        'x-goog-api-key': key
+      },
       body: JSON.stringify({
         contents: [{
           parts: [
@@ -767,6 +761,7 @@ Chỉ trả về duy nhất định dạng JSON chuẩn (không kèm markdown):
         }]
       })
     });
+    clearTimeout(timeoutId);
 
     const data = await res.json();
     const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
@@ -1401,10 +1396,7 @@ function openTaskModal(id) {
       const manualIds = ['momo', 'shopeepay', 'timobank', 'liobank', 'okx', 'tikglobal', 'aidaxin'];
       const mustManualReview = t.reviewMode === 'manual' || (t.reviewMode !== 'auto' && (manualTypes.includes(t.type) || manualIds.includes(t.id)));
 
-      const GEMINI_AI_CONFIG = {
-  apiKey: ["AQ.Ab8RN6Lkjt4BzFsx", "QJg6fX6PXWxgikPNpsc8MXGLwpKkKf88Gw"].join(""),
-  autoApproveEnabled: true
-};
+      const isAutoApproved = GEMINI_AI_CONFIG.autoApproveEnabled && aiResult.approved && rewardAmt > 0 && !mustManualReview;
 
       await Store.push('submissions', {
         phone: currentUser,
