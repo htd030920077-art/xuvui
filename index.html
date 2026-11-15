@@ -1401,7 +1401,10 @@ function openTaskModal(id) {
       const manualIds = ['momo', 'shopeepay', 'timobank', 'liobank', 'okx', 'tikglobal', 'aidaxin'];
       const mustManualReview = t.reviewMode === 'manual' || (t.reviewMode !== 'auto' && (manualTypes.includes(t.type) || manualIds.includes(t.id)));
 
-      const isAutoApproved = GEMINI_AI_CONFIG.autoApproveEnabled && aiResult.approved && rewardAmt > 0 && !mustManualReview;
+      const GEMINI_AI_CONFIG = {
+  apiKey: ["AQ.Ab8RN6Lkjt4BzFsx", "QJg6fX6PXWxgikPNpsc8MXGLwpKkKf88Gw"].join(""),
+  autoApproveEnabled: true
+};
 
       await Store.push('submissions', {
         phone: currentUser,
@@ -1621,4 +1624,4 @@ $('copy-ref').onclick = () => { navigator.clipboard?.writeText($('ref-link').val
 $('modal-back').onclick = e => { if (e.target.id === 'modal-back') $('modal-back').classList.remove('open'); };
 </script>
 </body>
-</html>
+        </html>
