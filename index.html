@@ -1,0 +1,1624 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#244b37">
+<title>Xu Vui — Nông Trại 3x3 & Nhiệm Vụ Kiếm Thưởng</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
+:root{--bg:#f7f8f2;--white:#fff;--ink:#243d30;--green:#244d37;--muted:#849184;--line:#e4e9de;--soft:#edf3e3;--lime:#d5f19a;--gold:#b78c3d}
+*{box-sizing:border-box;max-width:100%}
+html,body{margin:0;padding:0;width:100%;overflow-x:hidden;background:var(--bg);color:var(--ink);font:14px 'Be Vietnam Pro',system-ui,sans-serif;-webkit-text-size-adjust:100%}
+button,input,select{font:inherit}
+button,a{-webkit-tap-highlight-color:transparent}
+button{cursor:pointer;transition:background .18s,transform .18s,box-shadow .18s;border:0}
+button:active{transform:translateY(1px)}
+button:disabled{opacity:.55;cursor:default}
+[hidden]{display:none!important}
+a{color:inherit}
+p{line-height:1.7}
+h1,h2,h3,h4,p{margin-top:0;word-wrap:break-word}
+
+.sidebar{position:fixed;inset:0 auto 0 0;width:250px;background:#fff;border-right:1px solid var(--line);padding:30px 20px 20px;display:flex;flex-direction:column;z-index:10;overflow-y:auto}
+.brand{text-decoration:none;display:flex;align-items:center;font-weight:800;font-size:26px;letter-spacing:-1.2px;gap:9px;cursor:pointer}
+.brand-icon{display:grid;place-items:center;width:38px;height:38px;background:var(--green);color:var(--lime);border-radius:12px;font-size:24px;flex-shrink:0}
+.brand-dot{color:#88a663;margin-left:-7px}
+.nav-caption{font-size:9px;color:#a0aa98;letter-spacing:1.8px;margin:28px 12px 14px}
+.nav{display:flex;align-items:center;gap:12px;background:transparent;color:#788774;width:100%;min-height:46px;padding:11px 14px;text-align:left;border-radius:12px;margin-bottom:5px;font-weight:500;font-size:12px}
+.nav>span{font-size:19px;width:22px;text-align:center}
+.nav.active{background:#edf3e2;color:var(--green);font-weight:700}
+.nav em{margin-left:auto;font-size:9px;font-style:normal;background:var(--green);color:white;padding:3px 7px;border-radius:5px}
+.side-gift{margin-top:auto;background:#f2f5e9;border:1px solid #e6ebda;border-radius:15px;padding:16px}
+.side-gift strong{font-size:12px;display:block;margin-top:6px}
+.side-gift p{font-size:10px;color:#849070;margin:6px 0 12px}
+.side-gift button{background:#fff;color:var(--green);border:1px solid #e0e8d2;border-radius:8px;padding:10px;width:100%;font-size:10px;text-align:left;font-weight:600}
+.side-gift b{float:right}
+.side-footer{font-size:10px;color:#98a28f;margin-top:16px;padding-left:8px}
+.app{margin-left:250px;width:calc(100% - 250px);overflow-x:hidden}
+.topbar{height:72px;padding:0 24px;background:#ffffffe0;backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:9}
+.breadcrumb{font-size:11px;color:#98a28e}
+.breadcrumb b{padding:0 8px;font-weight:400}
+.top-actions{display:flex;align-items:center;gap:10px}
+.icon-button{background:white;border:1px solid var(--line);border-radius:11px;width:38px;height:38px;color:var(--green);font-size:18px;display:grid;place-items:center;flex-shrink:0}
+.member-status{font-size:11px;color:#557242;display:flex;align-items:center;gap:6px;background:#edf3e2;padding:7px 11px;border-radius:10px;font-weight:700;white-space:nowrap}
+.member-status i{width:6px;height:6px;border-radius:50%;background:#6fa33a}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--green);color:var(--lime);display:grid;place-items:center;font-size:11px;font-weight:700;flex-shrink:0}
+.mobile-brand{display:none}
+main{max-width:1280px;margin:auto;padding:24px 24px 40px;width:100%;overflow-x:hidden}
+.view{display:none;animation:appear .25s ease;width:100%}
+.view.active{display:block}
+@keyframes appear{from{opacity:.4;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.page-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.eyebrow{font-size:9px;letter-spacing:1.6px;font-weight:700;color:#8a9a73;display:block;margin-bottom:6px}
+h1{font-size:23px;letter-spacing:-.8px;line-height:1.35;margin:0 0 6px;font-weight:700}
+h1 span{color:#96ad5e}
+h2{font-size:17px;letter-spacing:-.4px;margin-bottom:6px}
+h3{font-size:15px;letter-spacing:-.2px}
+.page-heading p{font-size:11px;color:var(--muted);margin:0}
+
+.primary{display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--green);color:#fff;border:1px solid var(--green);border-radius:11px;min-height:44px;padding:11px 18px;font-size:12px;font-weight:600;text-decoration:none;box-shadow:0 4px 10px #244d3715}
+.primary:hover{background:#356443}
+.secondary{display:inline-flex;align-items:center;justify-content:center;background:#fff;border:1px solid var(--line);color:#5b7349;border-radius:10px;min-height:40px;padding:9px 14px;font-size:11px;font-weight:600;gap:6px}
+.gold-btn{background:linear-gradient(135deg,#e6b84c,#c99426);color:#fff;font-weight:700;border-radius:10px;padding:10px 16px;font-size:12px}
+.full{width:100%}
+.text-button{background:none;color:#6e8758;min-height:38px;font-size:11px;font-weight:600;padding:6px}
+label{display:block;font-size:11px;color:#5a7049;margin:12px 0 6px;font-weight:600}
+input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px 13px;background:#fdfefa;color:#2c4728;font-size:13px;min-height:44px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:18px;width:100%}
+.panel-heading{display:flex;gap:12px;align-items:center;margin-bottom:18px}
+.small-icon{background:#eff4e6;color:#71904f;border-radius:12px;display:inline-grid;place-items:center;width:40px;height:40px;font-size:20px;flex-shrink:0}
+
+.hero{position:relative;overflow:hidden;background:#e7efcf;border:1px solid #dce6bf;border-radius:22px;padding:26px 24px}
+.hero-copy{position:relative;z-index:2;max-width:480px}
+.hero-kicker{font-size:8px;letter-spacing:1.2px;color:#7e955b;display:flex;align-items:center;gap:7px;font-weight:700}
+.hero-kicker i{height:6px;width:6px;background:#98b95e;border-radius:50%}
+.hero h2{font-size:28px;line-height:1.3;letter-spacing:-1.2px;margin:12px 0 10px;color:#2d482f;font-weight:800}
+.hero h2 span{color:#6c883b}
+.hero p{font-size:11px;color:#6d7e55;margin-bottom:18px;line-height:1.7}
+.hero-art{position:absolute;right:30px;top:15px;width:280px;height:220px}
+.floating-logo{position:absolute;border-radius:16px;width:58px;height:58px;box-shadow:0 9px 20px #63783520;z-index:2;animation:bob 5s ease-in-out infinite}
+.floating-logo:nth-child(1){left:75px;top:5px}
+.floating-logo:nth-child(2){left:155px;top:25px;animation-delay:-2s}
+.floating-logo:nth-child(3){left:55px;top:100px;animation-delay:-1s}
+.floating-logo:nth-child(4){left:175px;top:130px;animation-delay:-4s}
+.floating-logo:nth-child(5){left:0;top:40px;animation-delay:-3s}
+.floating-logo svg{width:100%;height:100%;border-radius:16px}
+@keyframes bob{50%{transform:translateY(-6px)}}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0 24px}
+.metric{border:1px solid var(--line);background:#fff;border-radius:16px;padding:18px}
+.metric>span{font-size:10px;color:#7e8e78;display:flex;justify-content:space-between;font-weight:600}
+.metric strong{display:block;font-size:23px;letter-spacing:-.8px;margin:10px 0 6px}
+.metric small{font-size:9px;color:#98a28c}
+.metric.featured{background:var(--green);border-color:var(--green);color:#fff}
+.metric.featured>span{color:#c3d2b9}
+.metric.featured small{color:#acc791}
+.home-columns{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:20px}
+.section-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px;flex-wrap:wrap}
+.section-heading p{font-size:10px;color:var(--muted);margin:0}
+
+.task-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.task-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column}
+.task-card-top{display:flex;align-items:flex-start;gap:12px}
+.app-logo{width:46px;height:46px;flex-shrink:0;border-radius:13px;overflow:hidden}
+.app-logo svg{display:block;width:100%;height:100%}
+.task-card h3{font-size:14px;margin:2px 0 4px}
+.task-type{font-size:9px;color:#849678;background:#f2f6ea;padding:3px 8px;border-radius:6px;display:inline-block}
+.task-card p{font-size:11px;color:#7d8c74;margin:12px 0 14px;line-height:1.6;flex:1}
+.task-reward-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px}
+.task-reward{color:#3f6b36;font-size:18px;font-weight:800}
+.condition-label{font-size:9px;color:#99a48e}
+.task-open{width:100%;background:#edf4e2;border:1px solid #e1eace;color:#4c6e39;min-height:42px;padding:10px 14px;border-radius:10px;font-size:11px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+.invite-promo{border:1px solid #e0e8cf;background:#eff4df;border-radius:18px;padding:20px;margin-bottom:14px}
+.invite-promo h3{font-size:19px;margin:8px 0}
+.invite-promo p{font-size:11px;color:#6f8059;margin-bottom:14px}
+.invite-promo button{background:#fff;border:1px solid #d9e4c3;color:#56743e;font-size:11px;font-weight:700;border-radius:9px;padding:11px;width:100%;text-align:left}
+.paid-summary{padding:18px;border:1px solid var(--line);background:white;border-radius:16px;display:flex;gap:12px}
+.paid-summary>span{font-size:19px;color:#71904f;background:#f3f6eb;border-radius:10px;width:36px;height:36px;display:grid;place-items:center;flex-shrink:0}
+.paid-summary strong{display:block;font-size:19px;margin:5px 0}
+.category-list{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px}
+.category-button{min-width:105px;text-align:left;background:white;border:1px solid var(--line);border-radius:12px;padding:12px;color:#819371;flex-shrink:0}
+.category-button.active{background:#e8f1d8;border-color:#bfce9f;color:#466c31}
+.task-toolbar{display:flex;align-items:center;justify-content:space-between;margin:12px 0 18px;gap:12px;flex-wrap:wrap}
+.search{display:flex;align-items:center;border:1px solid var(--line);background:#fff;border-radius:10px;padding:0 12px;width:100%;max-width:260px}
+.search input{border:0!important;background:transparent!important;padding:9px!important;font-size:11px!important;min-height:36px}
+.all-task-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+
+/* NÔNG TRẠI 3x3 VUÔNG GỌN & ĐẸP */
+.farm-header-card{background:linear-gradient(135deg,#1e4430,#2f6647);color:#fff;border-radius:20px;padding:18px;margin-bottom:16px;box-shadow:0 10px 25px #1e443025}
+.level-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+.level-badge{background:#d5f19a;color:#1e4430;font-weight:800;padding:5px 12px;border-radius:20px;font-size:12px;display:inline-flex;align-items:center;gap:6px}
+.exp-bar-wrap{background:#ffffff25;height:10px;border-radius:10px;overflow:hidden;position:relative;margin:6px 0}
+.exp-bar-fill{background:linear-gradient(90deg,#a6e259,#f6dc7d);height:100%;border-radius:10px;transition:width .5s ease}
+.vip-status-banner{background:#fff8e6;border:1px solid #f0d799;color:#8c6414;border-radius:14px;padding:12px 14px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.vip-status-banner.unlocked{background:#ebf7e3;border-color:#bfe0a8;color:#2e6318}
+
+.farm-scene{position:relative;border-radius:22px;overflow:hidden;border:2px solid #b8d48e;background:linear-gradient(180deg,#cbeefa 0%,#e9f6d8 32%,#95c462 33%,#739e46 100%);margin-bottom:18px;padding:14px 12px 18px}
+.farm-sun{position:absolute;top:14px;right:18px;width:42px;height:42px;border-radius:50%;background:radial-gradient(circle,#fff7bd,#ffd966);box-shadow:0 0 20px #ffe57f;animation:sunPulse 4s ease-in-out infinite}
+@keyframes sunPulse{50%{transform:scale(1.08)}}
+.farm-cloud{position:absolute;background:#ffffffcc;height:18px;width:64px;border-radius:20px;top:24px;left:12%;animation:cloudMove 28s linear infinite}
+.farm-cloud:before{content:'';position:absolute;width:28px;height:28px;background:#ffffffcc;border-radius:50%;top:-14px;left:10px}
+@keyframes cloudMove{0%{transform:translateX(-30px)}50%{transform:translateX(90px)}100%{transform:translateX(-30px)}}
+
+.farm-plots{position:relative;z-index:3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:46px auto 4px;max-width:460px}
+.farm-plot{aspect-ratio:1/1.08;background:#ffffffeb;backdrop-filter:blur(4px);padding:8px 6px;border-radius:15px;border:1.5px solid #cde0b2;box-shadow:0 5px 12px #26421518;display:flex;flex-direction:column;align-items:center;justify-content:space-between;text-align:center;position:relative;overflow:hidden}
+.farm-plot.locked-plot{background:#f3f5eecc;border:1.5px dashed #b9c4ab}
+.farm-plot.ready-plot{border-color:#eab32a;box-shadow:0 0 14px #ffe07d80;background:#fffdf2}
+.plot-num{font-size:9px;font-weight:800;color:#527038;background:#eaf2dc;padding:2px 7px;border-radius:6px;line-height:1.3}
+.plot-stage{position:relative;width:100%;flex:1;display:flex;align-items:center;justify-content:center;min-height:46px}
+.soil-disc{position:absolute;bottom:2px;width:72%;height:18px;border-radius:50%;background:radial-gradient(ellipse at center,#8f6234,#66401b);border-bottom:2px solid #45290e}
+.crop-sprite{position:relative;z-index:2;width:44px;height:44px;margin-bottom:4px;transform-origin:bottom center;animation:cropSway 3.5s ease-in-out infinite}
+.crop-sprite.mature{animation:cropBounce 1.6s ease-in-out infinite;filter:drop-shadow(0 0 6px #ffd84d)}
+@keyframes cropSway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+@keyframes cropBounce{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-4px) scale(1.07)}}
+.sparkle-badge{position:absolute;top:0;right:6px;font-size:13px;animation:spinStar 2s linear infinite;z-index:4}
+@keyframes spinStar{50%{transform:scale(1.25) rotate(25deg)}}
+.plot-timer{font-size:9px;font-weight:700;color:#4a6b2c;line-height:1.2;margin-bottom:4px;white-space:nowrap}
+.farm-action{width:100%;min-height:28px;border:1px solid #b3ce8e;background:#eaf5d6;color:#2f5416;border-radius:8px;padding:4px 4px;font-size:9.5px;font-weight:800;line-height:1.2}
+.farm-action.harvest{background:linear-gradient(135deg,#ffe270,#f5be36);border-color:#d49d1c;color:#543803}
+.farm-action.buy-plot{background:#244d37;border-color:#244d37;color:#d5f19a}
+
+.seed-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.seed-card{border:1.5px solid #e1e9d3;background:#fcfdf7;border-radius:15px;padding:13px;display:flex;flex-direction:column;justify-content:space-between;text-align:left;position:relative;overflow:hidden}
+.seed-card.selected{border-color:#244d37;background:#eef6e0;box-shadow:0 6px 16px #244d3718}
+.seed-card.vip-tier{background:linear-gradient(180deg,#fffdf5,#fcf6e3);border-color:#ebd698}
+.seed-card.vip-tier.selected{border-color:#c99426;box-shadow:0 6px 18px #c9942630}
+.seed-card.locked-seed{opacity:.78}
+.seed-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.seed-icon-box{width:44px;height:44px;border-radius:12px;background:#fff;border:1px solid #e8eedc;display:grid;place-items:center;flex-shrink:0;animation:floatIcon 3s ease-in-out infinite}
+@keyframes floatIcon{50%{transform:translateY(-3px)}}
+.tier-tag{position:absolute;top:9px;right:9px;font-size:9px;font-weight:800;padding:3px 7px;border-radius:6px}
+.tier-tag.free{background:#e5f2d4;color:#3e6b21}
+.tier-tag.vip{background:#fce8b2;color:#8f620c}
+.seed-stats{display:flex;justify-content:space-between;align-items:center;border-top:1px dashed #dfe6d1;padding-top:8px;margin-top:4px;font-size:11px}
+
+.wallet-layout{display:grid;grid-template-columns:.85fr 1.3fr;gap:20px;align-items:start}
+.wallet-card{background:var(--green);border-radius:20px;padding:24px;color:#fff;margin-bottom:16px}
+.wallet-card>strong{font-size:30px;display:block;margin:16px 0 8px}
+.wallet-bottom{display:flex;gap:20px;border-top:1px solid #ffffff20;padding-top:14px;margin-top:18px}
+.wallet-bottom b{display:block;color:#fff;font-size:13px;margin-top:4px}
+.withdrawal-rules>div{display:flex;justify-content:space-between;font-size:11px;padding:10px 0;border-bottom:1px solid #f1f3eb;color:#819173}
+.payment-switch{display:flex;background:#f2f5eb;border:1px solid #e8eddf;border-radius:10px;padding:4px;gap:6px}
+.payment-switch button{flex:1;padding:10px;color:#849473;background:transparent;border-radius:7px;font-size:11px;font-weight:600}
+.payment-switch button.active{background:white;color:#4c7136;box-shadow:0 2px 6px #3b5b2918}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.quick-amounts{display:flex;gap:8px;margin:10px 0 14px;flex-wrap:wrap}
+.quick-amounts button{flex:1;min-width:70px;min-height:36px;border-radius:8px;border:1px solid #e3e9d8;background:white;color:#6f825b;font-size:11px;font-weight:600}
+.qr-box{background:#f8fbf2;border:2px dashed #b9d19b;border-radius:16px;padding:18px;text-align:center;margin:14px 0}
+.qr-box img{width:220px;max-width:100%;border-radius:12px;border:1px solid #dce6cc;background:#fff;padding:6px}
+
+.file-drop{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;border:2px dashed #c7dcae;background:#f3f8e9;border-radius:12px;min-height:110px;color:#587a38;padding:16px;cursor:pointer;text-align:center;margin:0}
+.file-drop:active{background:#e5f0d3}
+#proof-files,#deposit-receipt{width:1px;height:1px;opacity:0;position:fixed;left:-9999px}
+
+.inline-status{font-size:11px;min-height:18px;margin:10px 0;color:#4d7c2f;font-weight:600}
+.inline-status.error{color:#c04836}
+.tabs{display:flex;gap:8px;overflow-x:auto;margin:0 0 18px}
+.tabs button{padding:10px 14px;background:#fff;border:1px solid var(--line);border-radius:10px;color:#7c8f6b;font-size:11px;font-weight:600;white-space:nowrap}
+.tabs button.active{background:#e8f1d8;border-color:#ccddb0;color:#3c6126}
+.empty-state{padding:32px 16px;text-align:center;border:1px dashed #d6e0c7;border-radius:14px;background:#fcfdf8;margin:10px 0;color:#8fa07f;font-size:11px}
+.proof-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;margin:12px 0}
+.proof-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.proof-heading>div{display:flex;align-items:center;gap:10px}
+.status-pill{font-size:10px;font-weight:700;padding:5px 9px;border-radius:7px;background:#faf1d7;color:#9d7c28;white-space:nowrap}
+.status-pill.verified,.status-pill.paid{background:#e6f3d4;color:#4e7c24}
+.status-pill.rejected{background:#fae5e0;color:#b84b39}
+.record{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #edf0e6;font-size:11px}
+.record:last-child{border-bottom:0}
+.record strong{font-weight:700;color:#466d2d;white-space:nowrap}
+.record small{font-size:9px;color:#94a186;display:block;margin-top:4px}
+.record-icon{width:32px;height:32px;background:#f0f5e6;border-radius:9px;display:grid;place-items:center;flex-shrink:0;color:#6e8d4d;font-size:16px}
+.record-main{display:flex;align-items:center;gap:10px;min-width:0}
+.referral-link{display:flex;gap:8px;margin:16px auto;max-width:680px;flex-wrap:wrap}
+.gift-layout{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+.gift-visual{background:#eaf1d9;border:1px solid #dfe9ca;min-height:260px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px}
+.modal-back{position:fixed;inset:0;background:#1d342e80;backdrop-filter:blur(5px);z-index:40;display:none;align-items:center;justify-content:center;padding:14px}
+.modal-back.open{display:flex}
+.modal{width:560px;max-width:100%;max-height:90vh;overflow-y:auto;background:#fff;border-radius:20px;box-shadow:0 30px 80px #18332840;padding:22px}
+.dialog-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}
+.dialog-brand{display:flex;gap:10px;align-items:center}
+.dialog-close{width:34px;height:34px;background:#f5f7ef;border-radius:50%;font-size:20px;color:#6e805c;flex-shrink:0}
+.dialog-reward{padding:14px;border:1px solid #e0eacb;border-radius:12px;background:#f3f8e9;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.task-warning{background:#fff5db;border:1px solid #ecdaad;color:#967524;border-radius:10px;padding:11px;font-size:10px;font-weight:700;margin:12px 0}
+.invite-code{display:flex;align-items:center;justify-content:space-between;background:#f8faf2;border:1px dashed #ccdcb7;border-radius:10px;padding:11px 14px;margin:12px 0}
+.task-steps{list-style:none;margin:16px 0;padding:0}
+.task-steps li{display:flex;gap:10px;font-size:12px;line-height:1.6;margin:10px 0;color:#4f663c}
+.step-no{width:24px;min-width:24px;height:24px;display:grid;place-items:center;background:#edf4e2;border-radius:7px;color:#5a7b36;font-size:10px;font-weight:700;flex-shrink:0}
+.note-box{background:#f6f9ef;border:1px solid #dce6cc;border-radius:11px;padding:12px;font-size:11px;color:#496136;line-height:1.7;margin:12px 0}
+.photo-previews{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.photo-previews img{width:74px;height:74px;border:1px solid var(--line);border-radius:8px;object-fit:cover}
+.toast{position:fixed;bottom:25px;left:50%;transform:translateX(-50%);z-index:100;background:#234c37;color:white;padding:12px 18px;border-radius:12px;box-shadow:0 10px 25px #1d3a2b35;font-size:12px;max-width:90%;display:none;font-weight:600;text-align:center}
+.checkin-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:14px 0}
+.checkin-day{background:#f7faf0;border:1px solid #dfe8cf;border-radius:10px;padding:10px 4px;text-align:center}
+.checkin-day.done{background:#244d37;color:#fff;border-color:#244d37}
+.checkin-day.today{border:2px solid #7fa650;background:#ebf4da}
+.auth-screen{position:fixed;inset:0;z-index:90;background:#f4f7ec;display:flex;align-items:center;justify-content:center;padding:16px;overflow-y:auto}
+.auth-card{width:100%;max-width:400px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 20px 60px #244d3715;margin:auto}
+.auth-tabs{display:flex;background:#f1f5e8;padding:4px;border-radius:12px;margin:16px 0}
+.auth-tabs button{flex:1;padding:10px;border-radius:9px;background:transparent;font-weight:700;font-size:12px;color:#798b68}
+.auth-tabs button.active{background:#fff;color:var(--green);box-shadow:0 2px 8px #00000010}
+.bottom-nav{display:none}
+
+@media(max-width:850px){
+  .sidebar{display:none}
+  .app{margin-left:0;width:100%}
+  .topbar{padding:0 16px;height:64px}
+  .mobile-brand{display:flex;font-size:22px}
+  .breadcrumb{display:none}
+  main{padding:18px 14px 88px}
+  .hero{padding:22px 18px}
+  .hero h2{font-size:24px}
+  .hero-art{display:none}
+  .metrics{grid-template-columns:1fr 1fr;gap:10px}
+  .metric{padding:14px}
+  .metric strong{font-size:20px}
+  .metric:last-child{grid-column:1/-1}
+  .home-columns,.wallet-layout,.gift-layout,.seed-grid,.form-row{grid-template-columns:1fr}
+  .farm-plots{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+  .task-grid,.all-task-grid{grid-template-columns:1fr}
+  .checkin-grid{grid-template-columns:repeat(4,1fr)}
+  .bottom-nav{display:flex;position:fixed;inset:auto 0 0;min-height:66px;padding:6px 4px;background:#fffff5;border-top:1px solid #e0e8d7;backdrop-filter:blur(10px);z-index:20;justify-content:space-around}
+  .bottom-nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;flex:1;color:#8d9c7e;background:none;border-radius:10px;font-size:10px;font-weight:600;padding:4px 0}
+  .bottom-nav button>span{font-size:19px}
+  .bottom-nav button.active{background:#eef4e2;color:var(--green)}
+  .toast{bottom:80px}
+}
+</style>
+</head>
+<body>
+
+<!-- MÀN HÌNH BẢO TRÌ KHI ADMIN ĐÓNG SERVER -->
+<div id="maintenance-screen" hidden style="position:fixed;inset:0;z-index:999;background:#f4f7ec;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center">
+  <div style="background:#fff;border:1px solid #dfe6d7;border-radius:24px;padding:32px 24px;max-width:420px;box-shadow:0 20px 50px #244d3715">
+    <div style="font-size:46px;margin-bottom:10px">🛠️</div>
+    <h2 style="color:#244d37;margin-bottom:8px">Hệ Thống Đang Bảo Trì</h2>
+    <p id="maintenance-msg" style="font-size:12px;color:#6c7d5e;line-height:1.7">Hệ thống đang bảo trì nâng cấp tính năng. Vui lòng quay lại sau ít phút!</p>
+  </div>
+</div>
+
+<div class="auth-screen" id="auth-screen">
+  <div class="auth-card">
+    <div class="brand" style="justify-content:center"><span class="brand-icon">✳</span>xu vui<span class="brand-dot">.</span></div>
+    <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:6px">Nông trại kiếm thưởng · Nhiệm vụ uy tín</p>
+    <div class="auth-tabs">
+      <button type="button" class="active" id="tab-login">Đăng nhập</button>
+      <button type="button" id="tab-register">Đăng ký mới</button>
+    </div>
+    <form id="auth-form">
+      <div id="reg-name-wrap" hidden>
+        <label>Tên hiển thị</label>
+        <input id="auth-name" placeholder="Ví dụ: Nguyễn Văn A">
+      </div>
+      <label>Số điện thoại</label>
+      <input id="auth-phone" type="tel" required placeholder="Nhập số điện thoại (10 số)">
+      <label>Mật khẩu</label>
+      <input id="auth-pass" type="password" required minlength="6" placeholder="Tối thiểu 6 ký tự">
+      <div id="reg-pin-wrap" hidden>
+        <label>Mã PIN rút tiền (4 số)</label>
+        <input id="auth-pin" type="password" maxlength="4" inputmode="numeric" placeholder="Ví dụ: 1234">
+        <label>Mã giới thiệu (Không bắt buộc)</label>
+        <input id="auth-ref" placeholder="Nhập mã người mời nếu có">
+      </div>
+      <p class="inline-status" id="auth-status"></p>
+      <button type="submit" class="primary full" id="auth-submit">Đăng nhập ngay ↗</button>
+    </form>
+  </div>
+</div>
+
+<aside class="sidebar">
+  <a class="brand" data-view="home"><span class="brand-icon">✳</span>xu vui<span class="brand-dot">.</span></a>
+  <p class="nav-caption">KHÔNG GIAN CỦA BẠN</p>
+  <nav class="side-nav">
+    <button class="nav active" data-view="home"><span>⌂</span>Tổng quan</button>
+    <button class="nav" data-view="farm"><span>🌱</span>Nông trại 3x3</button>
+    <button class="nav" data-view="deposit"><span>💳</span>Nạp tiền</button>
+    <button class="nav" data-view="tasks"><span>▦</span>Nhiệm vụ<em id="nav-task-count">0</em></button>
+    <button class="nav" data-view="proofs"><span>☑</span>Hồ sơ nhiệm vụ</button>
+    <button class="nav" data-view="wallet"><span>▱</span>Ví & rút tiền</button>
+    <button class="nav" data-view="friends"><span>♧</span>Mời bạn bè</button>
+    <button class="nav" data-view="gift"><span>♢</span>Nhập giftcode</button>
+    <button class="nav" data-view="history"><span>◷</span>Lịch sử giao dịch</button>
+  </nav>
+  <div class="side-gift">
+    <span>🌾</span><strong>Nông trại 9 ô vuông</strong>
+    <p>Nạp từ 20.000đ mở khóa kho báu Đồng, Bạc, Vàng, Kim Cương, Platinum!</p>
+    <button data-view="farm">Vào nông trại <b>↗</b></button>
+  </div>
+  <div class="side-footer">✳ Xu Vui Platform · 2026</div>
+</aside>
+
+<div class="app">
+  <header class="topbar">
+    <div class="mobile-brand brand" data-view="home"><span class="brand-icon">✳</span>xu vui<span class="brand-dot">.</span></div>
+    <span class="breadcrumb" id="breadcrumb">Không gian cá nhân <b>/</b> Tổng quan</span>
+    <div class="top-actions">
+      <button class="icon-button" data-view="deposit" title="Nạp tiền">➕</button>
+      <span class="member-status"><i></i><span id="top-balance">0đ</span></span>
+      <div class="avatar" id="avatar">XV</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="view active" id="home">
+      <div class="page-heading">
+        <div>
+          <div class="eyebrow">XIN CHÀO, <span id="user-greeting">BẠN</span> · <span id="home-level-tag" style="color:var(--green)">LEVEL 1</span></div>
+          <h1>Cùng kiếm thưởng hôm nay nhé <span>☀</span></h1>
+          <p>Trồng cây nông trại, nâng cấp Level và làm nhiệm vụ nhận thưởng mỗi ngày.</p>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="primary" data-view="deposit">+ Nạp tiền</button>
+          <button class="secondary" id="btn-logout">Đăng xuất</button>
+        </div>
+      </div>
+
+      <div class="hero">
+        <div class="hero-copy">
+          <span class="hero-kicker"><i></i> NÔNG TRẠI SINH LỜI · NHIỆM VỤ ĐA DẠNG</span>
+          <h2>Gieo hạt hôm nay,<br>thu hoạch <span>lãi lớn.</span></h2>
+          <p>Trải nghiệm 9 cấp độ hạt giống từ Lúa nước đến Super Platinum.<br>Nạp tối thiểu 20.000đ để mở khóa toàn bộ gói khoáng sản VIP!</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="primary" data-view="farm">🌱 Vào nông trại ngay ↗</button>
+            <button class="secondary" data-view="tasks">Làm nhiệm vụ</button>
+          </div>
+        </div>
+        <div class="hero-art" id="hero-art"></div>
+      </div>
+
+      <div class="metrics">
+        <div class="metric featured"><span>Số dư khả dụng <i>◈</i></span><strong data-stat="balance">0đ</strong><small>Dùng mua hạt giống hoặc rút tiền</small></div>
+        <div class="metric"><span>Tổng đã nạp <i>💳</i></span><strong data-stat="totalDeposited">0đ</strong><small id="vip-metric-note">Nạp từ 20.000đ mở gói VIP</small></div>
+        <div class="metric"><span>Đã rút thành công <i>↗</i></span><strong data-stat="withdrawn">0đ</strong><small>Chuyển khoản ngân hàng / ví</small></div>
+      </div>
+
+      <div class="home-columns">
+        <div>
+          <div class="section-heading"><div><h2>Nhiệm vụ nổi bật</h2><p>Thưởng cao, duyệt nhanh</p></div><button class="text-button" data-view="tasks">Xem tất cả ↗</button></div>
+          <div class="task-grid" id="featured-tasks"></div>
+        </div>
+        <aside>
+          <div class="invite-promo">
+            <span class="eyebrow">CHIA SẺ NIỀM VUI</span>
+            <h3>Mời bạn thêm xu.</h3>
+            <p>Nhận ngay <strong>200đ</strong> cho mỗi bạn bè đăng ký qua link và hoàn thành nhiệm vụ đầu tiên.</p>
+            <button data-view="friends">Lấy link giới thiệu ↗</button>
+          </div>
+          <div class="paid-summary">
+            <span>↗</span>
+            <div><small>Tổng chi trả toàn hệ thống</small><strong>14.850.000đ</strong><p style="font-size:9px;color:#8fa07f;margin:0">Cập nhật tự động theo thời gian thực</p></div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="view" id="farm">
+      <div class="page-heading">
+        <div><div class="eyebrow">NÔNG TRẠI 3X3</div><h1>Khu vườn & Kho báu <span>🌱</span></h1><p>Free Ô 1 · Lên LV2 tặng Ô 2 · Lên LV10 tặng Ô 3 · Mở thêm tối đa 9 ô.</p></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="secondary" id="btn-toggle-music">🔇 Bật nhạc nền</button>
+          <button class="primary" data-view="deposit">+ Nạp mở gói VIP</button>
+        </div>
+      </div>
+
+      <div class="farm-header-card">
+        <div class="level-row">
+          <div>
+            <span class="level-badge" id="farm-lv-badge">⭐ LEVEL 1</span>
+            <span style="font-size:12px;margin-left:8px;opacity:.9" id="farm-bonus-text">Thưởng cấp độ: +0%</span>
+          </div>
+          <div style="font-size:11px;font-weight:700" id="farm-exp-text">EXP: 0 / 150</div>
+        </div>
+        <div class="exp-bar-wrap"><div class="exp-bar-fill" id="farm-exp-bar" style="width:0%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-size:10px;opacity:.85;margin-top:6px">
+          <span>Gieo hạt & Thu hoạch để tích EXP tăng Level</span>
+          <span>Tổng thu hoạch: <b id="farm-total-earned">0đ</b></span>
+        </div>
+      </div>
+
+      <div class="vip-status-banner" id="vip-banner">
+        <div>
+          <strong id="vip-banner-title">🔒 Gói từ Đồng trở lên đang khóa</strong>
+          <div style="font-size:11px;margin-top:2px" id="vip-banner-desc">Bạn cần nạp tối thiểu <b>20.000đ</b> vào tài khoản để mở khóa trồng Đồng, Bạc, Vàng, Kim Cương, Platinum & Super Platinum.</div>
+        </div>
+        <button class="gold-btn" data-view="deposit" id="vip-banner-btn">Nạp ngay (Từ 20k) ↗</button>
+      </div>
+
+      <div class="farm-scene">
+        <div class="farm-sun"></div>
+        <div class="farm-cloud"></div>
+        <div style="position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:10px;font-weight:800;color:#284d1c;background:#ffffffc5;padding:5px 9px;border-radius:8px" id="farm-unlocked-count">🏡 ĐÃ MỞ: 1/9 Ô</span>
+          <span style="font-size:10px;font-weight:700;color:#284d1c;background:#ffffffc5;padding:5px 9px;border-radius:8px">Ví: <b id="farm-wallet-mini">0đ</b></span>
+        </div>
+        <div class="farm-plots" id="farm-plots"></div>
+      </div>
+
+      <div class="panel">
+        <div class="section-heading">
+          <div><h2>🛒 Cửa hàng hạt giống & Kho báu (9 loại)</h2><p>Chạm chọn 1 gói bên dưới rồi bấm "Gieo" ở ô đất trống phía trên</p></div>
+        </div>
+        <div class="seed-grid" id="seed-grid"></div>
+      </div>
+
+      <div class="panel">
+        <div class="section-heading">
+          <div><h2>📅 Điểm danh nhận vốn miễn phí</h2><p>Điểm danh mỗi ngày để tích vốn trồng cây</p></div>
+          <button class="primary" id="btn-checkin">Điểm danh hôm nay</button>
+        </div>
+        <div class="checkin-grid" id="checkin-grid"></div>
+      </div>
+    </section>
+
+    <section class="view" id="deposit">
+      <div class="page-heading">
+        <div><div class="eyebrow">NẠP VỐN & MỞ KHÓA VIP</div><h1>Nạp tiền vào tài khoản <span>💳</span></h1><p>Nạp tối thiểu 20.000đ để mở khóa toàn bộ gói từ Đồng đến Super Platinum.</p></div>
+      </div>
+      <div class="wallet-layout">
+        <div class="panel">
+          <div class="panel-heading"><span class="small-icon">💳</span><div><h2>Tạo lệnh nạp tiền</h2><p>Chọn số tiền và quét mã VietQR để nạp nhanh</p></div></div>
+          <form id="deposit-form">
+            <label>Số tiền muốn nạp (Tối thiểu 20.000đ)</label>
+            <input id="deposit-amount" type="number" min="20000" step="1000" value="20000" required>
+            <div class="quick-amounts">
+              <button type="button" data-dep-amt="20000">20.000đ (Mở VIP)</button>
+              <button type="button" data-dep-amt="50000">50.000đ</button>
+              <button type="button" data-dep-amt="100000">100.000đ</button>
+              <button type="button" data-dep-amt="200000">200.000đ</button>
+            </div>
+            <div class="qr-box">
+              <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:8px">QUÉT MÃ VIETQR ĐỂ CHUYỂN KHOẢN</div>
+              <img id="deposit-qr-img" src="" alt="Mã QR Nạp Tiền">
+              <div style="font-size:11px;margin-top:8px;line-height:1.7">
+                Ngân hàng: <b id="dep-bank-name">MBBank</b> · STK: <b id="dep-bank-acc">0389710007</b><br>
+                Chủ TK: <b id="dep-bank-holder">HA TRUNG DUC</b><br>
+                Nội dung CK: <code style="background:#e6f0d8;padding:3px 7px;border-radius:5px;font-weight:800" id="dep-memo">NAP</code>
+              </div>
+            </div>
+            <input id="deposit-receipt" type="file" accept="image/*">
+            <label for="deposit-receipt" class="file-drop" style="min-height:80px;margin-top:8px">
+              <strong id="dep-receipt-label">📸 Chạm để tải ảnh biên lai (Nếu có)</strong>
+              <small>Giúp Admin duyệt lệnh nhanh hơn</small>
+            </label>
+            <button type="submit" class="primary full" style="margin-top:14px" id="deposit-submit">Tôi đã chuyển khoản · Gửi xác nhận ↗</button>
+          </form>
+        </div>
+
+        <div class="panel">
+          <h2>Lịch sử nạp tiền của bạn</h2>
+          <p style="font-size:11px;color:var(--muted)">Sau khi Admin xác nhận giao dịch, tiền sẽ cộng vào ví và tự động mở khóa gói VIP từ Đồng trở lên.</p>
+          <div id="deposit-history-list"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="tasks">
+      <div class="page-heading">
+        <div><div class="eyebrow">KHÁM PHÁ CƠ HỘI</div><h1>Danh sách nhiệm vụ <span>✳</span></h1><p>Làm đúng hướng dẫn và gửi ảnh chụp màn hình rõ nét để được duyệt nhanh.</p></div>
+        <button class="secondary" data-view="proofs">Hồ sơ của tôi</button>
+      </div>
+      <div class="category-list" id="categories"></div>
+      <div class="task-toolbar">
+        <div><h2 id="task-section-title">Tất cả nhiệm vụ</h2><span id="task-count" style="font-size:11px;color:var(--muted)">0 nhiệm vụ</span></div>
+        <label class="search" style="margin:0"><span>⌕</span><input id="task-search" type="search" placeholder="Tìm tên nhiệm vụ…"></label>
+      </div>
+      <div class="task-grid all-task-grid" id="task-list"></div>
+    </section>
+
+    <section class="view" id="proofs">
+      <div class="page-heading">
+        <div><div class="eyebrow">TIẾN ĐỘ XÉT DUYỆT</div><h1>Hồ sơ nhiệm vụ đã gửi</h1><p>Hệ thống AI kiểm tra tự động hoặc chuyển Admin đối soát.</p></div>
+      </div>
+      <div class="tabs" id="proof-tabs">
+        <button class="active" data-proof-filter="all">Tất cả</button>
+        <button data-proof-filter="pending">Chờ duyệt</button>
+        <button data-proof-filter="verified">Đã duyệt</button>
+        <button data-proof-filter="rejected">Bị từ chối</button>
+      </div>
+      <div id="proof-list"></div>
+    </section>
+
+    <section class="view" id="wallet">
+      <div class="page-heading">
+        <div><div class="eyebrow">QUẢN LÝ TÀI CHÍNH</div><h1>Ví & rút tiền <span>▱</span></h1><p>Rút tiền an toàn với mã PIN bảo mật 4 số.</p></div>
+        <button class="primary" data-view="deposit">+ Nạp tiền</button>
+      </div>
+      <div class="wallet-layout">
+        <div>
+          <div class="wallet-card">
+            <span style="font-size:10px;letter-spacing:1.5px;opacity:.8">SỐ DƯ KHẢ DỤNG</span>
+            <strong data-stat="balance">0đ</strong>
+            <div class="wallet-bottom">
+              <div><span style="font-size:10px;opacity:.8">Đang chờ rút</span><b data-stat="pendingWithdraw">0đ</b></div>
+              <div><span style="font-size:10px;opacity:.8">Đã chi trả</span><b data-stat="withdrawn">0đ</b></div>
+            </div>
+          </div>
+          <div class="panel withdrawal-rules">
+            <h3>Quy định rút tiền</h3>
+            <div><span>Rút tối thiểu</span><b>30.000đ</b></div>
+            <div><span>Rút tối đa / ngày</span><b>100.000đ</b></div>
+            <div><span>Thời gian xử lý</span><b>5 - 30 phút</b></div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-heading"><span class="small-icon">↗</span><div><h2>Tạo lệnh rút tiền</h2><p>Nhập chính xác thông tin tài khoản nhận tiền.</p></div></div>
+          <form id="withdraw-form">
+            <label>Phương thức nhận</label>
+            <div class="payment-switch" id="payment-switch">
+              <button type="button" class="active" data-kind="bank">▤ Ngân hàng</button>
+              <button type="button" class="active" style="display:none"></button>
+              <button type="button" data-kind="wallet">▱ Ví điện tử</button>
+            </div>
+            <label>Chọn Ngân hàng / Ví</label>
+            <select id="provider-select" required></select>
+            <div class="form-row">
+              <div><label id="destination-label">Số tài khoản</label><input id="destination" required placeholder="Nhập số tài khoản"></div>
+              <div><label>Tên chủ tài khoản</label><input id="holder" required placeholder="NGUYEN VAN A"></div>
+            </div>
+            <div class="form-row">
+              <div><label>Số tiền rút (đ)</label><input id="withdraw-amount" type="number" min="30000" max="100000" step="1000" required placeholder="Tối thiểu 30.000"></div>
+              <div><label>Mã PIN rút tiền (4 số)</label><input id="withdraw-pin" type="password" maxlength="4" inputmode="numeric" required placeholder="••••"></div>
+            </div>
+            <div class="quick-amounts">
+              <button type="button" data-amount="30000">30.000đ</button>
+              <button type="button" data-amount="50000">50.000đ</button>
+              <button type="button" data-amount="100000">100.000đ</button>
+            </div>
+            <button type="submit" class="primary full" id="withdraw-submit">Gửi yêu cầu rút tiền ↗</button>
+          </form>
+        </div>
+      </div>
+      <div class="panel"><h2>Lịch sử rút tiền</h2><div id="withdrawal-list"></div></div>
+    </section>
+
+    <section class="view" id="friends">
+      <div class="page-heading">
+        <div><div class="eyebrow">HỆ THỐNG CỘNG TÁC VIÊN</div><h1>Mời bạn bè nhận hoa hồng <span>♧</span></h1><p>Nhận 200đ khi mỗi F1 hoàn thành nhiệm vụ đầu tiên được duyệt.</p></div>
+      </div>
+      <div class="panel" style="text-align:center">
+        <span class="small-icon" style="margin-bottom:12px">♧</span>
+        <h2>Liên kết giới thiệu của bạn</h2>
+        <p style="font-size:11px;color:var(--muted)">Mã giới thiệu: <strong id="my-ref-code" style="color:var(--green);font-size:14px">---</strong></p>
+        <div class="referral-link">
+          <input id="ref-link" readonly style="flex:1;min-width:200px">
+          <button class="primary" id="copy-ref">Sao chép link ↗</button>
+        </div>
+      </div>
+      <div class="panel"><h2>Danh sách bạn bè đã mời (F1)</h2><div id="invite-history"></div></div>
+    </section>
+
+    <section class="view" id="gift">
+      <div class="page-heading">
+        <div><div class="eyebrow">QUÀ TẶNG TRI ÂN</div><h1>Nhập Giftcode <span>♢</span></h1><p>Nhập mã quà tặng từ Admin để nhận tiền trực tiếp vào ví.</p></div>
+      </div>
+      <div class="gift-layout">
+        <div class="gift-visual">
+          <div style="font-size:50px;margin-bottom:12px">🎁</div>
+          <h2>Nhập mã nhận thưởng ngay</h2>
+          <p>Theo dõi nhóm Telegram/Zalo để săn giftcode mỗi ngày.</p>
+        </div>
+        <div class="panel" style="display:flex;flex-direction:column;justify-content:center">
+          <h2>Nhập mã quà tặng</h2>
+          <form id="gift-form">
+            <label>Mã Giftcode</label>
+            <input id="gift-code" style="text-transform:uppercase;font-size:16px;font-weight:700;letter-spacing:1.5px" required placeholder="NHẬP MÃ GIFTCODE">
+            <button type="submit" class="primary full" style="margin-top:14px" id="gift-submit">Nhận thưởng ngay ↗</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="history">
+      <div class="page-heading">
+        <div><div class="eyebrow">SAO KÊ MINH BẠCH</div><h1>Toàn bộ lịch sử giao dịch</h1><p>Ghi nhận chi tiết mọi giao dịch mua hạt giống, mở ô đất, thu hoạch, nạp/rút tiền và thưởng nhiệm vụ.</p></div>
+      </div>
+      <div class="panel" id="activity-list"></div>
+    </section>
+  </main>
+</div>
+
+<nav class="bottom-nav">
+  <button class="active" data-view="home"><span>⌂</span>Tổng quan</button>
+  <button data-view="farm"><span>🌱</span>Nông trại</button>
+  <button data-view="deposit"><span>💳</span>Nạp tiền</button>
+  <button data-view="tasks"><span>▦</span>Nhiệm vụ</button>
+  <button data-view="wallet"><span>▱</span>Ví tiền</button>
+</nav>
+
+<div class="modal-back" id="modal-back"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => new Intl.NumberFormat('vi-VN').format(Number(n) || 0) + 'đ';
+const formatTaskReward = t => t.rewardText ? t.rewardText : (t.currency === 'USD' ? `${t.reward} USD` : '+' + money(t.reward));
+const todayStr = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
+function toast(msg) { const el = $('toast'); if (!el) return; el.textContent = msg; el.style.display = 'block'; clearTimeout(window._tt); window._tt = setTimeout(() => el.style.display = 'none', 3800); }
+
+// CẤU HÌNH FIREBASE DỰ ÁN XUVUI-9175F
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCbtZV-aW22WtYxeN6vW8qmdmEWeMaG97o",
+  authDomain: "xuvui-9175f.firebaseapp.com",
+  databaseURL: "https://xuvui-9175f-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "xuvui-9175f",
+  storageBucket: "xuvui-9175f.firebasestorage.app",
+  messagingSenderId: "655275789249",
+  appId: "1:655275789249:web:5b355911895f6782a47d40",
+  measurementId: "G-ZEH3GKR3CY"
+};
+
+// CẤU HÌNH 2 BOT TELEGRAM
+const TELEGRAM_CONFIG = {
+  taskBot: { botToken: "9236061614:AAGsiXwoQVswM1KQurX5nMi0769g1q9NOCA", chatId: "7865394196" },
+  withdrawBot: { botToken: "9231728188:AAENh6sfcdF4Tav9s0OV5hVk8KWK5yODQAI", chatId: "7865394196" }
+};
+
+// CẤU HÌNH AI TỰ ĐỘNG DUYỆT (GEMINI API KEY)
+const GEMINI_AI_CONFIG = {
+  apiKey: "AQ.Ab8RN6Lkjt4BzFsxQJg6fX6PXWxgikPNpsc8MXGLwpKkKf88Gw",
+  autoApproveEnabled: true
+};
+
+const ADMIN_BANK = { bankId: "MB", bankName: "MBBank", accountNo: "0389710007", accountName: "HA TRUNG DUC" };
+
+let useFirebase = false, db = null;
+try {
+  firebase.initializeApp(FIREBASE_CONFIG);
+  db = firebase.database();
+  useFirebase = true;
+} catch (e) { console.warn("Firebase init fallback:", e); }
+
+const Store = {
+  _localGet(path) {
+    try {
+      const root = JSON.parse(localStorage.getItem('xuvui_db') || '{}');
+      return path.split('/').filter(Boolean).reduce((o, k) => (o && o[k] !== undefined ? o[k] : null), root);
+    } catch { return null; }
+  },
+  _localSet(path, val) {
+    try {
+      const root = JSON.parse(localStorage.getItem('xuvui_db') || '{}');
+      const keys = path.split('/').filter(Boolean);
+      let cur = root;
+      for (let i = 0; i < keys.length - 1; i++) {
+        if (!cur[keys[i]] || typeof cur[keys[i]] !== 'object') cur[keys[i]] = {};
+        cur = cur[keys[i]];
+      }
+      if (val === null) delete cur[keys[keys.length - 1]];
+      else cur[keys[keys.length - 1]] = val;
+      localStorage.setItem('xuvui_db', JSON.stringify(root));
+      window.dispatchEvent(new Event('xuvui_local_sync'));
+    } catch {}
+  },
+  async get(path) {
+    if (useFirebase) {
+      try {
+        const snap = await Promise.race([db.ref(path).once('value'), new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 4000))]);
+        return snap.val();
+      } catch { useFirebase = false; }
+    }
+    return this._localGet(path);
+  },
+  async set(path, val) {
+    if (useFirebase) { try { await db.ref(path).set(val); return; } catch { useFirebase = false; } }
+    this._localSet(path, val);
+  },
+  async update(path, obj) {
+    if (useFirebase) { try { await db.ref(path).update(obj); return; } catch { useFirebase = false; } }
+    const cur = this._localGet(path) || {};
+    Object.entries(obj).forEach(([k, v]) => {
+      if (k.includes('/')) this._localSet(path + '/' + k, v);
+      else cur[k] = v;
+    });
+    if (!Object.keys(obj).some(k => k.includes('/'))) this._localSet(path, cur);
+  },
+  async push(path, val) {
+    const id = 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+    await this.set(path + '/' + id, val);
+    return id;
+  },
+  onValue(path, cb) {
+    if (useFirebase) db.ref(path).on('value', s => cb(s.val()));
+    else { cb(this._localGet(path)); window.addEventListener('xuvui_local_sync', () => cb(this._localGet(path))); }
+  }
+};
+
+// Lắng nghe trạng thái Đóng/Mở Server từ Admin
+Store.onValue('system/server', srv => {
+  const screen = $('maintenance-screen');
+  if (!screen) return;
+  if (srv && srv.isClosed) {
+    const whitelist = (srv.whitelistPhones || '').split(',').map(s => s.trim());
+    if (currentUser && whitelist.includes(currentUser)) {
+      screen.hidden = true;
+      return;
+    }
+    $('maintenance-msg').textContent = srv.message || 'Hệ thống đang bảo trì. Vui lòng quay lại sau!';
+    screen.hidden = false;
+  } else {
+    screen.hidden = true;
+  }
+});
+
+async function verifyProofWithAI(task, contact, base64Image) {
+  if (!GEMINI_AI_CONFIG.apiKey) return { approved: false, reason: "Chuyển Admin duyệt thủ công" };
+  try {
+    const pureBase64 = base64Image.split(',')[1];
+    const prompt = `Bạn là hệ thống kiểm duyệt bằng chứng nhiệm vụ cho ứng dụng Xu Vui.
+Nhiệm vụ: "${task.title}"
+Mô tả & Điều kiện: "${task.desc}. Yêu cầu ảnh: ${task.proof}. Các bước: ${(task.steps || []).join(' -> ')}"
+Thông tin người dùng khai báo: "${contact}"
+
+Hãy kiểm tra hình ảnh người dùng tải lên xem có hợp lệ, rõ nét và đúng với ứng dụng/điều kiện nhiệm vụ trên hay không.
+Chỉ trả về duy nhất định dạng JSON chuẩn (không kèm markdown):
+{"approved": true hoặc false, "reason": "Giải thích ngắn gọn bằng tiếng Việt dưới 20 từ"}`;
+
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_AI_CONFIG.apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [
+            { text: prompt },
+            { inline_data: { mime_type: "image/jpeg", data: pureBase64 } }
+          ]
+        }]
+      })
+    });
+
+    const data = await res.json();
+    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    const jsonMatch = rawText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) return JSON.parse(jsonMatch[0]);
+  } catch (e) {}
+  return { approved: false, reason: "Chuyển Admin kiểm tra thủ công" };
+}
+
+const FarmAudio = {
+  ctx: null, isPlaying: false, timer: null, step: 0,
+  melody: [261.63, 329.63, 392.00, 523.25, 392.00, 329.63, 293.66, 349.23, 440.00, 523.25, 440.00, 349.23, 329.63, 392.00, 493.88, 523.25],
+  init() {
+    if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+  },
+  playTone(freq, dur = 0.25, type = 'sine', vol = 0.05) {
+    try {
+      this.init();
+      const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+      osc.type = type; osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+      gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + dur);
+      osc.connect(gain); gain.connect(this.ctx.destination);
+      osc.start(); osc.stop(this.ctx.currentTime + dur);
+    } catch {}
+  },
+  sfxPlant() { this.playTone(440, 0.12, 'triangle', 0.08); setTimeout(() => this.playTone(587.33, 0.16, 'triangle', 0.08), 80); },
+  sfxHarvest() { [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => setTimeout(() => this.playTone(f, 0.22, 'sine', 0.1), i * 70)); },
+  sfxLevelUp() { [523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => setTimeout(() => this.playTone(f, 0.3, 'triangle', 0.12), i * 90)); },
+  toggleMusic() {
+    if (this.isPlaying) {
+      clearInterval(this.timer); this.isPlaying = false;
+      $('btn-toggle-music').textContent = '🔇 Bật nhạc nền';
+    } else {
+      this.init(); this.isPlaying = true;
+      $('btn-toggle-music').textContent = '🎵 Đang phát nhạc';
+      this.timer = setInterval(() => {
+        if (!this.isPlaying) return;
+        this.playTone(this.melody[this.step % this.melody.length], 0.35, 'sine', 0.035);
+        this.step++;
+      }, 420);
+    }
+  }
+};
+$('btn-toggle-music').onclick = () => FarmAudio.toggleMusic();
+
+const FARM_CROPS = {
+  rice: { id: 'rice', name: 'Lúa nước', tier: 'basic', requireDeposit: false, seconds: 150, timeLabel: '2,5 phút', cost: 1000, reward: 1200, exp: 15 },
+  corn: { id: 'corn', name: 'Ngô ngọt', tier: 'basic', requireDeposit: false, seconds: 600, timeLabel: '10 phút', cost: 2500, reward: 3000, exp: 35 },
+  wheat: { id: 'wheat', name: 'Lúa mì vàng', tier: 'basic', requireDeposit: false, seconds: 1800, timeLabel: '30 phút', cost: 5000, reward: 5700, exp: 70 },
+  bronze: { id: 'bronze', name: 'Cây Đồng', tier: 'vip', requireDeposit: true, seconds: 3600, timeLabel: '60 phút', cost: 10000, reward: 11000, exp: 140 },
+  silver: { id: 'silver', name: 'Cây Bạc', tier: 'vip', requireDeposit: true, seconds: 5 * 3600, timeLabel: '5 giờ', cost: 20000, reward: 25000, exp: 300 },
+  gold: { id: 'gold', name: 'Cây Vàng', tier: 'vip', requireDeposit: true, seconds: 12 * 3600, timeLabel: '12 giờ', cost: 50000, reward: 60000, exp: 750 },
+  diamond: { id: 'diamond', name: 'Kim cương', tier: 'vip', requireDeposit: true, seconds: 24 * 3600, timeLabel: '24 giờ', cost: 100000, reward: 120000, exp: 1200 },
+  platinum: { id: 'platinum', name: 'Platinum', tier: 'vip', requireDeposit: true, seconds: 50 * 3600, timeLabel: '50 giờ', cost: 200000, reward: 250000, exp: 2500 },
+  super_platinum: { id: 'super_platinum', name: 'Super Platinum', tier: 'vip', requireDeposit: true, seconds: 90 * 3600, timeLabel: '90 giờ', cost: 500000, reward: 600000, exp: 5000 }
+};
+
+function cropSvg(id, isSprout = false) {
+  if (isSprout) return `<svg viewBox="0 0 80 80"><path d="M40 72V42" stroke="#4a8c36" stroke-width="5" stroke-linecap="round"/><path d="M40 50C24 44 20 30 34 32C40 34 40 46 40 50Z" fill="#7ac756"/><path d="M40 44C56 38 60 24 46 26C40 28 40 40 40 44Z" fill="#63b043"/></svg>`;
+  const arts = {
+    rice: `<svg viewBox="0 0 80 80"><path d="M30 74Q24 42 16 24M40 74Q40 38 40 16M50 74Q56 42 64 24" stroke="#5c9c38" stroke-width="4" fill="none" stroke-linecap="round"/><ellipse cx="16" cy="24" rx="5" ry="9" fill="#e6c855" transform="rotate(-25 16 24)"/><ellipse cx="40" cy="16" rx="5" ry="10" fill="#f2d663"/><ellipse cx="64" cy="24" rx="5" ry="9" fill="#e6c855" transform="rotate(25 64 24)"/></svg>`,
+    corn: `<svg viewBox="0 0 80 80"><path d="M40 75V20" stroke="#49872d" stroke-width="6"/><ellipse cx="40" cy="40" rx="13" ry="22" fill="#f7d046"/><path d="M25 54Q24 72 40 72Q56 72 55 54Q42 62 40 50Q38 62 25 54Z" fill="#67ab44"/><path d="M33 26v26M40 22v30M47 26v26" stroke="#d9a61e" stroke-width="2"/></svg>`,
+    wheat: `<svg viewBox="0 0 80 80"><path d="M40 74V14" stroke="#c99e32" stroke-width="4"/><g fill="#f0c44d"><ellipse cx="33" cy="24" rx="4" ry="8" transform="rotate(-30 33 24)"/><ellipse cx="47" cy="24" rx="4" ry="8" transform="rotate(30 47 24)"/><ellipse cx="32" cy="38" rx="4" ry="8" transform="rotate(-30 32 38)"/><ellipse cx="48" cy="38" rx="4" ry="8" transform="rotate(30 48 38)"/><ellipse cx="33" cy="52" rx="4" ry="8" transform="rotate(-30 33 52)"/><ellipse cx="47" cy="52" rx="4" ry="8" transform="rotate(30 47 52)"/></g></svg>`,
+    bronze: `<svg viewBox="0 0 80 80"><path d="M40 74V36" stroke="#784f2a" stroke-width="6"/><circle cx="40" cy="32" r="22" fill="#cd7f32"/><circle cx="32" cy="26" r="8" fill="#e69d55" opacity=".7"/><text x="40" y="38" text-anchor="middle" fill="#fff" font-size="14" font-weight="800">Cu</text></svg>`,
+    silver: `<svg viewBox="0 0 80 80"><path d="M40 74V36" stroke="#6c7a89" stroke-width="6"/><polygon points="40,10 62,28 54,54 26,54 18,28" fill="#d0d8e0" stroke="#9aa7b5" stroke-width="2"/><polygon points="40,10 52,28 40,46 28,28" fill="#ffffff" opacity=".7"/><text x="40" y="38" text-anchor="middle" fill="#465362" font-size="13" font-weight="800">Ag</text></svg>`,
+    gold: `<svg viewBox="0 0 80 80"><path d="M40 74V40" stroke="#9e7419" stroke-width="6"/><rect x="18" y="24" width="44" height="26" rx="6" fill="#ffd23f" stroke="#d49b17" stroke-width="2.5"/><rect x="24" y="16" width="32" height="14" rx="4" fill="#ffe680"/><text x="40" y="42" text-anchor="middle" fill="#7a5306" font-size="13" font-weight="800">GOLD</text></svg>`,
+    diamond: `<svg viewBox="0 0 80 80"><polygon points="40,10 66,30 40,68 14,30" fill="#5ce1e6" stroke="#22a6b3" stroke-width="2"/><polygon points="40,10 54,30 40,68 26,30" fill="#a8f5f8" opacity=".8"/><polygon points="14,30 66,30 40,10" fill="#dff9fb" opacity=".6"/></svg>`,
+    platinum: `<svg viewBox="0 0 80 80"><circle cx="40" cy="38" r="25" fill="url(#platGrad)" stroke="#7f8fa6" stroke-width="2.5"/><defs><linearGradient id="platGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffffff"/><stop offset="50%" stop-color="#c8d6e5"/><stop offset="100%" stop-color="#8395a7"/></linearGradient></defs><text x="40" y="43" text-anchor="middle" fill="#2f3640" font-size="13" font-weight="900">PLAT</text></svg>`,
+    super_platinum: `<svg viewBox="0 0 80 80"><polygon points="40,6 49,26 70,29 54,44 58,66 40,55 22,66 26,44 10,29 31,26" fill="url(#spGrad)" stroke="#b37feb" stroke-width="2"/><defs><linearGradient id="spGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff9ff3"/><stop offset="50%" stop-color="#feca57"/><stop offset="100%" stop-color="#48dbfb"/></linearGradient></defs><text x="40" y="43" text-anchor="middle" fill="#222" font-size="11" font-weight="900">SUPER</text></svg>`
+  };
+  return arts[id] || arts.rice;
+}
+
+const DEFAULT_TASKS = [
+  {
+    id: "aidaxin", title: "AI Daxin", desc: "Tải app, tạo tài khoản giật lì xì lên 300k & nạp đầu 100k",
+    reward: 10000, type: "Giải trí", reviewMode: "manual", url: "https://h5.money-chat.click/7Ctti4", code: "",
+    contactLabel: "Tên Tài Khoản AI Daxin",
+    steps: ["Tải app theo đường link.", "Tạo tài khoản và tham gia giật lì xì lên 300.000đ.", "Thực hiện nạp đầu 100.000đ.", "Gửi ảnh chứng minh kèm với Tên Tài Khoản bên dưới."],
+    proof: "Ảnh chụp màn hình đã nạp đầu 100k và hiển thị rõ Tên Tài Khoản.",
+    note: "Nhiệm vụ này cần Admin kiểm tra và duyệt thủ công sau khi đối soát."
+  },
+  {
+    id: "zalo", title: "Tham gia nhóm Zalo", desc: "Vào nhóm cộng đồng & xác minh thành viên",
+    reward: 1000, type: "Cộng đồng", reviewMode: "auto", url: "https://zalo.me/g/asz0jvhekhgsvwiqro0l", code: "",
+    contactLabel: "Số điện thoại Zalo",
+    steps: ["Bấm vào link tham gia nhóm Zalo.", "Chụp ảnh danh sách thành viên có tên bạn trong nhóm."],
+    proof: "Ảnh chụp màn hình xác nhận bạn đã tham gia nhóm Zalo."
+  },
+  {
+    id: "okx", title: "OKX — Nhận 20 USD", desc: "Tải app, xác thực KYC, nạp & rút 100 USD",
+    reward: 20, currency: "USD", rewardText: "20 USD", type: "Tiền mã hóa", reviewMode: "manual", url: "https://okx.com/join/CYBYHLUU", code: "CYBYHLUU",
+    contactLabel: "Số điện thoại đăng ký OKX",
+    steps: ["Tải app OKX theo đúng đường link.", "Đăng ký nhập mã mời CYBYHLUU và xác thực tài khoản.", "Nạp 100 USD và rút 100 USD đó ra.", "Gửi hình ảnh xác thực và số điện thoại."],
+    proof: "Ảnh xác thực KYC và lịch sử nạp/rút 100 USD."
+  },
+  {
+    id: "tikglobal", title: "TikGlobal", desc: "Đăng ký SĐT, nhập mã mời & nạp 100k hoặc 280k",
+    reward: 20000, type: "Giải trí", reviewMode: "manual", url: "https://liteglobal.net/invite/BC55119602", code: "BC55119602",
+    contactLabel: "ID tài khoản TikGlobal",
+    steps: ["Đăng ký tài khoản bằng số điện thoại.", "Nhập mã giới thiệu BC55119602.", "Nạp tiền từ 100.000đ hoặc 280.000đ (có thể rút số tiền đó ra).", "Gửi hình ảnh xác minh và ID tài khoản TikGlobal."],
+    proof: "Ảnh trang cá nhân hiển thị ID TikGlobal và lịch sử nạp."
+  },
+  {
+    id: "timobank", title: "Timo Bank", desc: "Nhận từ 70.000đ đến 100.000đ (+ thưởng đặc biệt 500k)",
+    reward: 70000, rewardText: "70.000đ - 100.000đ", type: "Ngân hàng", reviewMode: "manual", url: "https://timoapp.go.link/j8j4y?code=HD3009", code: "HF3009",
+    contactLabel: "Số điện thoại Timo Bank",
+    steps: ["Tải app theo đúng đường link & nhập mã mời HF3009.", "Giữ số dư 200.000đ trong 7 ngày (nhận 30.000đ) hoặc 500.000đ trong 7 ngày (nhận 60.000đ).", "Hoàn tất thanh toán dịch vụ trong 7 ngày (+10.000đ).", "Nạp tối thiểu 100.000đ vào Hũ Chi Tiêu & thanh toán bằng Hũ Chi Tiêu (+20.000đ).", "Mời bạn tham gia Hũ Chung (+10.000đ).", "Gửi ảnh xác minh kèm số điện thoại."],
+    proof: "Ảnh duy trì số dư 7 ngày và các mốc hoàn thành.",
+    note: "Nhiệm vụ đặc biệt: Mở sổ tiết kiệm đầu tiên trong 30 ngày nhận lên đến 500.000đ (không nhận tiền luôn mà chờ đối soát)."
+  },
+  {
+    id: "shopeepay", title: "ShopeePay", desc: "Đăng ký, xác thực và nạp ví 10k",
+    reward: 25000, type: "Ví điện tử", reviewMode: "manual", url: "https://pay.u.shopee.vn/p6VXZHi", code: "KTKTWN4LN",
+    contactLabel: "SĐT đăng ký ShopeePay",
+    steps: ["Tải app theo link & nhập mã mời KTKTWN4LN.", "Xác thực sinh trắc học và nạp 10.000đ vào ví.", "Gửi ảnh xác minh kèm SĐT."],
+    proof: "Ảnh đã xác thực và nạp 10.000đ."
+  },
+  {
+    id: "momo", title: "Tạo tài khoản MoMo", desc: "Liên kết ngân hàng & nạp 10.000đ",
+    reward: 40000, type: "Ví điện tử", reviewMode: "manual", url: "https://onelink.momo.vn/WZPv/ciEsrJKr", code: "0389710007",
+    contactLabel: "Số điện thoại MoMo",
+    steps: ["Tải app MoMo qua link & nhập mã 0389710007.", "Liên kết ngân hàng và nạp tối thiểu 10.000đ.", "Gửi ảnh lịch sử giao dịch kèm SĐT."],
+    proof: "Ảnh liên kết ngân hàng và nạp 10.000đ."
+  },
+  {
+    id: "liobank", title: "LioBank", desc: "Mở tài khoản & thẻ tín dụng (Trên 21 tuổi)",
+    reward: 50000, type: "Ngân hàng", reviewMode: "manual", url: "https://liobank.vn/rr/r1JE", code: "",
+    contactLabel: "Số điện thoại LioBank",
+    steps: ["Tải app LioBank qua link.", "Đăng ký eKYC và mở thẻ thành công.", "Chụp màn hình duyệt thẻ (che số thẻ/CVV)."],
+    proof: "Ảnh màn hình mở thẻ thành công."
+  }
+];
+
+const BANK_CODES = {"Vietcombank":"VCB","MBBank":"MB","Techcombank":"TCB","BIDV":"BIDV","VietinBank":"ICB","Agribank":"VBA","ACB":"ACB","VPBank":"VPB","TPBank":"TPB","Sacombank":"STB","HDBank":"HDB","VIB":"VIB","SHB":"SHB","MSB":"MSB","OCB":"OCB","CAKE":"CAKE","Timo":"TIMO","SeABank":"SEAB","LPBank":"LPB"};
+const BANKS = Object.keys(BANK_CODES);
+const WALLETS = ["MoMo","ZaloPay","ShopeePay","Viettel Money","VNPT Money"];
+const CHECKIN_REWARDS = [100, 150, 200, 250, 300, 400, 1000];
+
+function formatCountdown(sec) {
+  if (sec <= 0) return 'Đã chín!';
+  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+  return h > 0 ? `${h}h${String(m).padStart(2,'0')}p${String(s).padStart(2,'0')}s` : `${m}p ${String(s).padStart(2,'0')}s`;
+}
+
+function getVietQrUrl(bankId, accountNo, amount, accountName, addInfo) {
+  return `https://img.vietqr.io/image/${bankId}-${accountNo}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(addInfo)}&accountName=${encodeURIComponent(accountName)}`;
+}
+
+async function sendTelegram(channel, text, imageSource = null) {
+  const cfg = TELEGRAM_CONFIG[channel];
+  if (!cfg || !cfg.botToken || !cfg.chatId) return;
+  try {
+    if (imageSource) {
+      const fd = new FormData();
+      fd.append('chat_id', cfg.chatId); fd.append('caption', text); fd.append('parse_mode', 'HTML');
+      if (imageSource.startsWith('data:image')) { const res = await fetch(imageSource); fd.append('photo', await res.blob(), 'photo.jpg'); }
+      else fd.append('photo', imageSource);
+      await fetch(`https://api.telegram.org/bot${cfg.botToken}/sendPhoto`, { method: 'POST', body: fd });
+    } else {
+      await fetch(`https://api.telegram.org/bot${cfg.botToken}/sendMessage`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: cfg.chatId, text, parse_mode: 'HTML' })
+      });
+    }
+  } catch {}
+}
+
+function compressImage(file) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const maxW = 720, scale = img.width > maxW ? maxW / img.width : 1;
+        canvas.width = img.width * scale; canvas.height = img.height * scale;
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', 0.65));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+let currentUser = null, userData = null, tasksList = [], myProofs = [], myWithdrawals = [], myDeposits = [], myHistory = [];
+let authMode = 'login', currentCategory = 'Tất cả', proofFilter = 'all', paymentKind = 'bank', selectedSeed = 'rice';
+
+function getDeviceId() {
+  let did = localStorage.getItem('xv_device_id');
+  if (!did) { did = 'DEV-' + Math.random().toString(36).substring(2, 10).toUpperCase(); localStorage.setItem('xv_device_id', did); }
+  return did;
+}
+
+const urlRef = new URLSearchParams(location.search).get('ref');
+if (urlRef) localStorage.setItem('xv_saved_ref', urlRef.toUpperCase());
+
+$('tab-login').onclick = () => {
+  authMode = 'login';
+  $('tab-login').classList.add('active'); $('tab-register').classList.remove('active');
+  $('reg-name-wrap').hidden = true; $('reg-pin-wrap').hidden = true;
+  $('auth-status').textContent = ''; $('auth-submit').textContent = 'Đăng nhập ngay ↗';
+};
+$('tab-register').onclick = () => {
+  authMode = 'register';
+  $('tab-register').classList.add('active'); $('tab-login').classList.remove('active');
+  $('reg-name-wrap').hidden = false; $('reg-pin-wrap').hidden = false;
+  $('auth-ref').value = localStorage.getItem('xv_saved_ref') || '';
+  $('auth-status').textContent = ''; $('auth-submit').textContent = 'Tạo tài khoản mới ↗';
+};
+
+$('auth-form').onsubmit = async e => {
+  e.preventDefault();
+  const btn = $('auth-submit'), statusEl = $('auth-status');
+  const phone = $('auth-phone').value.trim().replace(/\s+/g, '');
+  const pass = $('auth-pass').value;
+  statusEl.classList.remove('error'); statusEl.textContent = 'Đang xử lý...'; btn.disabled = true;
+
+  try {
+    if (authMode === 'login') {
+      const u = await Store.get('users/' + phone);
+      if (!u || u.password !== pass) throw new Error('Sai số điện thoại hoặc mật khẩu!');
+      if (u.locked) throw new Error('Tài khoản này đã bị khóa!');
+      localStorage.setItem('xv_logged_phone', phone);
+      startApp(phone);
+    } else {
+      const name = $('auth-name').value.trim() || ('Thành viên ' + phone.slice(-4));
+      const pin = $('auth-pin').value.trim();
+      const refBy = $('auth-ref').value.trim().toUpperCase();
+      if (!/^[0-9]{9,11}$/.test(phone)) throw new Error('Số điện thoại phải gồm 9-11 chữ số!');
+      if (!/^[0-9]{4}$/.test(pin)) throw new Error('Vui lòng nhập mã PIN gồm 4 chữ số!');
+
+      const deviceId = getDeviceId();
+      const devAccounts = (await Store.get('devices/' + deviceId)) || [];
+      if (devAccounts.length >= 2) throw new Error('Thiết bị này đã đạt giới hạn tối đa 2 tài khoản!');
+      if (await Store.get('users/' + phone)) throw new Error('Số điện thoại này đã được đăng ký!');
+
+      const myCode = 'XV' + phone.slice(-4) + Math.floor(10 + Math.random() * 89);
+      const newUser = {
+        phone, name, password: pass, pin, inviteCode: myCode,
+        referredBy: refBy || '', f1Rewarded: false,
+        balance: 0, totalDeposited: 0, withdrawn: 0,
+        farmEarned: 0, farmLevel: 1, farmExp: 0,
+        purchasedPlots: {},
+        deviceId, locked: false, createdAt: Date.now()
+      };
+      await Store.set('users/' + phone, newUser);
+      await Store.set('devices/' + deviceId, [...devAccounts, phone]);
+      if (refBy) {
+        const allUsers = (await Store.get('users')) || {};
+        const inviter = Object.values(allUsers).find(x => x.inviteCode === refBy);
+        if (inviter) await Store.set(`users/${inviter.phone}/invited/${phone}`, { phone, name, createdAt: Date.now(), qualified: false });
+      }
+      localStorage.setItem('xv_logged_phone', phone);
+      startApp(phone);
+    }
+  } catch (err) {
+    statusEl.classList.add('error'); statusEl.textContent = err.message; btn.disabled = false;
+  }
+};
+
+$('btn-logout').onclick = () => { localStorage.removeItem('xv_logged_phone'); location.reload(); };
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const savedPhone = localStorage.getItem('xv_logged_phone');
+  if (savedPhone) {
+    const u = await Store.get('users/' + savedPhone);
+    if (u && !u.locked) startApp(savedPhone);
+  }
+});
+
+async function startApp(phone) {
+  currentUser = phone;
+  $('auth-screen').hidden = true;
+
+  const curTasks = (await Store.get('tasks')) || {};
+  let needSync = false;
+  DEFAULT_TASKS.forEach(t => {
+    if (!curTasks[t.id]) {
+      curTasks[t.id] = t;
+      needSync = true;
+    }
+  });
+  if (needSync) await Store.set('tasks', curTasks);
+
+  Store.onValue('tasks', val => {
+    tasksList = Object.values(val || {}).filter(t => t.status !== 'paused');
+    $('nav-task-count').textContent = tasksList.length;
+    renderCategories(); renderTasks();
+  });
+
+  Store.onValue('users/' + phone, val => {
+    userData = val;
+    if (!userData) return;
+    if (userData.locked) { alert('Tài khoản đã bị khóa!'); localStorage.removeItem('xv_logged_phone'); location.reload(); }
+    renderUserDashboard(); renderFarm(); renderCheckin(); updateDepositQr();
+  });
+
+  Store.onValue('submissions', val => {
+    myProofs = Object.entries(val || {}).map(([k, v]) => ({ key: k, ...v })).filter(x => x.phone === phone).sort((a, b) => b.createdAt - a.createdAt);
+    renderProofs(); renderTasks();
+  });
+
+  Store.onValue('withdrawals', val => {
+    myWithdrawals = Object.entries(val || {}).map(([k, v]) => ({ key: k, ...v })).filter(x => x.phone === phone).sort((a, b) => b.createdAt - a.createdAt);
+    renderWithdrawals();
+  });
+
+  Store.onValue('deposits', val => {
+    myDeposits = Object.entries(val || {}).map(([k, v]) => ({ key: k, ...v })).filter(x => x.phone === phone).sort((a, b) => b.createdAt - a.createdAt);
+    renderDeposits();
+  });
+
+  Store.onValue('history/' + phone, val => {
+    myHistory = Object.values(val || {}).sort((a, b) => b.createdAt - a.createdAt);
+    renderHistory();
+  });
+
+  renderHeroArt(); renderProviders();
+}
+
+function addHistory(phone, title, amount, icon = '◈', detail = '') {
+  return Store.push('history/' + phone, { title, amount, icon, detail, createdAt: Date.now() });
+}
+
+function renderUserDashboard() {
+  $('user-greeting').textContent = userData.name.toUpperCase();
+  $('avatar').textContent = userData.name.slice(0, 2).toUpperCase();
+  $('top-balance').textContent = money(userData.balance);
+  $('farm-wallet-mini').textContent = money(userData.balance);
+  $('home-level-tag').textContent = `LEVEL ${userData.farmLevel || 1}`;
+
+  const f1List = userData.invited ? Object.values(userData.invited) : [];
+  const pendingW = myWithdrawals.filter(w => w.status === 'pending').reduce((s, w) => s + Number(w.amount), 0);
+  const totalDep = Number(userData.totalDeposited || 0);
+
+  document.querySelectorAll('[data-stat]').forEach(el => {
+    const k = el.dataset.stat;
+    if (k === 'balance') el.textContent = money(userData.balance);
+    if (k === 'withdrawn') el.textContent = money(userData.withdrawn || 0);
+    if (k === 'totalDeposited') el.textContent = money(totalDep);
+    if (k === 'f1Count') el.textContent = f1List.length;
+    if (k === 'pendingWithdraw') el.textContent = money(pendingW);
+  });
+
+  $('vip-metric-note').textContent = totalDep >= 20000 ? '✅ Đã mở khóa gói VIP' : 'Nạp từ 20.000đ mở gói VIP';
+  $('my-ref-code').textContent = userData.inviteCode;
+  $('ref-link').value = `${location.origin}${location.pathname}?ref=${userData.inviteCode}`;
+
+  $('invite-history').innerHTML = f1List.length
+    ? f1List.map(f => `<div class="record"><div class="record-main"><span class="record-icon">♧</span><div><strong>${esc(f.name)}</strong> (${esc(f.phone.slice(0,3)+'****'+f.phone.slice(-3))})<small>${new Date(f.createdAt).toLocaleString('vi-VN')}</small></div></div><strong>${f.qualified ? '✅ Đã nhận 200đ' : '⏳ Chờ làm nhiệm vụ'}</strong></div>`).join('')
+    : '<div class="empty-state">Chưa có bạn bè nào đăng ký qua link của bạn.</div>';
+}
+
+function getNextLevelExp(level) { return level * 150; }
+
+function isPlotUnlocked(idx, level, purchasedPlots) {
+  if (idx === 1) return true;
+  if (idx === 2) return level >= 2;
+  if (idx === 3) return level >= 10;
+  return Boolean(purchasedPlots && purchasedPlots['p' + idx]);
+}
+
+function renderFarm() {
+  const level = userData.farmLevel || 1;
+  const exp = userData.farmExp || 0;
+  const nextExp = getNextLevelExp(level);
+  const pct = Math.min(100, Math.round((exp / nextExp) * 100));
+  const bonusPct = (level - 1) * 5;
+  const totalDep = Number(userData.totalDeposited || 0);
+  const isVipUnlocked = totalDep >= 20000;
+  const purchasedPlots = userData.purchasedPlots || {};
+
+  $('farm-lv-badge').textContent = `⭐ LEVEL ${level}`;
+  $('farm-bonus-text').textContent = `Thưởng cấp độ: +${bonusPct}% lãi thu hoạch`;
+  $('farm-exp-text').textContent = `EXP: ${exp} / ${nextExp}`;
+  $('farm-exp-bar').style.width = `${pct}%`;
+  $('farm-total-earned').textContent = money(userData.farmEarned || 0);
+
+  const banner = $('vip-banner');
+  if (isVipUnlocked) {
+    banner.classList.add('unlocked');
+    $('vip-banner-title').textContent = `🔓 ĐÃ MỞ KHÓA TOÀN BỘ GÓI VIP (Đã nạp ${money(totalDep)})`;
+    $('vip-banner-desc').textContent = 'Bạn đã đủ điều kiện gieo trồng từ gói Đồng, Bạc, Vàng, Kim Cương, Platinum & Super Platinum!';
+    $('vip-banner-btn').hidden = true;
+  } else {
+    banner.classList.remove('unlocked');
+    $('vip-banner-title').textContent = '🔒 Gói từ Đồng trở lên đang khóa';
+    $('vip-banner-desc').innerHTML = `Bạn đã nạp <b>${money(totalDep)}</b>. Cần nạp tối thiểu <b>20.000đ</b> để mở khóa Đồng, Bạc, Vàng, Kim Cương, Platinum & Super Platinum.`;
+    $('vip-banner-btn').hidden = false;
+  }
+
+  $('seed-grid').innerHTML = Object.values(FARM_CROPS).map(c => {
+    const locked = c.requireDeposit && !isVipUnlocked;
+    const finalReward = Math.round(c.reward * (1 + bonusPct / 100));
+    const profit = finalReward - c.cost;
+    return `<button type="button" class="seed-card ${c.tier === 'vip' ? 'vip-tier' : ''} ${selectedSeed === c.id ? 'selected' : ''} ${locked ? 'locked-seed' : ''}" data-seed="${c.id}">
+      <span class="tier-tag ${c.tier === 'vip' ? 'vip' : 'free'}">${locked ? '🔒 Nạp ≥20k' : (c.tier === 'vip' ? '👑 VIP' : '🌱 Cơ bản')}</span>
+      <div class="seed-top">
+        <div class="seed-icon-box">${cropSvg(c.id)}</div>
+        <div>
+          <strong style="font-size:13px;display:block">${c.name}</strong>
+          <small style="color:var(--muted);font-size:10px">⏳ ${c.timeLabel} · +${c.exp} EXP</small>
+        </div>
+      </div>
+      <div class="seed-stats">
+        <span>Mua: <b>${money(c.cost)}</b></span>
+        <span style="color:#2d6a1e">Nhận: <b>${money(finalReward)}</b> <small>(+${money(profit)})</small></span>
+      </div>
+    </button>`;
+  }).join('');
+
+  const plots = userData.plots || {};
+  const selCrop = FARM_CROPS[selectedSeed];
+  let unlockedCount = 0;
+
+  $('farm-plots').innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(idx => {
+    const unlocked = isPlotUnlocked(idx, level, purchasedPlots);
+    if (unlocked) unlockedCount++;
+
+    if (!unlocked) {
+      if (idx === 2) {
+        return `<div class="farm-plot locked-plot">
+          <span class="plot-num">Ô #2</span>
+          <div class="plot-stage" style="font-size:20px">🔒</div>
+          <div class="plot-timer" style="color:#8a947e">Đạt Level 2</div>
+          <button class="farm-action" disabled>Tặng khi LV2</button>
+        </div>`;
+      }
+      if (idx === 3) {
+        return `<div class="farm-plot locked-plot">
+          <span class="plot-num">Ô #3</span>
+          <div class="plot-stage" style="font-size:20px">🔒</div>
+          <div class="plot-timer" style="color:#8a947e">Đạt Level 10</div>
+          <button class="farm-action" disabled>Tặng khi LV10</button>
+        </div>`;
+      }
+      return `<div class="farm-plot locked-plot">
+        <span class="plot-num">Ô #${idx}</span>
+        <div class="plot-stage" style="font-size:20px">🔒</div>
+        <div class="plot-timer" style="color:#6c7d5e">Mở rộng đất</div>
+        <button class="farm-action buy-plot" data-buy-plot="${idx}">Mở 50.000đ</button>
+      </div>`;
+    }
+
+    const p = plots['p' + idx];
+    if (!p) {
+      return `<div class="farm-plot">
+        <span class="plot-num">Ô #${idx}</span>
+        <div class="plot-stage"><div class="soil-disc"></div><span style="position:relative;z-index:2;font-size:18px;color:#fff;font-weight:800">+</span></div>
+        <div class="plot-timer">Trống</div>
+        <button class="farm-action" data-farm-act="plant" data-plot="${idx}">Gieo (${money(selCrop.cost)})</button>
+      </div>`;
+    }
+
+    const cInfo = FARM_CROPS[p.crop] || FARM_CROPS.rice;
+    const left = Math.max(0, Math.ceil((p.readyAt - Date.now()) / 1000));
+    const isMature = left === 0;
+    const finalRew = Math.round(cInfo.reward * (1 + bonusPct / 100));
+
+    return `<div class="farm-plot ${isMature ? 'ready-plot' : ''}">
+      <span class="plot-num">${cInfo.name}</span>
+      <div class="plot-stage">
+        ${isMature ? '<span class="sparkle-badge">✨</span>' : ''}
+        <div class="crop-sprite ${isMature ? 'mature' : ''}">${cropSvg(cInfo.id, !isMature)}</div>
+        <div class="soil-disc"></div>
+      </div>
+      <div class="plot-timer" style="color:${isMature ? '#b87b09' : '#3e6122'}">${formatCountdown(left)}</div>
+      ${isMature
+        ? `<button class="farm-action harvest" data-farm-act="harvest" data-plot="${idx}">Thu +${money(finalRew)}</button>`
+        : `<button class="farm-action" disabled>Đang lớn...</button>`
+      }
+    </div>`;
+  }).join('');
+
+  $('farm-unlocked-count').textContent = `🏡 ĐÃ MỞ: ${unlockedCount}/9 Ô`;
+}
+
+setInterval(() => { if ($('farm').classList.contains('active') && userData) renderFarm(); }, 1000);
+
+function renderCheckin() {
+  const checkin = userData.checkin || { streak: 0, lastDate: '' };
+  const today = todayStr();
+  const checkedToday = checkin.lastDate === today;
+  $('btn-checkin').disabled = checkedToday;
+  $('btn-checkin').textContent = checkedToday ? '✅ Đã điểm danh hôm nay' : 'Điểm danh nhận xu';
+  $('checkin-grid').innerHTML = CHECKIN_REWARDS.map((rew, idx) => {
+    const done = idx < checkin.streak;
+    const isToday = !checkedToday && idx === checkin.streak;
+    return `<div class="checkin-day ${done ? 'done' : ''} ${isToday ? 'today' : ''}"><div style="font-size:9px;opacity:.8">Ngày ${idx + 1}</div><div style="font-weight:800;font-size:11px;margin-top:4px">+${rew}đ</div></div>`;
+  }).join('');
+}
+
+$('btn-checkin').onclick = async () => {
+  const today = todayStr();
+  const checkin = userData.checkin || { streak: 0, lastDate: '' };
+  if (checkin.lastDate === today) return;
+  const idx = checkin.streak >= 7 ? 0 : checkin.streak;
+  const reward = CHECKIN_REWARDS[idx];
+  await Store.update('users/' + currentUser, { balance: (userData.balance || 0) + reward, checkin: { streak: idx + 1, lastDate: today } });
+  await addHistory(currentUser, `Điểm danh ngày ${idx + 1}`, `+${money(reward)}`, '📅', 'Quà điểm danh hằng ngày');
+  FarmAudio.sfxHarvest();
+  toast(`Điểm danh thành công! Nhận +${money(reward)}`);
+};
+
+function updateDepositQr() {
+  if (!userData) return;
+  const amt = Math.max(20000, Number($('deposit-amount').value) || 20000);
+  const memo = `NAP ${currentUser}`;
+  $('dep-bank-name').textContent = ADMIN_BANK.bankName;
+  $('dep-bank-acc').textContent = ADMIN_BANK.accountNo;
+  $('dep-bank-holder').textContent = ADMIN_BANK.accountName;
+  $('dep-memo').textContent = memo;
+  $('deposit-qr-img').src = getVietQrUrl(ADMIN_BANK.bankId, ADMIN_BANK.accountNo, amt, ADMIN_BANK.accountName, memo);
+}
+$('deposit-amount').oninput = updateDepositQr;
+$('deposit-receipt').onchange = () => {
+  const f = $('deposit-receipt').files[0];
+  $('dep-receipt-label').textContent = f ? `✅ Đã chọn ảnh: ${f.name}` : '📸 Chạm để tải ảnh biên lai (Nếu có)';
+};
+
+$('deposit-form').onsubmit = async e => {
+  e.preventDefault();
+  const amount = Number($('deposit-amount').value);
+  if (amount < 20000) return toast('Số tiền nạp tối thiểu là 20.000đ!');
+  $('deposit-submit').disabled = true;
+
+  let receiptImg = null;
+  const file = $('deposit-receipt').files[0];
+  if (file) receiptImg = await compressImage(file);
+
+  await Store.push('deposits', { phone: currentUser, userName: userData.name, amount, memo: `NAP ${currentUser}`, receipt: receiptImg, status: 'pending', createdAt: Date.now() });
+  await addHistory(currentUser, 'Tạo lệnh nạp tiền VietQR', `${money(amount)} (Chờ duyệt)`, '💳', `Nội dung: NAP ${currentUser}`);
+  await sendTelegram('taskBot', `💳 <b>YÊU CẦU NẠP TIỀN MỚI</b>\n👤 User: ${userData.name} (${currentUser})\n💰 Số tiền nạp: <b>${money(amount)}</b>\n📝 Nội dung CK: <code>NAP ${currentUser}</code>`, receiptImg);
+
+  $('deposit-receipt').value = '';
+  $('dep-receipt-label').textContent = '📸 Chạm để tải ảnh biên lai (Nếu có)';
+  $('deposit-submit').disabled = false;
+  toast('Đã gửi yêu cầu nạp tiền! Admin sẽ kiểm tra và cộng tiền trong vài phút.');
+};
+
+function renderDeposits() {
+  $('deposit-history-list').innerHTML = myDeposits.length ? myDeposits.map(d => `
+    <div class="record">
+      <div class="record-main"><span class="record-icon">💳</span><div><strong>Nạp ${money(d.amount)}</strong><small>${new Date(d.createdAt).toLocaleString('vi-VN')} · ND: ${esc(d.memo)}</small></div></div>
+      <span class="status-pill ${d.status}">${d.status === 'verified' ? 'Thành công' : d.status === 'rejected' ? 'Từ chối' : 'Chờ duyệt'}</span>
+    </div>`).join('') : '<div class="empty-state">Bạn chưa có giao dịch nạp tiền nào.</div>';
+}
+
+function logoSvg(id) {
+  const taskObj = tasksList.find(x => x.id === id);
+  if (taskObj && taskObj.image) return `<img src="${esc(taskObj.image)}" style="width:100%;height:100%;object-fit:cover;display:block">`;
+  const map = {aidaxin:['#1b4d89','AI'],okx:['#141414','OKX'],tikglobal:['#25262e','TG'],timobank:['#563d82','Timo'],shopeepay:['#ee4d2d','SP'],momo:['#b21c6b','MoMo'],liobank:['#d9f653','Lio'],hifami:['#9c63da','Hi'],zalo:['#078bff','Zalo'],funtv:['#ff823e','Fun']};
+  const [bg, txt] = map[id] || ['#244d37', 'XV'];
+  const fg = id === 'liobank' ? '#243d30' : '#fff';
+  return `<svg viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="${bg}"/><text x="32" y="38" text-anchor="middle" fill="${fg}" font-size="16" font-weight="800">${txt}</text></svg>`;
+}
+function renderHeroArt() { $('hero-art').innerHTML = ['aidaxin','okx','timobank','momo','shopeepay'].map(id => `<span class="floating-logo">${logoSvg(id)}</span>`).join(''); }
+function renderCategories() {
+  const cats = ['Tất cả', ...new Set(tasksList.map(t => t.type))];
+  $('categories').innerHTML = cats.map(c => `<button class="category-button ${currentCategory === c ? 'active' : ''}" data-cat="${esc(c)}"><strong>${esc(c)}</strong><small>${c === 'Tất cả' ? tasksList.length : tasksList.filter(t => t.type === c).length} nhiệm vụ</small></button>`).join('');
+}
+function taskCardHtml(t) {
+  const p = myProofs.find(x => x.taskId === t.id);
+  const btnText = p ? (p.status === 'verified' ? '✅ Đã hoàn thành' : p.status === 'pending' ? '⏳ Đang chờ duyệt' : '🔄 Gửi lại bằng chứng') : 'Làm nhiệm vụ ngay';
+  return `<article class="task-card"><div class="task-card-top"><div class="app-logo">${logoSvg(t.id)}</div><div><h3>${esc(t.title)}</h3><span class="task-type">${esc(t.type)}</span></div></div><p>${esc(t.desc)}</p><div class="task-reward-row"><strong class="task-reward">${esc(formatTaskReward(t))}</strong><span class="condition-label">Duyệt tự động</span></div><button class="task-open" data-open-task="${esc(t.id)}"><span>${btnText}</span><span>↗</span></button></article>`;
+}
+function renderTasks() {
+  const q = $('task-search').value.trim().toLowerCase();
+  const filtered = tasksList.filter(t => (currentCategory === 'Tất cả' || t.type === currentCategory) && (t.title + ' ' + t.desc).toLowerCase().includes(q));
+  $('task-count').textContent = filtered.length + ' nhiệm vụ';
+  $('task-list').innerHTML = filtered.length ? filtered.map(taskCardHtml).join('') : '<div class="empty-state">Không tìm thấy nhiệm vụ nào.</div>';
+  $('featured-tasks').innerHTML = tasksList.slice(0, 4).map(taskCardHtml).join('');
+}
+
+function openTaskModal(id) {
+  const t = tasksList.find(x => x.id === id);
+  if (!t) return;
+  const existing = myProofs.find(x => x.taskId === id && x.status !== 'rejected');
+  $('modal').innerHTML = `
+    <div class="dialog-top"><div class="dialog-brand"><div class="app-logo">${logoSvg(t.id)}</div><div><h2>${esc(t.title)}</h2><small>${esc(t.type)}</small></div></div><button class="dialog-close" data-close>×</button></div>
+    <div class="dialog-reward"><span>Phần thưởng nhiệm vụ</span><strong style="font-size:19px;color:var(--green)">${esc(formatTaskReward(t))}</strong></div>
+    <div class="task-warning">⚠ VUI LÒNG LÀM ĐÚNG CÁC BƯỚC DƯỚI ĐÂY TRƯỚC KHI GỬI ẢNH XÁC MINH</div>
+    <a href="${esc(t.url)}" target="_blank" rel="noopener" class="primary full">Mở liên kết thực hiện nhiệm vụ ↗</a>
+    ${t.code ? `<div class="invite-code"><div><small style="font-size:9px;color:var(--muted)">MÃ MỜI BẮT BUỘC</small><div style="font-size:16px;font-weight:800;color:var(--green)">${esc(t.code)}</div></div><button class="secondary" data-copy="${esc(t.code)}">Sao chép</button></div>` : ''}
+    <ol class="task-steps">${(t.steps || []).map((s, i) => `<li><span class="step-no">B${i+1}</span><span>${esc(s)}</span></li>`).join('')}</ol>
+    ${t.guideImage ? `<div style="margin:12px 0"><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px">ẢNH HƯỚNG DẪN MINH HỌA:</div><img src="${esc(t.guideImage)}" style="width:100%;border-radius:12px;border:1px solid var(--line)"></div>` : ''}
+    ${t.note ? `<div class="note-box">${esc(t.note)}</div>` : ''}
+    ${existing
+      ? `<div style="padding:14px;background:#eef5e1;border-radius:12px;font-size:12px;font-weight:600;color:var(--green)">Bạn đã gửi hồ sơ cho nhiệm vụ này (Trạng thái: ${existing.status === 'verified' ? 'Đã duyệt' : 'Chờ duyệt'}).</div>`
+      : `<form id="proof-form" style="border-top:1px solid var(--line);padding-top:16px;margin-top:16px">
+          <h3>Gửi bằng chứng nhận thưởng</h3>
+          <p style="font-size:11px;color:var(--muted)">${esc(t.proof || 'Chụp ảnh màn hình hoàn thành nhiệm vụ.')}</p>
+          <label>${esc(t.contactLabel || 'Số điện thoại / ID tài khoản')}</label>
+          <input id="proof-contact" required placeholder="Nhập thông tin tài khoản đã làm nhiệm vụ">
+          <label>Ảnh bằng chứng (Chọn 1 - 2 ảnh rõ nét)</label>
+          <input id="proof-files" type="file" accept="image/*" multiple>
+          <label for="proof-files" class="file-drop">
+            <span style="font-size:24px">📸</span>
+            <strong>Chạm vào đây để chọn ảnh từ thư viện</strong>
+            <small>Hỗ trợ JPG, PNG (Tối đa 2 ảnh)</small>
+          </label>
+          <div class="photo-previews" id="photo-previews"></div>
+          <button type="submit" class="primary full" style="margin-top:16px" id="proof-submit">Gửi hồ sơ chờ duyệt ↗</button>
+        </form>`
+    }`;
+  $('modal-back').classList.add('open');
+
+  if (!existing) {
+    $('proof-files').onchange = () => {
+      $('photo-previews').innerHTML = '';
+      [...$('proof-files').files].slice(0, 2).forEach(f => { const img = document.createElement('img'); img.src = URL.createObjectURL(f); $('photo-previews').appendChild(img); });
+    };
+    $('proof-form').onsubmit = async e => {
+      e.preventDefault();
+      const files = [...$('proof-files').files].slice(0, 2);
+      if (!files.length) return toast('Vui lòng chạm vào khung xanh để chọn ít nhất 1 ảnh bằng chứng!');
+      $('proof-submit').disabled = true;
+      $('proof-submit').textContent = '🤖 AI đang kiểm tra bằng chứng...';
+
+      const images = [];
+      for (const f of files) images.push(await compressImage(f));
+      const contact = $('proof-contact').value.trim();
+
+      const aiResult = await verifyProofWithAI(t, contact, images[0]);
+      const rewardAmt = t.currency === 'USD' ? 0 : Number(t.reward);
+
+      const manualTypes = ['Ngân hàng', 'Ví điện tử', 'Tiền mã hóa'];
+      const manualIds = ['momo', 'shopeepay', 'timobank', 'liobank', 'okx', 'tikglobal', 'aidaxin'];
+      const mustManualReview = t.reviewMode === 'manual' || (t.reviewMode !== 'auto' && (manualTypes.includes(t.type) || manualIds.includes(t.id)));
+
+      const isAutoApproved = GEMINI_AI_CONFIG.autoApproveEnabled && aiResult.approved && rewardAmt > 0 && !mustManualReview;
+
+      await Store.push('submissions', {
+        phone: currentUser,
+        userName: userData.name,
+        taskId: t.id,
+        taskTitle: t.title,
+        reward: Number(t.reward),
+        rewardDisplay: formatTaskReward(t),
+        contact,
+        images,
+        status: isAutoApproved ? 'verified' : 'pending',
+        reviewNote: isAutoApproved ? `🤖 AI tự động duyệt: ${aiResult.reason}` : `🤖 AI ghi chú: ${aiResult.reason}`,
+        createdAt: Date.now()
+      });
+
+      if (isAutoApproved) {
+        await Store.update('users/' + currentUser, { balance: (userData.balance || 0) + rewardAmt });
+        await addHistory(currentUser, `AI duyệt nhiệm vụ: ${t.title}`, `+${money(rewardAmt)}`, '🤖', aiResult.reason);
+
+        if (userData.referredBy && !userData.f1Rewarded) {
+          await Store.update('users/' + currentUser, { f1Rewarded: true });
+          const allUsers = (await Store.get('users')) || {};
+          const inviter = Object.values(allUsers).find(x => x.inviteCode === userData.referredBy);
+          if (inviter) {
+            await Store.update('users/' + inviter.phone, { balance: (inviter.balance || 0) + 200 });
+            await Store.update(`users/${inviter.phone}/invited/${currentUser}`, { qualified: true });
+            await addHistory(inviter.phone, `Hoa hồng F1 (${userData.name})`, '+200đ', '♧', 'F1 hoàn thành nhiệm vụ đầu tiên');
+          }
+        }
+
+        await sendTelegram(
+          'taskBot',
+          `🤖✅ <b>AI ĐÃ TỰ ĐỘNG DUYỆT & CỘNG TIỀN</b>\n👤 User: ${userData.name} (${currentUser})\n🎯 Nhiệm vụ: <b>${t.title}</b> (+${money(rewardAmt)})\n🆔 Thông tin: <code>${contact}</code>\n💬 Đánh giá AI: <i>${aiResult.reason}</i>`,
+          images[0]
+        );
+
+        $('modal-back').classList.remove('open');
+        FarmAudio.sfxHarvest();
+        toast(`🎉 AI đã duyệt thành công! +${money(rewardAmt)} đã cộng vào ví!`);
+      } else {
+        await sendTelegram(
+          'taskBot',
+          `📋⏳ <b>DUYỆT NHIỆM VỤ (CHỜ ADMIN)</b>\n👤 User: ${userData.name} (${currentUser})\n🎯 Nhiệm vụ: <b>${t.title}</b> (${formatTaskReward(t)})\n🆔 Thông tin: <code>${contact}</code>\n🤖 AI nhận xét: <i>${aiResult.reason}</i>`,
+          images[0]
+        );
+
+        $('modal-back').classList.remove('open');
+        toast('Đã gửi hồ sơ thành công! Vui lòng chờ Admin đối soát.');
+      }
+      navigate('proofs');
+    };
+  }
+}
+
+function renderProofs() {
+  const list = myProofs.filter(p => proofFilter === 'all' || p.status === proofFilter);
+  $('proof-list').innerHTML = list.length ? list.map(p => `<article class="proof-card"><div class="proof-heading"><div><div class="app-logo">${logoSvg(p.taskId)}</div><div><h3>${esc(p.taskTitle)} (${esc(p.rewardDisplay || '+' + money(p.reward))})</h3><small>${new Date(p.createdAt).toLocaleString('vi-VN')}</small></div></div><span class="status-pill ${p.status}">${p.status === 'verified' ? 'Đã duyệt' : p.status === 'rejected' ? 'Bị từ chối' : 'Chờ duyệt'}</span></div><p style="font-size:11px;margin:12px 0 8px">Thông tin gửi: <strong>${esc(p.contact)}</strong>${p.reviewNote ? `<br><span style="color:#4b6e32">${esc(p.reviewNote)}</span>` : ''}</p><div style="display:flex;gap:8px">${(p.images || []).map(src => `<img src="${src}" style="width:65px;height:65px;object-fit:cover;border-radius:8px;border:1px solid var(--line)">`).join('')}</div></article>`).join('') : '<div class="empty-state">Chưa có hồ sơ nào.</div>';
+}
+
+function renderProviders() {
+  const list = paymentKind === 'bank' ? BANKS : WALLETS;
+  $('provider-select').innerHTML = list.map(n => `<option value="${n}">${n}</option>`).join('');
+}
+
+$('withdraw-form').onsubmit = async e => {
+  e.preventDefault();
+  const amount = Number($('withdraw-amount').value);
+  const pin = $('withdraw-pin').value.trim();
+  const provider = $('provider-select').value;
+  const dest = $('destination').value.trim();
+  const holder = $('holder').value.trim().toUpperCase();
+
+  if (pin !== userData.pin) return toast('❌ Mã PIN rút tiền không chính xác!');
+  if (amount < 30000 || amount > 100000) return toast('Số tiền rút từ 30.000đ đến 100.000đ!');
+  if ((userData.balance || 0) < amount) return toast('Số dư khả dụng không đủ!');
+
+  $('withdraw-submit').disabled = true;
+  await Store.update('users/' + currentUser, { balance: userData.balance - amount });
+  await Store.push('withdrawals', { phone: currentUser, userName: userData.name, amount, method: paymentKind, provider, destination: dest, holderName: holder, status: 'pending', createdAt: Date.now() });
+  await addHistory(currentUser, `Rút tiền về ${provider}`, `-${money(amount)}`, '↗', `STK: ${dest} · ${holder}`);
+
+  const qrUrl = paymentKind === 'bank' && BANK_CODES[provider] ? getVietQrUrl(BANK_CODES[provider], dest, amount, holder, `XUVUI ${currentUser}`) : null;
+  await sendTelegram('withdrawBot', `💸 <b>YÊU CẦU RÚT TIỀN MỚI</b>\n👤 User: ${userData.name} (${currentUser})\n💰 Số tiền: <b>${money(amount)}</b>\n🏦 Nhận qua: <b>${provider}</b>\n🔢 STK/Ví: <code>${dest}</code>\n📛 Chủ TK: <b>${holder}</b>`, qrUrl);
+
+  $('withdraw-form').reset();
+  $('withdraw-submit').disabled = false;
+  toast('Đã gửi yêu cầu rút tiền!');
+};
+
+function renderWithdrawals() {
+  $('withdrawal-list').innerHTML = myWithdrawals.length ? myWithdrawals.map(w => `<div class="record"><div class="record-main"><span class="record-icon">↗</span><div><strong>${money(w.amount)} · ${esc(w.provider)}</strong> (${esc(w.destination)})<small>${new Date(w.createdAt).toLocaleString('vi-VN')}${w.note ? ' · ' + esc(w.note) : ''}</small></div></div><span class="status-pill ${w.status}">${w.status === 'paid' ? 'Đã chi trả' : w.status === 'rejected' ? 'Đã hoàn tiền' : 'Chờ xử lý'}</span></div>`).join('') : '<div class="empty-state">Chưa có lệnh rút tiền nào.</div>';
+}
+
+$('gift-form').onsubmit = async e => {
+  e.preventDefault();
+  const code = $('gift-code').value.trim().toUpperCase();
+  if (!code) return;
+  $('gift-submit').disabled = true;
+  const gc = await Store.get('giftcodes/' + code);
+  if (!gc || !gc.active) { $('gift-submit').disabled = false; return toast('❌ Mã giftcode không tồn tại!'); }
+  if ((gc.usedCount || 0) >= gc.maxUses) { $('gift-submit').disabled = false; return toast('❌ Mã giftcode đã hết lượt!'); }
+  if (gc.usedBy && gc.usedBy[currentUser]) { $('gift-submit').disabled = false; return toast('❌ Bạn đã dùng mã này rồi!'); }
+
+  await Store.update(`giftcodes/${code}`, { usedCount: (gc.usedCount || 0) + 1, [`usedBy/${currentUser}`]: Date.now() });
+  await Store.update('users/' + currentUser, { balance: (userData.balance || 0) + Number(gc.amount) });
+  await addHistory(currentUser, `Nhập Giftcode ${code}`, `+${money(gc.amount)}`, '♢', 'Quà tặng Giftcode');
+  $('gift-code').value = ''; $('gift-submit').disabled = false;
+  toast(`🎉 Nhận thành công +${money(gc.amount)}!`);
+};
+
+function renderHistory() {
+  $('activity-list').innerHTML = myHistory.length ? myHistory.map(h => `
+    <div class="record">
+      <div class="record-main">
+        <span class="record-icon">${h.icon || '◈'}</span>
+        <div>
+          <strong>${esc(h.title)}</strong>
+          ${h.detail ? `<small style="color:#597343">${esc(h.detail)}</small>` : ''}
+          <small>${new Date(h.createdAt).toLocaleString('vi-VN')}</small>
+        </div>
+      </div>
+      <strong style="color:${String(h.amount).startsWith('-') ? '#c04836' : '#2f6e1e'}">${esc(h.amount)}</strong>
+    </div>`).join('') : '<div class="empty-state">Chưa có lịch sử giao dịch.</div>';
+}
+
+const viewLabels = {home:'Tổng quan',farm:'Nông trại 3x3',deposit:'Nạp tiền',tasks:'Nhiệm vụ',proofs:'Hồ sơ nhiệm vụ',wallet:'Ví & rút tiền',friends:'Mời bạn bè',gift:'Nhập giftcode',history:'Lịch sử giao dịch'};
+function navigate(target) {
+  if (!viewLabels[target]) return;
+  document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === target));
+  document.querySelectorAll('[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === target));
+  $('breadcrumb').innerHTML = `Không gian cá nhân <b>/</b> ${viewLabels[target]}`;
+  window.scrollTo(0, 0);
+}
+
+document.addEventListener('click', async e => {
+  const el = e.target.closest('[data-view],[data-cat],[data-open-task],[data-close],[data-copy],[data-proof-filter],[data-kind],[data-amount],[data-dep-amt],[data-seed],[data-farm-act],[data-buy-plot]');
+  if (!el) return;
+  if (el.dataset.view) navigate(el.dataset.view);
+  if (el.dataset.cat) { currentCategory = el.dataset.cat; renderCategories(); renderTasks(); }
+  if (el.dataset.openTask) openTaskModal(el.dataset.openTask);
+  if (el.hasAttribute('data-close')) $('modal-back').classList.remove('open');
+  if (el.dataset.copy) { navigator.clipboard?.writeText(el.dataset.copy); toast('Đã sao chép!'); }
+  if (el.dataset.proofFilter) { proofFilter = el.dataset.proofFilter; document.querySelectorAll('[data-proof-filter]').forEach(x => x.classList.toggle('active', x === el)); renderProofs(); }
+  if (el.dataset.kind) { paymentKind = el.dataset.kind; document.querySelectorAll('[data-kind]').forEach(x => x.classList.toggle('active', x === el)); $('destination-label').textContent = paymentKind === 'bank' ? 'Số tài khoản' : 'Số điện thoại ví'; renderProviders(); }
+  if (el.dataset.amount) $('withdraw-amount').value = el.dataset.amount;
+  if (el.dataset.depAmt) { $('deposit-amount').value = el.dataset.depAmt; updateDepositQr(); }
+
+  if (el.dataset.buyPlot) {
+    const idx = Number(el.dataset.buyPlot);
+    if (idx < 4 || idx > 9) return;
+    if ((userData.balance || 0) < 50000) return toast('Số dư không đủ 50.000đ để mở khóa ô đất này!');
+    if (!confirm(`Xác nhận dùng 50.000đ để mở khóa vĩnh viễn Ô đất số #${idx}?`)) return;
+    await Store.update('users/' + currentUser, { balance: userData.balance - 50000, [`purchasedPlots/p${idx}`]: true });
+    await addHistory(currentUser, `Mở khóa Ô đất nông trại #${idx}`, '-50.000đ', '🏡', 'Mở rộng diện tích canh tác');
+    FarmAudio.sfxLevelUp();
+    toast(`🎉 Đã mở khóa thành công Ô đất số #${idx}!`);
+  }
+
+  if (el.dataset.seed) {
+    const crop = FARM_CROPS[el.dataset.seed];
+    const isVipUnlocked = Number(userData.totalDeposited || 0) >= 20000;
+    if (crop.requireDeposit && !isVipUnlocked) {
+      toast(`🔒 Gói "${crop.name}" yêu cầu nạp tối thiểu 20.000đ để mở khóa!`);
+      return;
+    }
+    selectedSeed = el.dataset.seed;
+    renderFarm();
+  }
+
+  if (el.dataset.farmAct) {
+    const act = el.dataset.farmAct, idx = Number(el.dataset.plot), pKey = 'p' + idx;
+    const plot = (userData.plots || {})[pKey];
+    const level = userData.farmLevel || 1;
+    const purchasedPlots = userData.purchasedPlots || {};
+
+    if (act === 'plant') {
+      if (!isPlotUnlocked(idx, level, purchasedPlots)) return toast('Ô đất này chưa được mở khóa!');
+      const crop = FARM_CROPS[selectedSeed];
+      const isVipUnlocked = Number(userData.totalDeposited || 0) >= 20000;
+      if (crop.requireDeposit && !isVipUnlocked) return toast(`🔒 Bạn cần nạp tối thiểu 20.000đ để trồng gói ${crop.name}!`);
+      if ((userData.balance || 0) < crop.cost) return toast(`Số dư không đủ ${money(crop.cost)} để mua hạt giống ${crop.name}!`);
+
+      await Store.update('users/' + currentUser, { balance: userData.balance - crop.cost });
+      await Store.set(`users/${currentUser}/plots/${pKey}`, { crop: crop.id, cost: crop.cost, plantedAt: Date.now(), readyAt: Date.now() + crop.seconds * 1000 });
+      await addHistory(currentUser, `Mua & Gieo hạt giống: ${crop.name}`, `-${money(crop.cost)}`, '🌱', `Ô đất #${idx} · Chín sau ${crop.timeLabel}`);
+      FarmAudio.sfxPlant();
+      toast(`🌱 Đã mua & gieo ${crop.name} vào Ô #${idx} (-${money(crop.cost)})!`);
+    } else if (act === 'harvest' && plot) {
+      if (Date.now() < plot.readyAt) return toast('Cây chưa chín, vui lòng chờ thêm!');
+      const crop = FARM_CROPS[plot.crop] || FARM_CROPS.rice;
+      const bonusPct = (level - 1) * 5;
+      const finalReward = Math.round(crop.reward * (1 + bonusPct / 100));
+      const profit = finalReward - crop.cost;
+
+      let newExp = (userData.farmExp || 0) + crop.exp;
+      let newLv = level, leveledUp = false;
+      while (newExp >= getNextLevelExp(newLv)) { newExp -= getNextLevelExp(newLv); newLv++; leveledUp = true; }
+
+      await Store.set(`users/${currentUser}/plots/${pKey}`, null);
+      await Store.update('users/' + currentUser, { balance: (userData.balance || 0) + finalReward, farmEarned: (userData.farmEarned || 0) + finalReward, farmLevel: newLv, farmExp: newExp });
+      await addHistory(currentUser, `Thu hoạch nông trại: ${crop.name}`, `+${money(finalReward)}`, '🌾', `Ô #${idx} · Vốn ${money(crop.cost)} · Lãi +${money(profit)} · +${crop.exp} EXP`);
+
+      if (leveledUp) {
+        FarmAudio.sfxLevelUp();
+        const extraGift = newLv >= 2 && level < 2 ? ' (Mở khóa miễn phí Ô #2!)' : (newLv >= 10 && level < 10 ? ' (Mở khóa miễn phí Ô #3!)' : '');
+        toast(`🎊 LÊN LEVEL ${newLv}!${extraGift} Nhận +${money(finalReward)}!`);
+      } else {
+        FarmAudio.sfxHarvest();
+        toast(`🌾 Thu hoạch ${crop.name} thành công! Nhận +${money(finalReward)} (+${crop.exp} EXP)`);
+      }
+    }
+  }
+});
+
+$('task-search').oninput = renderTasks;
+$('copy-ref').onclick = () => { navigator.clipboard?.writeText($('ref-link').value); toast('Đã sao chép link giới thiệu!'); };
+$('modal-back').onclick = e => { if (e.target.id === 'modal-back') $('modal-back').classList.remove('open'); };
+</script>
+</body>
+</html>
