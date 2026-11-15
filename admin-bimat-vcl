@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Xu Vui — Hệ Thống Quản Trị Toàn Diện</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
+:root{--bg:#f4f7ee;--ink:#243d30;--green:#244d37;--line:#dfe6d7;--lime:#d5f19a;--muted:#7b8c6c;--red:#c94a38;--gold:#d49b27}
+*{box-sizing:border-box;max-width:100%}
+html,body{margin:0;padding:0;width:100%;overflow-x:hidden;background:var(--bg);color:var(--ink);font:13px 'Be Vietnam Pro',system-ui,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0;border-radius:10px;padding:10px 14px;font-weight:700;font-size:11px;transition:transform .15s,opacity .15s}
+button:active{transform:translateY(1px)}
+[hidden]{display:none!important}
+.primary{background:var(--green);color:#fff}
+.danger{background:var(--red);color:#fff}
+.gold{background:var(--gold);color:#fff}
+.secondary{background:#fff;border:1px solid var(--line);color:var(--green)}
+header{background:var(--green);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:20}
+.container{max-width:1240px;margin:20px auto;padding:0 14px 60px}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.stat-box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}
+.stat-box span{font-size:10px;color:var(--muted);font-weight:600}
+.stat-box strong{display:block;font-size:20px;margin-top:6px;color:var(--green)}
+.tabs{display:flex;gap:8px;overflow-x:auto;margin-bottom:18px;padding-bottom:4px}
+.tabs button{background:#fff;border:1px solid var(--line);color:#5c704c;white-space:nowrap;padding:11px 15px}
+.tabs button.active{background:var(--green);color:#fff}
+.tabs button em{font-style:normal;background:#d9534f;color:#fff;padding:2px 6px;border-radius:10px;font-size:9px;margin-left:5px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:18px}
+.card{border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;background:#fcfdf9}
+.row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+label{display:block;font-size:11px;font-weight:700;color:#4f663c;margin:6px 0 4px}
+input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;padding:10px 12px;margin:0 0 12px;background:#fff}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.badge{padding:4px 9px;border-radius:6px;font-size:10px;font-weight:700;display:inline-block}
+.badge.pending{background:#fff1cc;color:#997014}
+.badge.verified,.badge.paid,.badge.open{background:#e2f3ce;color:#417519}
+.badge.rejected,.badge.closed{background:#fbe2de;color:#b53b2a}
+.badge.vip{background:#fce8b2;color:#8f620c}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;background:#f4f8ec;padding:10px 12px;border-radius:10px;margin:10px 0;font-size:11px}
+.server-banner{border-radius:16px;padding:18px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;border:2px solid}
+.server-banner.online{background:#ebf7e3;border-color:#9fd17b;color:#275914}
+.server-banner.offline{background:#fdecea;border-color:#eb9b91;color:#9c2b1e}
+.plot-check-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;background:#f4f8ec;padding:12px;border-radius:12px;margin-bottom:14px}
+.plot-check-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;background:#fff;padding:8px;border-radius:8px;border:1px solid var(--line)}
+.plot-check-item input{width:16px;height:16px;margin:0}
+.login-overlay{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;z-index:50;padding:16px}
+.login-box{background:#fff;padding:28px;border-radius:20px;border:1px solid var(--line);width:360px;max-width:100%}
+.modal-back{position:fixed;inset:0;background:#1d342e80;backdrop-filter:blur(4px);z-index:60;display:none;align-items:center;justify-content:center;padding:14px}
+.modal-back.open{display:flex}
+.modal{background:#fff;border-radius:20px;padding:22px;width:580px;max-width:100%;max-height:92vh;overflow-y:auto}
+@media(max-width:850px){.stats{grid-template-columns:1fr 1fr}.grid-2,.grid-3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div class="login-overlay" id="admin-login">
+  <div class="login-box">
+    <h2 style="margin-top:0;color:var(--green)">✳ Xu Vui Admin Master</h2>
+    <p style="font-size:11px;color:var(--muted)">Mật khẩu mặc định: <b>admin123</b></p>
+    <form id="admin-login-form">
+      <input type="password" id="admin-pass-input" placeholder="Nhập mật khẩu Admin..." required>
+      <p id="login-msg" style="font-size:11px;font-weight:700;color:var(--red);min-height:16px;margin:0 0 10px"></p>
+      <button type="submit" class="primary" style="width:100%" id="btn-admin-login">Vào Bảng Điều Khiển ↗</button>
+    </form>
+  </div>
+</div>
+
+<header>
+  <div style="font-weight:800;font-size:16px">✳ XU VUI — QUẢN TRỊ TOÀN DIỆN</div>
+  <div style="display:flex;gap:10px;align-items:center">
+    <span id="conn-status" style="font-size:10px;background:#ffffff20;padding:4px 9px;border-radius:8px">Đang kết nối...</span>
+    <a href="index.html" target="_blank" style="color:var(--lime);text-decoration:none;font-size:11px;font-weight:700">Mở Web Chính ↗</a>
+  </div>
+</header>
+
+<div class="container">
+  <div class="server-banner online" id="server-banner">
+    <div>
+      <strong style="font-size:15px" id="srv-title">🟢 SERVER ĐANG MỞ HOẠT ĐỘNG BÌNH THƯỜNG</strong>
+      <div style="font-size:11px;margin-top:3px" id="srv-desc">Tất cả người chơi đều có thể truy cập và thao tác trên trang web.</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="secondary" onclick="openServerModal()">⚙ Cài đặt thông báo bảo trì</button>
+      <button class="danger" id="btn-toggle-server" onclick="toggleServerStatus()">🛑 Đóng Server (Bảo trì)</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-box"><span>Tổng thành viên</span><strong id="st-users">0</strong></div>
+    <div class="stat-box"><span>Nạp tiền chờ duyệt</span><strong id="st-deposits" style="color:var(--gold)">0</strong></div>
+    <div class="stat-box"><span>Nhiệm vụ chờ duyệt</span><strong id="st-proofs" style="color:#2b7ab8">0</strong></div>
+    <div class="stat-box"><span>Rút tiền chờ xử lý</span><strong id="st-withdraws" style="color:var(--red)">0</strong></div>
+    <div class="stat-box"><span>Tổng đã chi trả</span><strong id="st-paid">0đ</strong></div>
+  </div>
+
+  <div class="tabs" id="admin-tabs">
+    <button class="active" data-tab="tab-deposits">1. Duyệt Nạp Tiền <em id="cnt-dep">0</em></button>
+    <button data-tab="tab-proofs">2. Duyệt Nhiệm Vụ <em id="cnt-prf">0</em></button>
+    <button data-tab="tab-withdraws">3. Duyệt Rút Tiền <em id="cnt-wdr">0</em></button>
+    <button data-tab="tab-tasks">4. Up & Dừng Nhiệm Vụ</button>
+    <button data-tab="tab-users">5. Thành Viên & Cấp Dưới</button>
+    <button data-tab="tab-giftcodes">6. Giftcode & Hệ Thống</button>
+  </div>
+
+  <div class="tab-content" id="tab-deposits">
+    <div class="panel">
+      <h3>Danh sách yêu cầu nạp tiền (Duyệt sẽ cộng ví & mở khóa gói VIP ≥ 20.000đ)</h3>
+      <div id="admin-deposit-list"></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-proofs" hidden>
+    <div class="panel">
+      <h3>Hồ sơ bằng chứng nhiệm vụ chờ duyệt</h3>
+      <div id="admin-proof-list"></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-withdraws" hidden>
+    <div class="panel">
+      <h3>Yêu cầu rút tiền & Quét mã VietQR</h3>
+      <div id="admin-withdraw-list"></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-tasks" hidden>
+    <div class="panel">
+      <h3>➕ Đăng nhiệm vụ mới lên trang chủ</h3>
+      <form id="new-task-form">
+        <div class="grid-2">
+          <div><label>Tên ứng dụng / Nhiệm vụ *</label><input id="nt-title" required placeholder="Ví dụ: Tải app Cake by VPBank"></div>
+          <div><label>Danh mục *</label><select id="nt-type"><option>Ngân hàng</option><option>Ví điện tử</option><option>Tiền mã hóa</option><option>Giải trí</option><option>Cộng đồng</option></select></div>
+        </div>
+        <div class="grid-3">
+          <div><label>Tiền thưởng VNĐ *</label><input id="nt-reward" type="number" required placeholder="30000"></div>
+          <div><label>Chữ hiển thị thưởng (Tùy chọn)</label><input id="nt-reward-text" placeholder="VD: 50.000đ hoặc 20 USD"></div>
+          <div><label>Chế độ duyệt *</label><select id="nt-review-mode"><option value="manual">Admin duyệt thủ công</option><option value="auto">AI tự động duyệt</option></select></div>
+        </div>
+        <div class="grid-2">
+          <div><label>Chọn ảnh Logo từ điện thoại</label><input id="nt-logo-file" type="file" accept="image/*" style="padding:7px"></div>
+          <div><label>Hoặc dán Link ảnh Logo (URL)</label><input id="nt-logo-url" type="url" placeholder="https://..."></div>
+        </div>
+        <div class="grid-2">
+          <div><label>Mã mời (Nếu có)</label><input id="nt-code" placeholder="Ví dụ: HF3009"></div>
+          <div><label>Nhãn thông tin user cần nhập *</label><input id="nt-contact" value="Số điện thoại đăng ký" required></div>
+        </div>
+        <label>Mô tả ngắn gọn *</label><input id="nt-desc" required placeholder="Đăng ký tài khoản và phát sinh giao dịch đầu tiên">
+        <label>Link tham gia nhiệm vụ *</label><input id="nt-url" type="url" required placeholder="https://...">
+        <label>Các bước hướng dẫn (Mỗi bước xuống 1 dòng) *</label><textarea id="nt-steps" rows="4" required placeholder="B1: Tải app qua link&#10;B2: Nhập mã mời&#10;B3: Chụp ảnh gửi xác minh"></textarea>
+        <div class="grid-2">
+          <div><label>Yêu cầu ảnh bằng chứng</label><input id="nt-proof" value="Ảnh chụp màn hình hoàn thành nhiệm vụ rõ nét."></div>
+          <div><label>Ảnh hướng dẫn minh họa (Tùy chọn)</label><input id="nt-guide-file" type="file" accept="image/*" style="padding:7px"></div>
+        </div>
+        <label>Ghi chú / Cảnh báo điều kiện (Tùy chọn)</label><input id="nt-note" placeholder="Lưu ý về thời gian đối soát hoặc điều kiện đặc biệt">
+        <button type="submit" class="primary" style="width:100%">🚀 Đăng nhiệm vụ lên trang web ngay ↗</button>
+      </form>
+    </div>
+
+    <div class="panel">
+      <h3>Quản lý, Sửa & Dừng hoạt động nhiệm vụ</h3>
+      <div id="admin-task-list"></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-users" hidden>
+    <div class="panel">
+      <div class="row" style="margin-bottom:14px">
+        <h3 style="margin:0">Quản lý Thành viên, Sửa dữ liệu & Xem cấp dưới (F1/F2)</h3>
+        <input id="user-search" placeholder="Tìm theo SĐT, tên hoặc mã mời..." style="max-width:280px;margin:0">
+      </div>
+      <div id="admin-user-list"></div>
+    </div>
+  </div>
+
+  <div class="tab-content" id="tab-giftcodes" hidden>
+    <div class="panel">
+      <h3>Phát hành Giftcode mới</h3>
+      <form id="new-gc-form" class="grid-2">
+        <div><label>Mã Code</label><input id="gc-code" required placeholder="XUVUI2026" style="text-transform:uppercase"></div>
+        <div><label>Số tiền thưởng (VNĐ)</label><input id="gc-amount" type="number" required placeholder="5000"></div>
+        <div><label>Số lượt nhập tối đa</label><input id="gc-uses" type="number" required value="50"></div>
+        <div style="display:flex;align-items:flex-end"><button type="submit" class="primary" style="width:100%;margin-bottom:12px">Tạo mã Giftcode</button></div>
+      </form>
+      <div id="admin-gc-list"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-back" id="modal-back"><div class="modal" id="modal"></div></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => new Intl.NumberFormat('vi-VN').format(Number(n) || 0) + 'đ';
+
+// CẤU HÌNH FIREBASE DỰ ÁN XUVUI-9175F
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCbtZV-aW22WtYxeN6vW8qmdmEWeMaG97o",
+  authDomain: "xuvui-9175f.firebaseapp.com",
+  databaseURL: "https://xuvui-9175f-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "xuvui-9175f",
+  storageBucket: "xuvui-9175f.firebasestorage.app",
+  messagingSenderId: "655275789249",
+  appId: "1:655275789249:web:5b355911895f6782a47d40",
+  measurementId: "G-ZEH3GKR3CY"
+};
+
+const ADMIN_PASSWORDS = ["admin123", "123456"];
+
+const BANK_CODES = {"Vietcombank":"VCB","MBBank":"MB","Techcombank":"TCB","BIDV":"BIDV","VietinBank":"ICB","Agribank":"VBA","ACB":"ACB","VPBank":"VPB","TPBank":"TPB","Sacombank":"STB","HDBank":"HDB","VIB":"VIB","SHB":"SHB","MSB":"MSB","OCB":"OCB","CAKE":"CAKE","Timo":"TIMO","SeABank":"SEAB","LPBank":"LPB"};
+const CROP_NAMES = {rice:'Lúa nước',corn:'Ngô ngọt',wheat:'Lúa mì vàng',bronze:'Cây Đồng',silver:'Cây Bạc',gold:'Cây Vàng',diamond:'Kim cương',platinum:'Platinum',super_platinum:'Super Platinum'};
+
+let useFirebase = false, db = null;
+try {
+  firebase.initializeApp(FIREBASE_CONFIG);
+  db = firebase.database();
+  useFirebase = true;
+} catch (e) {}
+
+const Store = {
+  _localGet(path) {
+    try {
+      const root = JSON.parse(localStorage.getItem('xuvui_db') || '{}');
+      return path.split('/').filter(Boolean).reduce((o, k) => (o && o[k] !== undefined ? o[k] : null), root);
+    } catch { return null; }
+  },
+  _localSet(path, val) {
+    try {
+      const root = JSON.parse(localStorage.getItem('xuvui_db') || '{}');
+      const keys = path.split('/').filter(Boolean);
+      let cur = root;
+      for (let i = 0; i < keys.length - 1; i++) {
+        if (!cur[keys[i]] || typeof cur[keys[i]] !== 'object') cur[keys[i]] = {};
+        cur = cur[keys[i]];
+      }
+      if (val === null) delete cur[keys[keys.length - 1]];
+      else cur[keys[keys.length - 1]] = val;
+      localStorage.setItem('xuvui_db', JSON.stringify(root));
+      window.dispatchEvent(new Event('xuvui_local_sync'));
+    } catch {}
+  },
+  async get(path) {
+    if (useFirebase) { try { const s = await db.ref(path).once('value'); return s.val(); } catch { useFirebase = false; } }
+    return this._localGet(path);
+  },
+  async set(path, val) {
+    if (useFirebase) { try { await db.ref(path).set(val); return; } catch { useFirebase = false; } }
+    this._localSet(path, val);
+  },
+  async update(path, obj) {
+    if (useFirebase) { try { await db.ref(path).update(obj); return; } catch { useFirebase = false; } }
+    const cur = this._localGet(path) || {};
+    Object.entries(obj).forEach(([k, v]) => {
+      if (k.includes('/')) this._localSet(path + '/' + k, v);
+      else cur[k] = v;
+    });
+    if (!Object.keys(obj).some(k => k.includes('/'))) this._localSet(path, cur);
+  },
+  async push(path, val) {
+    const id = 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+    await this.set(path + '/' + id, val);
+    return id;
+  },
+  onValue(path, cb) {
+    if (useFirebase) db.ref(path).on('value', s => cb(s.val()));
+    else { cb(this._localGet(path)); window.addEventListener('xuvui_local_sync', () => cb(this._localGet(path))); }
+  }
+};
+
+function compressImgAdmin(file, maxW = 450) {
+  return new Promise(resolve => {
+    const r = new FileReader();
+    r.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const c = document.createElement('canvas');
+        const s = img.width > maxW ? maxW / img.width : 1;
+        c.width = img.width * s; c.height = img.height * s;
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        resolve(c.toDataURL('image/jpeg', 0.72));
+      };
+      img.src = e.target.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+$('admin-login-form').onsubmit = e => {
+  e.preventDefault();
+  const inputPass = $('admin-pass-input').value.trim();
+  if (ADMIN_PASSWORDS.includes(inputPass)) {
+    $('login-msg').textContent = '';
+    $('admin-login').hidden = true;
+    initAdmin();
+  } else {
+    $('login-msg').textContent = '❌ Sai mật khẩu! Hãy nhập chính xác: admin123';
+  }
+};
+
+document.querySelectorAll('#admin-tabs button').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('#admin-tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c => c.hidden = c.id !== btn.dataset.tab);
+  };
+});
+
+let allUsersCache = {}, allTasksCache = {}, serverConfig = { isClosed: false, message: 'Hệ thống đang bảo trì nâng cấp tính năng. Vui lòng quay lại sau ít phút!', whitelistPhones: '' };
+
+function initAdmin() {
+  $('conn-status').textContent = useFirebase ? '🟢 Firebase Cloud (xuvui-9175f)' : '🟡 Local Sync';
+
+  Store.onValue('system/server', val => {
+    if (val) serverConfig = { ...serverConfig, ...val };
+    const banner = $('server-banner');
+    const btn = $('btn-toggle-server');
+    if (serverConfig.isClosed) {
+      banner.className = 'server-banner offline';
+      $('srv-title').textContent = '🔴 SERVER ĐANG ĐÓNG (CHẾ ĐỘ BẢO TRÌ)';
+      $('srv-desc').textContent = `Thông báo hiển thị cho khách: "${serverConfig.message}"`;
+      btn.className = 'primary';
+      btn.textContent = '🟢 Mở lại Server ngay';
+    } else {
+      banner.className = 'server-banner online';
+      $('srv-title').textContent = '🟢 SERVER ĐANG MỞ HOẠT ĐỘNG BÌNH THƯỜNG';
+      $('srv-desc').textContent = 'Tất cả thành viên đang truy cập và làm nhiệm vụ bình thường.';
+      btn.className = 'danger';
+      btn.textContent = '🛑 Đóng Server (Bảo trì)';
+    }
+  });
+
+  Store.onValue('users', val => {
+    allUsersCache = val || {};
+    $('st-users').textContent = Object.keys(allUsersCache).length;
+    renderUsers();
+  });
+
+  Store.onValue('deposits', val => {
+    const items = Object.entries(val || {}).map(([k, v]) => ({ key: k, ...v })).sort((a, b) => b.createdAt - a.createdAt);
+    const pendingCount = items.filter(i => i.status === 'pending').length;
+    $('st-deposits').textContent = pendingCount;
+    $('cnt-dep').textContent = pendingCount;
+
+    $('admin-deposit-list').innerHTML = items.length ? items.map(d => `
+      <div class="card">
+        <div class="row">
+          <div>
+            <strong style="font-size:15px;color:var(--green)">Nạp ${money(d.amount)}</strong> — <b>${esc(d.userName)}</b> (${esc(d.phone)})<br>
+            <small>Nội dung CK: <code>${esc(d.memo)}</code> · ${new Date(d.createdAt).toLocaleString('vi-VN')}</small>
+          </div>
+          <span class="badge ${d.status}">${d.status === 'verified' ? 'Đã duyệt' : d.status === 'rejected' ? 'Từ chối' : 'Chờ duyệt'}</span>
+        </div>
+        ${d.receipt ? `<div style="margin:10px 0"><a href="${d.receipt}" target="_blank"><img src="${d.receipt}" style="width:100px;height:100px;object-fit:cover;border-radius:10px;border:1px solid #ccc"></a></div>` : ''}
+        ${d.status === 'pending' ? `<div style="display:flex;gap:8px;margin-top:10px">
+          <button class="primary" onclick="approveDeposit('${d.key}', '${d.phone}', ${d.amount})">✅ Duyệt nạp +${money(d.amount)} (Mở VIP)</button>
+          <button class="danger" onclick="rejectDeposit('${d.key}', '${d.phone}', ${d.amount})">❌ Từ chối</button>
+        </div>` : ''}
+      </div>`).join('') : '<p style="color:var(--muted)">Chưa có yêu cầu nạp tiền nào.</p>';
+  });
+
+  Store.onValue('submissions', val => {
+    const items = Object.entries(val || {}).map(([k, v]) => ({ key: k, ...v })).sort((a, b) => b.createdAt - a.createdAt);
+    const pendingCount = items.filter(i => i.status === 'pending').length;
+    $('st-proofs').textContent = pendingCount;
+    $('cnt-prf').textContent = pendingCount;
+
+    $('admin-proof-list').innerHTML = items.length ? items.map(p => `
+      <div class="card">
+        <div class="row">
+          <div>
+            <strong>${esc(p.taskTitle)} (${esc(p.rewardDisplay || money(p.reward))})</strong> — <b>${esc(p.userName)}</b> (${esc(p.phone)})<br>
+            <small>Thông tin nộp: <code>${esc(p.contact)}</code> · ${new Date(p.createdAt).toLocaleString('vi-VN')}</small>
+            ${p.reviewNote ? `<div style="font-size:11px;color:#4a6b2c;margin-top:4px">${esc(p.reviewNote)}</div>` : ''}
+          </div>
+          <span class="badge ${p.status}">${p.status === 'verified' ? 'Đã duyệt' : p.status === 'rejected' ? 'Từ chối' : 'Chờ duyệt'}</span>
+        </div>
+        <div style="display:flex;gap:8px;margin:10px 0;flex-wrap:wrap">
+          ${(p.images || []).map(src => `<a href="${src}" target="_blank"><img src="${src}" style="width:95px;height:95px;object-fit:cover;border-radius:8px;border:1px solid #ccc"></a>`).join('')}
+        </div>
+        ${p.status === 'pending' ? `<div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="primary" onclick="approveProof('${p.key}', '${p.phone}', ${p.reward}, '${esc(p.taskTitle)}')">✅ Duyệt & Cộng thưởng</button>
+          <button class="danger" onclick="rejectProof('${p.key}')">❌ Từ chối</button>
+        </div>` : ''}
+      </div>`).join('') : '<p style="color:var(--muted)">Chưa có hồ sơ nhiệm vụ nào.</p>';
+  });
+
+  Store.onValue('withdrawals', val => {
+    const items = Object.entries(val || {}).map(([k, v]) => ({ key: k, ...v })).sort((a, b) => b.createdAt - a.createdAt);
+    const pendingCount = items.filter(i => i.status === 'pending').length;
+    $('st-withdraws').textContent = pendingCount;
+    $('cnt-wdr').textContent = pendingCount;
+    $('st-paid').textContent = money(items.filter(i => i.status === 'paid').reduce((s, i) => s + Number(i.amount), 0));
+
+    $('admin-withdraw-list').innerHTML = items.length ? items.map(w => `
+      <div class="card row">
+        <div>
+          <strong style="font-size:15px;color:var(--green)">${money(w.amount)}</strong> — <b>${esc(w.provider)}</b>: <code>${esc(w.destination)}</code> (${esc(w.holderName)})<br>
+          <small>User: ${esc(w.userName)} (${esc(w.phone)}) · ${new Date(w.createdAt).toLocaleString('vi-VN')}</small>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="badge ${w.status}">${w.status === 'paid' ? 'Đã chuyển' : w.status === 'rejected' ? 'Đã hoàn tiền' : 'Chờ duyệt'}</span>
+          ${w.status === 'pending' ? `
+            ${BANK_CODES[w.provider] ? `<button class="secondary" onclick="showVietQR('${BANK_CODES[w.provider]}','${w.destination}',${w.amount},'${esc(w.holderName)}','${w.phone}')">📱 Quét VietQR</button>` : ''}
+            <button class="primary" onclick="approveWithdraw('${w.key}', '${w.phone}', ${w.amount})">✅ Đã chuyển khoản</button>
+            <button class="danger" onclick="rejectWithdraw('${w.key}', '${w.phone}', ${w.amount})">❌ Từ chối (Hoàn tiền)</button>
+          ` : ''}
+        </div>
+      </div>`).join('') : '<p style="color:var(--muted)">Chưa có lệnh rút tiền nào.</p>';
+  });
+
+  Store.onValue('tasks', val => {
+    allTasksCache = val || {};
+    const list = Object.values(allTasksCache);
+    $('admin-task-list').innerHTML = list.map(t => {
+      const isPaused = t.status === 'paused';
+      return `<div class="card row">
+        <div style="display:flex;gap:12px;align-items:center;flex:1;min-width:220px">
+          ${t.image ? `<img src="${esc(t.image)}" style="width:46px;height:46px;border-radius:10px;object-fit:cover;border:1px solid #ddd">` : `<div style="width:46px;height:46px;border-radius:10px;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:800">${esc(t.title.slice(0,2).toUpperCase())}</div>`}
+          <div>
+            <strong>${esc(t.title)}</strong> (${esc(t.type)}) — Thưởng: <b>${esc(t.rewardText || money(t.reward))}</b>
+            ${isPaused ? '<span class="badge closed">⏸ ĐANG DỪNG</span>' : '<span class="badge open">▶ ĐANG CHẠY</span>'}
+            <span class="badge pending">${t.reviewMode === 'auto' ? '🤖 AI tự duyệt' : '👨‍💼 Admin duyệt'}</span><br>
+            <small>${esc(t.desc)}</small>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="secondary" onclick="openEditTaskModal('${t.id}')">✏️ Sửa</button>
+          <button class="${isPaused ? 'primary' : 'gold'}" onclick="toggleTaskStatus('${t.id}', '${isPaused ? 'active' : 'paused'}')">${isPaused ? '▶ Mở lại' : '⏸ Dừng nhiệm vụ'}</button>
+          <button class="danger" onclick="deleteTask('${t.id}')">🗑️ Xóa</button>
+        </div>
+      </div>`;
+    }).join('') || '<p>Chưa có nhiệm vụ nào.</p>';
+  });
+
+  Store.onValue('giftcodes', val => {
+    const list = Object.entries(val || {});
+    $('admin-gc-list').innerHTML = list.map(([code, g]) => `
+      <div class="card row">
+        <div>
+          <strong style="font-size:15px">${esc(code)}</strong> — Thưởng: <b>${money(g.amount)}</b> · Đã dùng: ${g.usedCount || 0}/${g.maxUses}
+          ${g.active ? '<span class="badge open">Đang mở</span>' : '<span class="badge closed">Đã khóa</span>'}
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="secondary" onclick="Store.update('giftcodes/${code}', {active: ${!g.active}})">${g.active ? 'Khóa mã' : 'Mở mã'}</button>
+          <button class="danger" onclick="Store.set('giftcodes/${code}', null)">Xóa</button>
+        </div>
+      </div>`).join('');
+  });
+}
+
+window.toggleServerStatus = async () => {
+  const nextState = !serverConfig.isClosed;
+  await Store.update('system/server', { isClosed: nextState, updatedAt: Date.now() });
+};
+
+window.openServerModal = () => {
+  $('modal').innerHTML = `
+    <h3>⚙ Cài đặt đóng/mở Server & Bảo trì</h3>
+    <label>Trạng thái Server hiện tại</label>
+    <select id="edit-srv-closed">
+      <option value="false" ${!serverConfig.isClosed ? 'selected' : ''}>🟢 Đang mở hoạt động bình thường</option>
+      <option value="true" ${serverConfig.isClosed ? 'selected' : ''}>🔴 Đang đóng Server (Bảo trì)</option>
+    </select>
+    <label>Nội dung thông báo khi đóng Server</label>
+    <textarea id="edit-srv-msg" rows="3">${esc(serverConfig.message || '')}</textarea>
+    <label>Danh sách SĐT Admin được phép vào test khi đóng Server (cách nhau dấu phẩy)</label>
+    <input id="edit-srv-whitelist" value="${esc(serverConfig.whitelistPhones || '')}" placeholder="Ví dụ: 0389710007, 0912345678">
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="primary" style="flex:1" onclick="saveServerConfig()">Lưu cài đặt Server</button>
+      <button class="secondary" onclick="$('modal-back').classList.remove('open')">Hủy</button>
+    </div>
+  `;
+  $('modal-back').classList.add('open');
+};
+
+window.saveServerConfig = async () => {
+  await Store.set('system/server', {
+    isClosed: $('edit-srv-closed').value === 'true',
+    message: $('edit-srv-msg').value.trim(),
+    whitelistPhones: $('edit-srv-whitelist').value.trim(),
+    updatedAt: Date.now()
+  });
+  $('modal-back').classList.remove('open');
+};
+
+$('new-task-form').onsubmit = async e => {
+  e.preventDefault();
+  const id = 'task_' + Date.now();
+  let image = $('nt-logo-url').value.trim();
+  if ($('nt-logo-file').files[0]) image = await compressImgAdmin($('nt-logo-file').files[0], 200);
+  let guideImage = '';
+  if ($('nt-guide-file').files[0]) guideImage = await compressImgAdmin($('nt-guide-file').files[0], 650);
+
+  await Store.set('tasks/' + id, {
+    id,
+    title: $('nt-title').value.trim(),
+    type: $('nt-type').value,
+    reward: Number($('nt-reward').value),
+    rewardText: $('nt-reward-text').value.trim(),
+    reviewMode: $('nt-review-mode').value,
+    image,
+    guideImage,
+    code: $('nt-code').value.trim(),
+    contactLabel: $('nt-contact').value.trim(),
+    desc: $('nt-desc').value.trim(),
+    url: $('nt-url').value.trim(),
+    steps: $('nt-steps').value.split('\n').map(s => s.trim()).filter(Boolean),
+    proof: $('nt-proof').value.trim(),
+    note: $('nt-note').value.trim(),
+    status: 'active',
+    createdAt: Date.now()
+  });
+  $('new-task-form').reset();
+};
+
+window.openEditTaskModal = (id) => {
+  const t = allTasksCache[id];
+  if (!t) return;
+  $('modal').innerHTML = `
+    <h3>✏️ Chỉnh sửa nhiệm vụ: ${esc(t.title)}</h3>
+    <div class="grid-2">
+      <div><label>Tên nhiệm vụ</label><input id="et-title" value="${esc(t.title)}"></div>
+      <div><label>Danh mục</label><select id="et-type">
+        ${['Ngân hàng','Ví điện tử','Tiền mã hóa','Giải trí','Cộng đồng'].map(c => `<option ${t.type === c ? 'selected' : ''}>${c}</option>`).join('')}
+      </select></div>
+    </div>
+    <div class="grid-3">
+      <div><label>Tiền thưởng VNĐ</label><input id="et-reward" type="number" value="${Number(t.reward) || 0}"></div>
+      <div><label>Chữ hiển thị thưởng</label><input id="et-reward-text" value="${esc(t.rewardText || '')}"></div>
+      <div><label>Chế độ duyệt</label><select id="et-review-mode">
+        <option value="manual" ${t.reviewMode !== 'auto' ? 'selected' : ''}>Admin duyệt thủ công</option>
+        <option value="auto" ${t.reviewMode === 'auto' ? 'selected' : ''}>AI tự động duyệt</option>
+      </select></div>
+    </div>
+    <div class="grid-2">
+      <div><label>Trạng thái hoạt động</label><select id="et-status">
+        <option value="active" ${t.status !== 'paused' ? 'selected' : ''}>▶ Đang hoạt động</option>
+        <option value="paused" ${t.status === 'paused' ? 'selected' : ''}>⏸ Dừng hoạt động</option>
+      </select></div>
+      <div><label>Mã mời</label><input id="et-code" value="${esc(t.code || '')}"></div>
+    </div>
+    <label>Mô tả ngắn</label><input id="et-desc" value="${esc(t.desc || '')}">
+    <label>Link tham gia</label><input id="et-url" value="${esc(t.url || '')}">
+    <label>Các bước hướng dẫn (Mỗi bước 1 dòng)</label><textarea id="et-steps" rows="4">${esc((t.steps || []).join('\n'))}</textarea>
+    <label>Ghi chú thêm</label><input id="et-note" value="${esc(t.note || '')}">
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="primary" style="flex:1" onclick="saveTaskEdit('${id}')">Lưu thay đổi ↗</button>
+      <button class="secondary" onclick="$('modal-back').classList.remove('open')">Đóng</button>
+    </div>
+  `;
+  $('modal-back').classList.add('open');
+};
+
+window.saveTaskEdit = async (id) => {
+  await Store.update('tasks/' + id, {
+    title: $('et-title').value.trim(),
+    type: $('et-type').value,
+    reward: Number($('et-reward').value),
+    rewardText: $('et-reward-text').value.trim(),
+    reviewMode: $('et-review-mode').value,
+    status: $('et-status').value,
+    code: $('et-code').value.trim(),
+    desc: $('et-desc').value.trim(),
+    url: $('et-url').value.trim(),
+    steps: $('et-steps').value.split('\n').map(s => s.trim()).filter(Boolean),
+    note: $('et-note').value.trim()
+  });
+  $('modal-back').classList.remove('open');
+};
+
+window.toggleTaskStatus = (id, status) => Store.update('tasks/' + id, { status });
+window.deleteTask = id => { Store.set('tasks/' + id, null); };
+
+function renderUsers() {
+  const q = $('user-search').value.trim().toLowerCase();
+  const allUsersArr = Object.values(allUsersCache);
+  const users = allUsersArr.filter(u => (u.phone + ' ' + u.name + ' ' + (u.inviteCode || '')).toLowerCase().includes(q));
+
+  $('admin-user-list').innerHTML = users.map(u => {
+    const isVip = Number(u.totalDeposited || 0) >= 20000;
+    const plots = u.plots ? Object.entries(u.plots) : [];
+    const plotText = plots.length
+      ? plots.map(([k, p]) => `${k.toUpperCase()}: ${CROP_NAMES[p.crop] || p.crop} (${Date.now() >= p.readyAt ? 'Đã chín' : 'Đang lớn'})`).join(' | ')
+      : 'Chưa gieo cây nào';
+
+    const f1Count = allUsersArr.filter(x => x.referredBy && x.referredBy === u.inviteCode).length;
+
+    return `<div class="card">
+      <div class="row">
+        <div>
+          <strong style="font-size:15px">${esc(u.name)}</strong> — SĐT: <code>${esc(u.phone)}</code> · MK: <code>${esc(u.password)}</code> · PIN: <code>${esc(u.pin)}</code>
+          ${isVip ? '<span class="badge vip">👑 VIP</span>' : '<span class="badge pending">Thường</span>'}
+          ${u.locked ? '<span class="badge closed">ĐÃ KHÓA</span>' : ''}
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="secondary" onclick="openSubordinatesModal('${u.phone}')">👥 Cấp dưới (${f1Count})</button>
+          <button class="primary" onclick="openEditUserModal('${u.phone}')">✏️ Sửa toàn bộ thông tin</button>
+          <button class="${u.locked ? 'secondary' : 'danger'}" onclick="Store.update('users/${u.phone}', {locked: ${!u.locked}})">${u.locked ? 'Mở khóa TK' : 'Khóa TK'}</button>
+        </div>
+      </div>
+      <div class="info-grid">
+        <div>💰 Số dư ví: <b>${money(u.balance)}</b></div>
+        <div>💳 Tổng đã nạp: <b>${money(u.totalDeposited || 0)}</b></div>
+        <div>↗ Đã rút: <b>${money(u.withdrawn || 0)}</b></div>
+        <div>⭐ Nông trại: <b>Level ${u.farmLevel || 1}</b> (${u.farmExp || 0} EXP)</div>
+        <div>🌾 Thu nông trại: <b>${money(u.farmEarned || 0)}</b></div>
+        <div>🔑 Mã mời: <b>${esc(u.inviteCode)}</b> (F1 của: ${esc(u.referredBy || 'Không')})</div>
+      </div>
+      <div style="font-size:11px;color:#4f683a">🌱 <b>Đang trồng:</b> ${esc(plotText)}</div>
+    </div>`;
+  }).join('') || '<p>Không tìm thấy thành viên nào.</p>';
+}
+$('user-search').oninput = renderUsers;
+
+window.openSubordinatesModal = (phone) => {
+  const u = allUsersCache[phone];
+  if (!u) return;
+
+  const allUsersArr = Object.values(allUsersCache);
+  const f1Users = allUsersArr.filter(x => x.referredBy && x.referredBy === u.inviteCode);
+  const f1Codes = f1Users.map(x => x.inviteCode).filter(Boolean);
+  const f2Users = allUsersArr.filter(x => x.referredBy && f1Codes.includes(x.referredBy));
+
+  const renderSubRow = (sub, levelLabel) => `
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:#fcfdf9">
+      <div>
+        <span class="badge ${levelLabel === 'F1' ? 'open' : 'pending'}">${levelLabel}</span>
+        <strong style="margin-left:4px">${esc(sub.name)}</strong> (<code>${esc(sub.phone)}</code>)<br>
+        <small style="color:var(--muted)">
+          Ví: <b>${money(sub.balance)}</b> · Đã nạp: <b>${money(sub.totalDeposited || 0)}</b> · LV${sub.farmLevel || 1} · ĐK: ${new Date(sub.createdAt).toLocaleDateString('vi-VN')}
+        </small>
+      </div>
+      <div style="text-align:right">
+        ${levelLabel === 'F1'
+          ? (sub.f1Rewarded ? '<span class="badge verified">✅ Đã trả 200đ</span>' : '<span class="badge pending">⏳ Chưa duyệt đơn đầu</span>')
+          : `<small style="color:var(--muted)">Qua mã: ${esc(sub.referredBy)}</small>`
+        }
+      </div>
+    </div>
+  `;
+
+  $('modal').innerHTML = `
+    <div class="row" style="margin-bottom:12px">
+      <div>
+        <h3 style="margin:0">👥 Hệ thống cấp dưới của ${esc(u.name)}</h3>
+        <small style="color:var(--muted)">SĐT: <b>${esc(u.phone)}</b> · Mã giới thiệu: <code>${esc(u.inviteCode)}</code></small>
+      </div>
+      <button class="secondary" onclick="$('modal-back').classList.remove('open')">Đóng</button>
+    </div>
+
+    <div class="info-grid" style="margin-bottom:14px">
+      <div>Tổng F1 trực tiếp: <b>${f1Users.length} người</b></div>
+      <div>F1 đã hoàn thành nhiệm vụ: <b>${f1Users.filter(x => x.f1Rewarded).length} người</b></div>
+      <div>Tổng F2 gián tiếp: <b>${f2Users.length} người</b></div>
+    </div>
+
+    <h4 style="margin:12px 0 8px;color:var(--green)">Danh sách F1 trực tiếp (${f1Users.length})</h4>
+    ${f1Users.length ? f1Users.map(s => renderSubRow(s, 'F1')).join('') : '<p style="font-size:11px;color:var(--muted)">Thành viên này chưa mời được F1 nào.</p>'}
+
+    <h4 style="margin:16px 0 8px;color:#5a7049">Danh sách F2 gián tiếp (${f2Users.length})</h4>
+    ${f2Users.length ? f2Users.map(s => renderSubRow(s, 'F2')).join('') : '<p style="font-size:11px;color:var(--muted)">Chưa có cấp dưới F2.</p>'}
+  `;
+  $('modal-back').classList.add('open');
+};
+
+window.openEditUserModal = (phone) => {
+  const u = allUsersCache[phone];
+  if (!u) return;
+  const pPlots = u.purchasedPlots || {};
+  $('modal').innerHTML = `
+    <h3>✏️ Chỉnh sửa toàn bộ dữ liệu: ${esc(u.name)} (${esc(u.phone)})</h3>
+    <div class="grid-2">
+      <div><label>Tên hiển thị</label><input id="eu-name" value="${esc(u.name)}"></div>
+      <div><label>Mã giới thiệu riêng</label><input id="eu-code" value="${esc(u.inviteCode || '')}"></div>
+    </div>
+    <div class="grid-2">
+      <div><label>Mật khẩu đăng nhập</label><input id="eu-pass" value="${esc(u.password || '')}"></div>
+      <div><label>Mã PIN rút tiền (4 số)</label><input id="eu-pin" maxlength="4" value="${esc(u.pin || '')}"></div>
+    </div>
+    <div class="grid-3">
+      <div><label>Số dư khả dụng (VNĐ)</label><input id="eu-balance" type="number" value="${Number(u.balance) || 0}"></div>
+      <div><label>Tổng đã nạp (≥20k mở VIP)</label><input id="eu-deposited" type="number" value="${Number(u.totalDeposited) || 0}"></div>
+      <div><label>Tổng đã rút (VNĐ)</label><input id="eu-withdrawn" type="number" value="${Number(u.withdrawn) || 0}"></div>
+    </div>
+    <div class="grid-3">
+      <div><label>Level Nông trại</label><input id="eu-lv" type="number" min="1" value="${Number(u.farmLevel) || 1}"></div>
+      <div><label>Điểm kinh nghiệm (EXP)</label><input id="eu-exp" type="number" min="0" value="${Number(u.farmExp) || 0}"></div>
+      <div><label>Tổng thu từ nông trại</label><input id="eu-farm-earned" type="number" min="0" value="${Number(u.farmEarned) || 0}"></div>
+    </div>
+    <label>Trạng thái mở khóa các ô đất mở rộng (Ô #4 đến Ô #9)</label>
+    <div class="plot-check-grid">
+      ${[4,5,6,7,8,9].map(i => `<label class="plot-check-item"><input type="checkbox" id="eu-plot-${i}" ${pPlots['p'+i] ? 'checked' : ''}> Mở Ô đất #${i}</label>`).join('')}
+    </div>
+    <label>Trạng thái tài khoản</label>
+    <select id="eu-locked">
+      <option value="false" ${!u.locked ? 'selected' : ''}>🟢 Đang hoạt động</option>
+      <option value="true" ${u.locked ? 'selected' : ''}>🔴 Khóa tài khoản</option>
+    </select>
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="primary" style="flex:1" onclick="saveUserFull('${phone}')">💾 Lưu toàn bộ thay đổi</button>
+      <button class="danger" onclick="deleteUserAccount('${phone}')">🗑️ Xóa TK</button>
+      <button class="secondary" onclick="$('modal-back').classList.remove('open')">Hủy</button>
+    </div>
+  `;
+  $('modal-back').classList.add('open');
+};
+
+window.saveUserFull = async (phone) => {
+  const newBalance = Number($('eu-balance').value) || 0;
+  const purchasedPlots = {};
+  [4,5,6,7,8,9].forEach(i => {
+    if ($('eu-plot-' + i).checked) purchasedPlots['p' + i] = true;
+  });
+
+  await Store.update('users/' + phone, {
+    name: $('eu-name').value.trim(),
+    inviteCode: $('eu-code').value.trim().toUpperCase(),
+    password: $('eu-pass').value.trim(),
+    pin: $('eu-pin').value.trim(),
+    balance: newBalance,
+    totalDeposited: Number($('eu-deposited').value) || 0,
+    withdrawn: Number($('eu-withdrawn').value) || 0,
+    farmLevel: Math.max(1, Number($('eu-lv').value) || 1),
+    farmExp: Math.max(0, Number($('eu-exp').value) || 0),
+    farmEarned: Math.max(0, Number($('eu-farm-earned').value) || 0),
+    purchasedPlots,
+    locked: $('eu-locked').value === 'true'
+  });
+
+  await Store.push('history/' + phone, {
+    title: 'Quản trị viên cập nhật tài khoản',
+    amount: `Số dư: ${money(newBalance)}`,
+    icon: '⚙️',
+    detail: 'Cập nhật thông tin từ hệ thống Admin',
+    createdAt: Date.now()
+  });
+
+  $('modal-back').classList.remove('open');
+};
+
+window.deleteUserAccount = async (phone) => {
+  await Store.set('users/' + phone, null);
+  $('modal-back').classList.remove('open');
+};
+
+window.approveDeposit = async (key, phone, amount) => {
+  await Store.update('deposits/' + key, { status: 'verified' });
+  const u = await Store.get('users/' + phone);
+  if (u) {
+    await Store.update('users/' + phone, {
+      balance: (u.balance || 0) + Number(amount),
+      totalDeposited: (u.totalDeposited || 0) + Number(amount)
+    });
+    await Store.push('history/' + phone, {
+      title: 'Nạp tiền thành công (VietQR)', amount: `+${money(amount)}`, icon: '💳',
+      detail: 'Đã cộng số dư & mở khóa gói VIP nông trại', createdAt: Date.now()
+    });
+  }
+};
+
+window.rejectDeposit = async (key, phone, amount) => {
+  await Store.update('deposits/' + key, { status: 'rejected' });
+  await Store.push('history/' + phone, { title: 'Lệnh nạp tiền bị từ chối', amount: `${money(amount)}`, icon: '❌', detail: 'Chưa nhận được chuyển khoản', createdAt: Date.now() });
+};
+
+window.approveProof = async (key, phone, defaultReward, title) => {
+  const customAmt = prompt(`Nhập số tiền VNĐ cộng cho nhiệm vụ "${title}":`, defaultReward > 100 ? defaultReward : 500000);
+  if (customAmt === null) return;
+  const reward = Number(customAmt) || 0;
+
+  await Store.update('submissions/' + key, { status: 'verified' });
+  const u = await Store.get('users/' + phone);
+  if (u) {
+    await Store.update('users/' + phone, { balance: (u.balance || 0) + reward });
+    await Store.push('history/' + phone, { title: `Duyệt nhiệm vụ: ${title}`, amount: `+${money(reward)}`, icon: '☑', detail: 'Hoàn thành nhiệm vụ được duyệt', createdAt: Date.now() });
+
+    if (u.referredBy && !u.f1Rewarded) {
+      await Store.update('users/' + phone, { f1Rewarded: true });
+      const inviter = Object.values(allUsersCache).find(x => x.inviteCode === u.referredBy);
+      if (inviter) {
+        await Store.update('users/' + inviter.phone, { balance: (inviter.balance || 0) + 200 });
+        await Store.update(`users/${inviter.phone}/invited/${phone}`, { qualified: true });
+        await Store.push('history/' + inviter.phone, { title: `Hoa hồng F1 (${u.name})`, amount: '+200đ', icon: '♧', detail: 'F1 hoàn thành nhiệm vụ đầu tiên', createdAt: Date.now() });
+      }
+    }
+  }
+};
+
+window.rejectProof = async (key) => {
+  const reason = prompt('Nhập lý do từ chối:');
+  if (reason === null) return;
+  await Store.update('submissions/' + key, { status: 'rejected', reviewNote: reason || 'Bằng chứng chưa hợp lệ' });
+};
+
+window.showVietQR = (bankId, acc, amount, name, phone) => {
+  const url = `https://img.vietqr.io/image/${bankId}-${acc}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent('XUVUI ' + phone)}&accountName=${encodeURIComponent(name)}`;
+  $('modal').innerHTML = `<div style="text-align:center"><h3>Quét mã VietQR thanh toán</h3><img src="${url}" style="max-width:260px;border-radius:12px;border:1px solid #ddd"><p><b>${esc(name)}</b> · ${esc(acc)} · <b>${money(amount)}</b></p><button class="primary" onclick="$('modal-back').classList.remove('open')">Đóng</button></div>`;
+  $('modal-back').classList.add('open');
+};
+
+window.approveWithdraw = async (key, phone, amount) => {
+  await Store.update('withdrawals/' + key, { status: 'paid' });
+  const u = await Store.get('users/' + phone);
+  if (u) await Store.update('users/' + phone, { withdrawn: (u.withdrawn || 0) + Number(amount) });
+};
+
+window.rejectWithdraw = async (key, phone, amount) => {
+  const reason = prompt('Lý do từ chối (Tiền sẽ hoàn lại ví user):');
+  if (reason === null) return;
+  await Store.update('withdrawals/' + key, { status: 'rejected', note: reason });
+  const u = await Store.get('users/' + phone);
+  if (u) {
+    await Store.update('users/' + phone, { balance: (u.balance || 0) + Number(amount) });
+    await Store.push('history/' + phone, { title: 'Hoàn tiền lệnh rút bị từ chối', amount: `+${money(amount)}`, icon: '↺', detail: reason, createdAt: Date.now() });
+  }
+};
+
+$('new-gc-form').onsubmit = async e => {
+  e.preventDefault();
+  const code = $('gc-code').value.trim().toUpperCase();
+  await Store.set('giftcodes/' + code, { amount: Number($('gc-amount').value), maxUses: Number($('gc-uses').value), usedCount: 0, active: true });
+  $('new-gc-form').reset();
+};
+
+$('modal-back').onclick = e => { if (e.target.id === 'modal-back') $('modal-back').classList.remove('open'); };
+</script>
+</body>
+</html>
