@@ -266,7 +266,6 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
 </head>
 <body>
 
-<!-- MÀN HÌNH BẢO TRÌ KHI ADMIN ĐÓNG SERVER -->
 <div id="maintenance-screen" hidden style="position:fixed;inset:0;z-index:999;background:#f4f7ec;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center">
   <div style="background:#fff;border:1px solid #dfe6d7;border-radius:24px;padding:32px 24px;max-width:420px;box-shadow:0 20px 50px #244d3715">
     <div style="font-size:46px;margin-bottom:10px">🛠️</div>
@@ -501,11 +500,11 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
 
     <section class="view" id="proofs">
       <div class="page-heading">
-        <div><div class="eyebrow">TIẾN ĐỘ XÉT DUYỆT</div><h1>Hồ sơ nhiệm vụ đã gửi</h1><p>Hệ thống AI kiểm tra tự động hoặc chuyển Admin đối soát.</p></div>
+        <div><div class="eyebrow">TIẾN ĐỘ XÉT DUYỆT</div><h1>Hồ sơ nhiệm vụ đã gửi</h1><p>Trạng thái xét duyệt thời gian thực.</p></div>
       </div>
       <div class="tabs" id="proof-tabs">
         <button class="active" data-proof-filter="all">Tất cả</button>
-        <button data-proof-filter="pending">Chờ duyệt</button>
+        <button data-proof-filter="pending">Chờ xử lý</button>
         <button data-proof-filter="verified">Đã duyệt</button>
         <button data-proof-filter="rejected">Bị từ chối</button>
       </div>
@@ -618,7 +617,12 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
   <button data-view="wallet"><span>▱</span>Ví tiền</button>
 </nav>
 
-<div class="modal-back" id="modal-back"><div class="modal" id="modal"></div></div>
+<div class="modal-back" id="modal-back">
+  <div class="modal" id="modal"></div>
+  <div id="image-lightbox" style="position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:none;align-items:center;justify-content:center;padding:16px">
+    <img id="lightbox-img" src="" style="max-width:100%;max-height:90vh;border-radius:12px;object-fit:contain">
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -645,12 +649,6 @@ const FIREBASE_CONFIG = {
 const TELEGRAM_CONFIG = {
   taskBot: { botToken: "9236061614:AAGsiXwoQVswM1KQurX5nMi0769g1q9NOCA", chatId: "7865394196" },
   withdrawBot: { botToken: "9231728188:AAENh6sfcdF4Tav9s0OV5hVk8KWK5yODQAI", chatId: "7865394196" }
-};
-
-// CẤU HÌNH AI TỰ ĐỘNG DUYỆT (GEMINI API KEY)
-const GEMINI_AI_CONFIG = {
-  apiKey: ["AQ.Ab8RN6KwmU6CJewCtfft", "_Fyve4qYv83s6uc7PrLgtF4IoMXyCQ"].join(""),
-  autoApproveEnabled: true
 };
 
 const ADMIN_BANK = { bankId: "MB", bankName: "MBBank", accountNo: "0389710007", accountName: "HA TRUNG DUC" };
@@ -733,18 +731,6 @@ Store.onValue('system/server', srv => {
   }
 });
 
-// Hàm kiểm tra AI tối ưu chống treo, thực thi bất đồng bộ an toàn
-async function verifyProofWithAI(task, contact, base64Image) {
-  const autoPassTypes = ['Cộng đồng', 'Giải trí'];
-  const isCommunity = autoPassTypes.includes(task.type) && task.id !== 'aidaxin' && task.id !== 'tikglobal';
-
-  if (isCommunity) {
-    return { approved: true, reason: "Ảnh hợp lệ, tự động duyệt thành công." };
-  } else {
-    return { approved: true, reason: "Đã ghi nhận ảnh bằng chứng, chuyển Admin đối soát." };
-  }
-}
-
 const FarmAudio = {
   ctx: null, isPlaying: false, timer: null, step: 0,
   melody: [261.63, 329.63, 392.00, 523.25, 392.00, 329.63, 293.66, 349.23, 440.00, 523.25, 440.00, 349.23, 329.63, 392.00, 493.88, 523.25],
@@ -814,59 +800,67 @@ function cropSvg(id, isSprout = false) {
 const DEFAULT_TASKS = [
   {
     id: "aidaxin", title: "AI Daxin", desc: "Tải app, tạo tài khoản giật lì xì lên 300k & nạp đầu 100k",
-    reward: 10000, type: "Giải trí", reviewMode: "manual", url: "https://h5.money-chat.click/7Ctti4", code: "",
+    reward: 10000, type: "Giải trí", url: "https://h5.money-chat.click/7Ctti4", code: "",
     contactLabel: "Tên Tài Khoản AI Daxin",
+    guideImage: "https://images.unsplash.com/photo-1616469829941-c7200edec809?w=500&auto=format&fit=crop&q=60",
     steps: ["Tải app theo đường link.", "Tạo tài khoản và tham gia giật lì xì lên 300.000đ.", "Thực hiện nạp đầu 100.000đ.", "Gửi ảnh chứng minh kèm với Tên Tài Khoản bên dưới."],
     proof: "Ảnh chụp màn hình đã nạp đầu 100k và hiển thị rõ Tên Tài Khoản.",
     note: "Nhiệm vụ này cần Admin kiểm tra và duyệt thủ công sau khi đối soát."
   },
   {
     id: "zalo", title: "Tham gia nhóm Zalo", desc: "Vào nhóm cộng đồng & xác minh thành viên",
-    reward: 1000, type: "Cộng đồng", reviewMode: "auto", url: "https://zalo.me/g/asz0jvhekhgsvwiqro0l", code: "",
+    reward: 1000, type: "Cộng đồng", url: "https://zalo.me/g/asz0jvhekhgsvwiqro0l", code: "",
     contactLabel: "Số điện thoại Zalo",
+    guideImage: "https://images.unsplash.com/photo-1611605698335-8b1569810432?w=500&auto=format&fit=crop&q=60",
     steps: ["Bấm vào link tham gia nhóm Zalo.", "Chụp ảnh danh sách thành viên có tên bạn trong nhóm."],
     proof: "Ảnh chụp màn hình xác nhận bạn đã tham gia nhóm Zalo."
   },
   {
     id: "okx", title: "OKX — Nhận 20 USD", desc: "Tải app, xác thực KYC, nạp & rút 100 USD",
-    reward: 20, currency: "USD", rewardText: "20 USD", type: "Tiền mã hóa", reviewMode: "manual", url: "https://okx.com/join/CYBYHLUU", code: "CYBYHLUU",
+    reward: 20, currency: "USD", rewardText: "20 USD", type: "Tiền mã hóa", url: "https://okx.com/join/CYBYHLUU", code: "CYBYHLUU",
     contactLabel: "Số điện thoại đăng ký OKX",
+    guideImage: "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=500&auto=format&fit=crop&q=60",
     steps: ["Tải app OKX theo đúng đường link.", "Đăng ký nhập mã mời CYBYHLUU và xác thực tài khoản.", "Nạp 100 USD và rút 100 USD đó ra.", "Gửi hình ảnh xác thực và số điện thoại."],
     proof: "Ảnh xác thực KYC và lịch sử nạp/rút 100 USD."
   },
   {
     id: "tikglobal", title: "TikGlobal", desc: "Đăng ký SĐT, nhập mã mời & nạp 100k hoặc 280k",
-    reward: 20000, type: "Giải trí", reviewMode: "manual", url: "https://liteglobal.net/invite/BC55119602", code: "BC55119602",
+    reward: 20000, type: "Giải trí", url: "https://liteglobal.net/invite/BC55119602", code: "BC55119602",
     contactLabel: "ID tài khoản TikGlobal",
+    guideImage: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=60",
     steps: ["Đăng ký tài khoản bằng số điện thoại.", "Nhập mã giới thiệu BC55119602.", "Nạp tiền từ 100.000đ hoặc 280.000đ (có thể rút số tiền đó ra).", "Gửi hình ảnh xác minh và ID tài khoản TikGlobal."],
     proof: "Ảnh trang cá nhân hiển thị ID TikGlobal và lịch sử nạp."
   },
   {
     id: "timobank", title: "Timo Bank", desc: "Nhận từ 70.000đ đến 100.000đ (+ thưởng đặc biệt 500k)",
-    reward: 70000, rewardText: "70.000đ - 100.000đ", type: "Ngân hàng", reviewMode: "manual", url: "https://timoapp.go.link/j8j4y?code=HD3009", code: "HF3009",
+    reward: 70000, rewardText: "70.000đ - 100.000đ", type: "Ngân hàng", url: "https://timoapp.go.link/j8j4y?code=HD3009", code: "HF3009",
     contactLabel: "Số điện thoại Timo Bank",
+    guideImage: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=500&auto=format&fit=crop&q=60",
     steps: ["Tải app theo đúng đường link & nhập mã mời HF3009.", "Giữ số dư 200.000đ trong 7 ngày (nhận 30.000đ) hoặc 500.000đ trong 7 ngày (nhận 60.000đ).", "Hoàn tất thanh toán dịch vụ trong 7 ngày (+10.000đ).", "Nạp tối thiểu 100.000đ vào Hũ Chi Tiêu & thanh toán bằng Hũ Chi Tiêu (+20.000đ).", "Mời bạn tham gia Hũ Chung (+10.000đ).", "Gửi ảnh xác minh kèm số điện thoại."],
     proof: "Ảnh duy trì số dư 7 ngày và các mốc hoàn thành.",
     note: "Nhiệm vụ đặc biệt: Mở sổ tiết kiệm đầu tiên trong 30 ngày nhận lên đến 500.000đ (không nhận tiền luôn mà chờ đối soát)."
   },
   {
     id: "shopeepay", title: "ShopeePay", desc: "Đăng ký, xác thực và nạp ví 10k",
-    reward: 25000, type: "Ví điện tử", reviewMode: "manual", url: "https://pay.u.shopee.vn/p6VXZHi", code: "KTKTWN4LN",
+    reward: 25000, type: "Ví điện tử", url: "https://pay.u.shopee.vn/p6VXZHi", code: "KTKTWN4LN",
     contactLabel: "SĐT đăng ký ShopeePay",
+    guideImage: "https://images.unsplash.com/photo-1556742049-0a67d553625a?w=500&auto=format&fit=crop&q=60",
     steps: ["Tải app theo link & nhập mã mời KTKTWN4LN.", "Xác thực sinh trắc học và nạp 10.000đ vào ví.", "Gửi ảnh xác minh kèm SĐT."],
     proof: "Ảnh đã xác thực và nạp 10.000đ."
   },
   {
     id: "momo", title: "Tạo tài khoản MoMo", desc: "Liên kết ngân hàng & nạp 10.000đ",
-    reward: 40000, type: "Ví điện tử", reviewMode: "manual", url: "https://onelink.momo.vn/WZPv/ciEsrJKr", code: "0389710007",
+    reward: 40000, type: "Ví điện tử", url: "https://onelink.momo.vn/WZPv/ciEsrJKr", code: "0389710007",
     contactLabel: "Số điện thoại MoMo",
+    guideImage: "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=500&auto=format&fit=crop&q=60",
     steps: ["Tải app MoMo qua link & nhập mã 0389710007.", "Liên kết ngân hàng và nạp tối thiểu 10.000đ.", "Gửi ảnh lịch sử giao dịch kèm SĐT."],
     proof: "Ảnh liên kết ngân hàng và nạp 10.000đ."
   },
   {
     id: "liobank", title: "LioBank", desc: "Mở tài khoản & thẻ tín dụng (Trên 21 tuổi)",
-    reward: 50000, type: "Ngân hàng", reviewMode: "manual", url: "https://liobank.vn/rr/r1JE", code: "",
+    reward: 50000, type: "Ngân hàng", url: "https://liobank.vn/rr/r1JE", code: "",
     contactLabel: "Số điện thoại LioBank",
+    guideImage: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=500&auto=format&fit=crop&q=60",
     steps: ["Tải app LioBank qua link.", "Đăng ký eKYC và mở thẻ thành công.", "Chụp màn hình duyệt thẻ (che số thẻ/CVV)."],
     proof: "Ảnh màn hình mở thẻ thành công."
   }
@@ -1017,7 +1011,7 @@ async function startApp(phone) {
   const curTasks = (await Store.get('tasks')) || {};
   let needSync = false;
   DEFAULT_TASKS.forEach(t => {
-    if (!curTasks[t.id]) {
+    if (!curTasks[t.id] || (t.guideImage && !curTasks[t.id].guideImage)) {
       curTasks[t.id] = t;
       needSync = true;
     }
@@ -1040,6 +1034,7 @@ async function startApp(phone) {
   Store.onValue('submissions', val => {
     myProofs = Object.entries(val || {}).map(([k, v]) => ({ key: k, ...v })).filter(x => x.phone === phone).sort((a, b) => b.createdAt - a.createdAt);
     renderProofs(); renderTasks();
+    checkZaloAutoProcessing();
   });
 
   Store.onValue('withdrawals', val => {
@@ -1303,8 +1298,8 @@ function renderCategories() {
 }
 function taskCardHtml(t) {
   const p = myProofs.find(x => x.taskId === t.id);
-  const btnText = p ? (p.status === 'verified' ? '✅ Đã hoàn thành' : p.status === 'pending' ? '⏳ Đang chờ duyệt' : '🔄 Gửi lại bằng chứng') : 'Làm nhiệm vụ ngay';
-  return `<article class="task-card"><div class="task-card-top"><div class="app-logo">${logoSvg(t.id)}</div><div><h3>${esc(t.title)}</h3><span class="task-type">${esc(t.type)}</span></div></div><p>${esc(t.desc)}</p><div class="task-reward-row"><strong class="task-reward">${esc(formatTaskReward(t))}</strong><span class="condition-label">Duyệt tự động</span></div><button class="task-open" data-open-task="${esc(t.id)}"><span>${btnText}</span><span>↗</span></button></article>`;
+  const btnText = p ? (p.status === 'verified' ? '✅ Đã hoàn thành' : p.status === 'processing' ? '⏳ Đang xử lý' : p.status === 'pending' ? '⏳ Chờ Admin duyệt' : '🔄 Gửi lại bằng chứng') : 'Làm nhiệm vụ ngay';
+  return `<article class="task-card"><div class="task-card-top"><div class="app-logo">${logoSvg(t.id)}</div><div><h3>${esc(t.title)}</h3><span class="task-type">${esc(t.type)}</span></div></div><p>${esc(t.desc)}</p><div class="task-reward-row"><strong class="task-reward">${esc(formatTaskReward(t))}</strong><span class="condition-label">${t.id === 'zalo' ? 'Xác thực hệ thống' : 'Admin duyệt'}</span></div><button class="task-open" data-open-task="${esc(t.id)}"><span>${btnText}</span><span>↗</span></button></article>`;
 }
 function renderTasks() {
   const q = $('task-search').value.trim().toLowerCase();
@@ -1314,10 +1309,41 @@ function renderTasks() {
   $('featured-tasks').innerHTML = tasksList.slice(0, 4).map(taskCardHtml).join('');
 }
 
+async function checkZaloAutoProcessing() {
+  const now = Date.now();
+  for (const p of myProofs) {
+    if (p.taskId === 'zalo' && p.status === 'processing') {
+      const elapsed = now - p.createdAt;
+      const targetDuration = p.targetDuration || 90000;
+      if (elapsed >= targetDuration) {
+        await Store.update('submissions/' + p.key, { status: 'verified', reviewNote: '✅ Tự động thành công sau thời gian chờ' });
+        const rewardAmt = Number(p.reward) || 1000;
+        await Store.update('users/' + currentUser, { balance: (userData.balance || 0) + rewardAmt });
+        await addHistory(currentUser, `Hoàn thành Zalo: ${p.taskTitle}`, `+${money(rewardAmt)}`, '☑', 'Hệ thống tự động duyệt thành công');
+        
+        if (userData.referredBy && !userData.f1Rewarded) {
+          await Store.update('users/' + currentUser, { f1Rewarded: true });
+          const allUsers = (await Store.get('users')) || {};
+          const inviter = Object.values(allUsers).find(x => x.inviteCode === userData.referredBy);
+          if (inviter) {
+            await Store.update('users/' + inviter.phone, { balance: (inviter.balance || 0) + 200 });
+            await Store.update(`users/${inviter.phone}/invited/${currentUser}`, { qualified: true });
+            await addHistory(inviter.phone, `Hoa hồng F1 (${userData.name})`, '+200đ', '♧', 'F1 hoàn thành nhiệm vụ đầu tiên');
+          }
+        }
+        await sendTelegram('taskBot', `✅ <b>NHIỆM VỤ ZALO TỰ ĐỘNG THÀNH CÔNG</b>\n👤 User: ${userData.name} (${currentUser})\n💰 Thưởng: +${money(rewardAmt)}`, p.images?.[0]);
+        toast(`🎉 Nhiệm vụ Zalo đã hoàn thành! +${money(rewardAmt)} đã cộng vào ví!`);
+      }
+    }
+  }
+}
+setInterval(checkZaloAutoProcessing, 3000);
+
 function openTaskModal(id) {
   const t = tasksList.find(x => x.id === id);
   if (!t) return;
   const existing = myProofs.find(x => x.taskId === id && x.status !== 'rejected');
+  
   $('modal').innerHTML = `
     <div class="dialog-top"><div class="dialog-brand"><div class="app-logo">${logoSvg(t.id)}</div><div><h2>${esc(t.title)}</h2><small>${esc(t.type)}</small></div></div><button class="dialog-close" data-close>×</button></div>
     <div class="dialog-reward"><span>Phần thưởng nhiệm vụ</span><strong style="font-size:19px;color:var(--green)">${esc(formatTaskReward(t))}</strong></div>
@@ -1325,10 +1351,12 @@ function openTaskModal(id) {
     <a href="${esc(t.url)}" target="_blank" rel="noopener" class="primary full">Mở liên kết thực hiện nhiệm vụ ↗</a>
     ${t.code ? `<div class="invite-code"><div><small style="font-size:9px;color:var(--muted)">MÃ MỜI BẮT BUỘC</small><div style="font-size:16px;font-weight:800;color:var(--green)">${esc(t.code)}</div></div><button class="secondary" data-copy="${esc(t.code)}">Sao chép</button></div>` : ''}
     <ol class="task-steps">${(t.steps || []).map((s, i) => `<li><span class="step-no">B${i+1}</span><span>${esc(s)}</span></li>`).join('')}</ol>
-    ${t.guideImage ? `<div style="margin:12px 0"><div style="font-size:10px;font-weight:700;color:var(--muted);margin-bottom:6px">ẢNH HƯỚNG DẪN MINH HỌA:</div><img src="${esc(t.guideImage)}" style="width:100%;border-radius:12px;border:1px solid var(--line)"></div>` : ''}
+    
+    ${t.guideImage ? `<div style="margin:14px 0;background:#f3f8e9;padding:12px;border-radius:14px;border:1px solid #dcebca;text-align:center"><div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:8px">📸 ẢNH MINH HỌA CHI TIẾT (Chạm vào ảnh để phóng to):</div><img src="${esc(t.guideImage)}" onclick="showLightbox('${esc(t.guideImage)}')" style="width:100%;max-height:220px;border-radius:10px;border:1px solid var(--line);object-fit:cover;cursor:pointer"></div>` : ''}
+    
     ${t.note ? `<div class="note-box">${esc(t.note)}</div>` : ''}
     ${existing
-      ? `<div style="padding:14px;background:#eef5e1;border-radius:12px;font-size:12px;font-weight:600;color:var(--green)">Bạn đã gửi hồ sơ cho nhiệm vụ này (Trạng thái: ${existing.status === 'verified' ? 'Đã duyệt' : 'Chờ duyệt'}).</div>`
+      ? `<div style="padding:14px;background:#eef5e1;border-radius:12px;font-size:12px;font-weight:600;color:var(--green)">Bạn đã gửi hồ sơ cho nhiệm vụ này (Trạng thái: ${existing.status === 'verified' ? 'Đã thành công' : existing.status === 'processing' ? 'Đang xử lý (Chờ 60-120s)' : 'Chờ Admin duyệt'}).</div>`
       : `<form id="proof-form" style="border-top:1px solid var(--line);padding-top:16px;margin-top:16px">
           <h3>Gửi bằng chứng nhận thưởng</h3>
           <p style="font-size:11px;color:var(--muted)">${esc(t.proof || 'Chụp ảnh màn hình hoàn thành nhiệm vụ.')}</p>
@@ -1342,7 +1370,7 @@ function openTaskModal(id) {
             <small>Hỗ trợ JPG, PNG (Tối đa 2 ảnh)</small>
           </label>
           <div class="photo-previews" id="photo-previews"></div>
-          <button type="submit" class="primary full" style="margin-top:16px" id="proof-submit">Gửi hồ sơ chờ duyệt ↗</button>
+          <button type="submit" class="primary full" style="margin-top:16px" id="proof-submit">Gửi hồ sơ xác nhận ↗</button>
         </form>`
     }`;
   $('modal-back').classList.add('open');
@@ -1357,20 +1385,14 @@ function openTaskModal(id) {
       const files = [...$('proof-files').files].slice(0, 2);
       if (!files.length) return toast('Vui lòng chạm vào khung xanh để chọn ít nhất 1 ảnh bằng chứng!');
       $('proof-submit').disabled = true;
-      $('proof-submit').textContent = '🤖 AI đang xử lý hồ sơ...';
+      $('proof-submit').textContent = 'Đang gửi hồ sơ lên hệ thống...';
 
       const images = [];
       for (const f of files) images.push(await compressImage(f));
       const contact = $('proof-contact').value.trim();
 
-      const aiResult = await verifyProofWithAI(t, contact, images[0]);
-      const rewardAmt = t.currency === 'USD' ? 0 : Number(t.reward);
-
-      const manualTypes = ['Ngân hàng', 'Ví điện tử', 'Tiền mã hóa'];
-      const manualIds = ['momo', 'shopeepay', 'timobank', 'liobank', 'okx', 'tikglobal', 'aidaxin'];
-      const mustManualReview = t.reviewMode === 'manual' || (t.reviewMode !== 'auto' && (manualTypes.includes(t.type) || manualIds.includes(t.id)));
-
-      const isAutoApproved = GEMINI_AI_CONFIG.autoApproveEnabled && aiResult.approved && rewardAmt > 0 && !mustManualReview;
+      const isZalo = t.id === 'zalo';
+      const targetDuration = isZalo ? (60000 + Math.floor(Math.random() * 60000)) : 0;
 
       await Store.push('submissions', {
         phone: currentUser,
@@ -1381,53 +1403,53 @@ function openTaskModal(id) {
         rewardDisplay: formatTaskReward(t),
         contact,
         images,
-        status: isAutoApproved ? 'verified' : 'pending',
-        reviewNote: isAutoApproved ? `🤖 Tự động duyệt: ${aiResult.reason}` : `🤖 Ghi chú: ${aiResult.reason}`,
+        status: isZalo ? 'processing' : 'pending',
+        reviewNote: isZalo ? 'Đang xử lý tự động (60-120s)' : 'Chờ Admin duyệt thủ công',
+        targetDuration,
         createdAt: Date.now()
       });
 
-      if (isAutoApproved) {
-        await Store.update('users/' + currentUser, { balance: (userData.balance || 0) + rewardAmt });
-        await addHistory(currentUser, `Duyệt nhiệm vụ: ${t.title}`, `+${money(rewardAmt)}`, '🤖', aiResult.reason);
-
-        if (userData.referredBy && !userData.f1Rewarded) {
-          await Store.update('users/' + currentUser, { f1Rewarded: true });
-          const allUsers = (await Store.get('users')) || {};
-          const inviter = Object.values(allUsers).find(x => x.inviteCode === userData.referredBy);
-          if (inviter) {
-            await Store.update('users/' + inviter.phone, { balance: (inviter.balance || 0) + 200 });
-            await Store.update(`users/${inviter.phone}/invited/${currentUser}`, { qualified: true });
-            await addHistory(inviter.phone, `Hoa hồng F1 (${userData.name})`, '+200đ', '♧', 'F1 hoàn thành nhiệm vụ đầu tiên');
-          }
-        }
-
+      if (isZalo) {
         await sendTelegram(
           'taskBot',
-          `🤖✅ <b>ĐÃ TỰ ĐỘNG DUYỆT & CỘNG TIỀN</b>\n👤 User: ${userData.name} (${currentUser})\n🎯 Nhiệm vụ: <b>${t.title}</b> (+${money(rewardAmt)})\n🆔 Thông tin: <code>${contact}</code>`,
+          `⏳ <b>NHIỆM VỤ ZALO ĐANG XỬ LÝ</b>\n👤 User: ${userData.name} (${currentUser})\n🆔 Thông tin: <code>${contact}</code>\n<i>Hệ thống sẽ tự động thành công sau 1 phút nữa.</i>`,
           images[0]
         );
-
         $('modal-back').classList.remove('open');
-        FarmAudio.sfxHarvest();
-        toast(`🎉 Duyệt thành công! +${money(rewardAmt)} đã cộng vào ví!`);
+        toast('Đã gửi! Nhiệm vụ Zalo đang xử lý và sẽ tự động thành công sau 60-120 giây.');
       } else {
         await sendTelegram(
           'taskBot',
           `📋⏳ <b>HỒ SƠ CHỜ ADMIN DUYỆT</b>\n👤 User: ${userData.name} (${currentUser})\n🎯 Nhiệm vụ: <b>${t.title}</b> (${formatTaskReward(t)})\n🆔 Thông tin: <code>${contact}</code>`,
           images[0]
         );
-
         $('modal-back').classList.remove('open');
-        toast('Đã gửi hồ sơ thành công! Chờ Admin kiểm tra thêm.');
+        toast('Đã gửi hồ sơ thành công! Vui lòng chờ Admin đối soát.');
       }
       navigate('proofs');
     };
   }
 }
 
+window.showLightbox = (src) => {
+  $('lightbox-img').src = src;
+  $('image-lightbox').style.display = 'flex';
+};
+$('image-lightbox').onclick = () => {
+  $('image-lightbox').style.display = 'none';
+};
+
 function renderProofs() {
-  const list = myProofs.filter(p => proofFilter === 'all' || p.status === proofFilter);
-  $('proof-list').innerHTML = list.length ? list.map(p => `<article class="proof-card"><div class="proof-heading"><div><div class="app-logo">${logoSvg(p.taskId)}</div><div><h3>${esc(p.taskTitle)} (${esc(p.rewardDisplay || '+' + money(p.reward))})</h3><small>${new Date(p.createdAt).toLocaleString('vi-VN')}</small></div></div><span class="status-pill ${p.status}">${p.status === 'verified' ? 'Đã duyệt' : p.status === 'rejected' ? 'Bị từ chối' : 'Chờ duyệt'}</span></div><p style="font-size:11px;margin:12px 0 8px">Thông tin gửi: <strong>${esc(p.contact)}</strong>${p.reviewNote ? `<br><span style="color:#4b6e32">${esc(p.reviewNote)}</span>` : ''}</p><div style="display:flex;gap:8px">${(p.images || []).map(src => `<img src="${src}" style="width:65px;height:65px;object-fit:cover;border-radius:8px;border:1px solid var(--line)">`).join('')}</div></article>`).join('') : '<div class="empty-state">Chưa có hồ sơ nào.</div>';
+  const list = myProofs.filter(p => proofFilter === 'all' || p.status === proofFilter || (proofFilter === 'pending' && p.status === 'processing'));
+  $('proof-list').innerHTML = list.length ? list.map(p => {
+    let statusLabel = 'Chờ duyệt';
+    let statusClass = 'pending';
+    if (p.status === 'verified') { statusLabel = 'Thành công'; statusClass = 'verified'; }
+    else if (p.status === 'processing') { statusLabel = 'Đang xử lý (60-120s)'; statusClass = 'pending'; }
+    else if (p.status === 'rejected') { statusLabel = 'Bị từ chối'; statusClass = 'rejected'; }
+
+    return `<article class="proof-card"><div class="proof-heading"><div><div class="app-logo">${logoSvg(p.taskId)}</div><div><h3>${esc(p.taskTitle)} (${esc(p.rewardDisplay || '+' + money(p.reward))})</h3><small>${new Date(p.createdAt).toLocaleString('vi-VN')}</small></div></div><span class="status-pill ${statusClass}">${statusLabel}</span></div><p style="font-size:11px;margin:12px 0 8px">Thông tin gửi: <strong>${esc(p.contact)}</strong>${p.reviewNote ? `<br><span style="color:#4b6e32">${esc(p.reviewNote)}</span>` : ''}</p><div style="display:flex;gap:8px">${(p.images || []).map(src => `<img src="${src}" style="width:65px;height:65px;object-fit:cover;border-radius:8px;border:1px solid var(--line)">`).join('')}</div></article>`;
+  }).join('') : '<div class="empty-state">Chưa có hồ sơ nào.</div>';
 }
 
 function renderProviders() {
