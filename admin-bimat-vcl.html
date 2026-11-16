@@ -50,6 +50,9 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
 .plot-check-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;background:#f4f8ec;padding:12px;border-radius:12px;margin-bottom:14px}
 .plot-check-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;background:#fff;padding:8px;border-radius:8px;border:1px solid var(--line)}
 .plot-check-item input{width:16px;height:16px;margin:0}
+.vip-tier-select-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.vip-tier-btn{background:#fffdf6;border:1.5px solid #e6d39c;color:#5c4209;text-align:left;padding:10px;border-radius:12px;display:flex;flex-direction:column;gap:2px}
+.vip-tier-btn:hover{background:#fcf3d4;border-color:#d4981e}
 .gift-preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
 .gift-preset-btn{background:#f4f8ec;border:1px solid #cde0b2;color:var(--green);text-align:left;padding:12px;border-radius:12px}
 .gift-preset-btn:hover{background:#e5f0d3}
@@ -57,8 +60,8 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
 .login-box{background:#fff;padding:28px;border-radius:20px;border:1px solid var(--line);width:360px;max-width:100%}
 .modal-back{position:fixed;inset:0;background:#1d342e80;backdrop-filter:blur(4px);z-index:60;display:none;align-items:center;justify-content:center;padding:14px}
 .modal-back.open{display:flex}
-.modal{background:#fff;border-radius:20px;padding:22px;width:580px;max-width:100%;max-height:92vh;overflow-y:auto}
-@media(max-width:850px){.stats{grid-template-columns:1fr 1fr}.grid-2,.grid-3,.gift-preset-grid{grid-template-columns:1fr}}
+.modal{background:#fff;border-radius:20px;padding:22px;width:620px;max-width:100%;max-height:92vh;overflow-y:auto}
+@media(max-width:850px){.stats{grid-template-columns:1fr 1fr}.grid-2,.grid-3,.gift-preset-grid,.vip-tier-select-grid{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -108,14 +111,14 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
     <button data-tab="tab-proofs">2. Duyệt Nhiệm Vụ <em id="cnt-prf">0</em></button>
     <button data-tab="tab-withdraws">3. Duyệt Rút Tiền <em id="cnt-wdr">0</em></button>
     <button data-tab="tab-tasks">4. Up & Dừng Nhiệm Vụ</button>
-    <button data-tab="tab-users">5. Thành Viên & Tặng VIP</button>
+    <button data-tab="tab-users">5. Thành Viên & Tặng VIP 0-8</button>
     <button data-tab="tab-giftcodes">6. Giftcode & Hệ Thống</button>
     <button data-tab="tab-phone-list">7. Danh sách SĐT</button>
   </div>
 
   <div class="tab-content" id="tab-deposits">
     <div class="panel">
-      <h3>Danh sách yêu cầu nạp tiền (MB BANK: 245331 · Duyệt mở khóa VIP ≥ 20.000đ)</h3>
+      <h3>Danh sách yêu cầu nạp tiền (MB BANK: 245331 · Duyệt tính tích lũy thăng cấp VIP 1-8)</h3>
       <div id="admin-deposit-list"></div>
     </div>
   </div>
@@ -179,7 +182,7 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
   <div class="tab-content" id="tab-users" hidden>
     <div class="panel">
       <div class="row" style="margin-bottom:14px">
-        <h3 style="margin:0">Quản lý Thành viên, Tặng Gói VIP & Xem cấp dưới (F1/F2)</h3>
+        <h3 style="margin:0">Quản lý Thành viên, Tặng Gói VIP 0-8 & Xem cấp dưới (F1/F2)</h3>
         <input id="user-search" placeholder="Tìm theo SĐT, tên hoặc mã mời..." style="max-width:280px;margin:0">
       </div>
       <div id="admin-user-list"></div>
@@ -229,6 +232,27 @@ const FIREBASE_CONFIG = {
 };
 
 const ADMIN_PASSWORDS = ["admin123", "123456"];
+
+// BẢNG CẤP BẬC VIP 0 -> VIP 8 ĐỒNG BỘ HOÀN TOÀN VỚI INDEX.HTML
+const VIP_TIERS = [
+  { level: 0, name: 'VIP 0', icon: '🌱', minDeposit: 0, dailyRebate: 0 },
+  { level: 1, name: 'VIP 1', icon: '🥉', minDeposit: 200000, dailyRebate: 2500 },
+  { level: 2, name: 'VIP 2', icon: '🥈', minDeposit: 500000, dailyRebate: 7500 },
+  { level: 3, name: 'VIP 3', icon: '🥇', minDeposit: 1000000, dailyRebate: 10000 },
+  { level: 4, name: 'VIP 4', icon: '💠', minDeposit: 3000000, dailyRebate: 30000 },
+  { level: 5, name: 'VIP 5', icon: '💎', minDeposit: 5000000, dailyRebate: 70000 },
+  { level: 6, name: 'VIP 6', icon: '👑', minDeposit: 10000000, dailyRebate: 150000 },
+  { level: 7, name: 'VIP 7', icon: '🔥', minDeposit: 20000000, dailyRebate: 350000 },
+  { level: 8, name: 'VIP 8', icon: '🐉', minDeposit: 50000000, dailyRebate: 700000 }
+];
+
+function getVipLevelByDeposit(dep) {
+  let lv = 0;
+  for (const t of VIP_TIERS) {
+    if (dep >= t.minDeposit) lv = t.level;
+  }
+  return lv;
+}
 
 const BANK_CODES = {"Vietcombank":"VCB","MBBank":"MB","Techcombank":"TCB","BIDV":"BIDV","VietinBank":"ICB","Agribank":"VBA","ACB":"ACB","VPBank":"VPB","TPBank":"TPB","Sacombank":"STB","HDBank":"HDB","VIB":"VIB","SHB":"SHB","MSB":"MSB","OCB":"OCB","CAKE":"CAKE","Timo":"TIMO","SeABank":"SEAB","LPBank":"LPB"};
 const CROP_NAMES = {rice:'Lúa nước',corn:'Ngô ngọt',wheat:'Lúa mì vàng',bronze:'Cây Đồng',silver:'Cây Bạc',gold:'Cây Vàng',diamond:'Kim cương',platinum:'Platinum',super_platinum:'Super Platinum'};
@@ -414,7 +438,7 @@ function initAdmin() {
         </div>
         ${d.receipt ? `<div style="margin:10px 0"><a href="${d.receipt}" target="_blank"><img src="${d.receipt}" style="width:100px;height:100px;object-fit:cover;border-radius:10px;border:1px solid #ccc"></a></div>` : ''}
         ${d.status === 'pending' ? `<div style="display:flex;gap:8px;margin-top:10px">
-          <button class="primary" onclick="approveDeposit('${d.key}', '${d.phone}', ${d.amount})">✅ Duyệt nạp +${money(d.amount)} (Mở VIP)</button>
+          <button class="primary" onclick="approveDeposit('${d.key}', '${d.phone}', ${d.amount})">✅ Duyệt nạp +${money(d.amount)} (Cộng tích lũy VIP)</button>
           <button class="danger" onclick="rejectDeposit('${d.key}', '${d.phone}', ${d.amount})">❌ Từ chối</button>
         </div>` : ''}
       </div>`).join('') : '<p style="color:var(--muted)">Chưa có yêu cầu nạp tiền nào.</p>';
@@ -456,7 +480,8 @@ function initAdmin() {
     $('admin-withdraw-list').innerHTML = items.length ? items.map(w => `
       <div class="card row">
         <div>
-          <strong style="font-size:15px;color:var(--green)">${money(w.amount)}</strong> — <b>${esc(w.provider)}</b>: <code>${esc(w.destination)}</code> (${esc(w.holderName)})<br>
+          <strong style="font-size:15px;color:var(--green)">${money(w.amount)}</strong> — <b>${esc(w.provider)}</b>: <code>${esc(w.destination)}</code> (${esc(w.holderName)})
+          ${w.isFirstWithdraw ? '<span class="badge verified">🎁 Lần đầu 2k</span>' : ''}<br>
           <small>User: ${esc(w.userName)} (${esc(w.phone)}) · ${new Date(w.createdAt).toLocaleString('vi-VN')}</small>
         </div>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -673,7 +698,10 @@ function renderUsers() {
   const users = allUsersArr.filter(u => (u.phone + ' ' + u.name + ' ' + (u.inviteCode || '')).toLowerCase().includes(q));
 
   $('admin-user-list').innerHTML = users.map(u => {
-    const isVip = Number(u.totalDeposited || 0) >= 20000;
+    const dep = Number(u.totalDeposited || 0);
+    const curVipLv = Math.max(Number(u.vipLevel || 0), getVipLevelByDeposit(dep));
+    const vipInfo = VIP_TIERS[curVipLv] || VIP_TIERS[0];
+
     const plots = u.plots ? Object.entries(u.plots) : [];
     const plotText = plots.length
       ? plots.map(([k, p]) => `${k.toUpperCase()}: ${CROP_NAMES[p.crop] || p.crop} (${Date.now() >= p.readyAt ? 'Đã chín' : 'Đang lớn'})`).join(' | ')
@@ -685,11 +713,11 @@ function renderUsers() {
       <div class="row">
         <div>
           <strong style="font-size:15px">${esc(u.name)}</strong> — SĐT: <code>${esc(u.phone)}</code> · MK: <code>${esc(u.password)}</code> · PIN: <code>${esc(u.pin)}</code>
-          ${isVip ? '<span class="badge vip">👑 VIP</span>' : '<span class="badge pending">Thường</span>'}
+          <span class="badge ${curVipLv > 0 ? 'vip' : 'pending'}">${vipInfo.icon} ${vipInfo.name} (${money(vipInfo.dailyRebate)}/ngày)</span>
           ${u.locked ? '<span class="badge closed">ĐÃ KHÓA</span>' : ''}
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="gold" onclick="openGiftVipModal('${u.phone}')">🎁 Tặng VIP & Quà</button>
+          <button class="gold" onclick="openGiftVipModal('${u.phone}')">🎁 Tặng VIP 0-8 & Quà</button>
           <button class="secondary" onclick="openSubordinatesModal('${u.phone}')">👥 Cấp dưới (${f1Count})</button>
           <button class="primary" onclick="openEditUserModal('${u.phone}')">✏️ Sửa chi tiết</button>
           <button class="${u.locked ? 'secondary' : 'danger'}" onclick="Store.update('users/${u.phone}', {locked: ${!u.locked}})">${u.locked ? 'Mở khóa TK' : 'Khóa TK'}</button>
@@ -697,7 +725,7 @@ function renderUsers() {
       </div>
       <div class="info-grid">
         <div>💰 Số dư ví: <b>${money(u.balance)}</b></div>
-        <div>💳 Tổng đã nạp: <b>${money(u.totalDeposited || 0)}</b></div>
+        <div>💳 Tích lũy VIP: <b>${money(dep)}</b></div>
         <div>↗ Đã rút: <b>${money(u.withdrawn || 0)}</b></div>
         <div>⭐ Nông trại: <b>Level ${u.farmLevel || 1}</b> (${u.farmExp || 0} EXP)</div>
         <div>🌾 Thu nông trại: <b>${money(u.farmEarned || 0)}</b></div>
@@ -709,43 +737,50 @@ function renderUsers() {
 }
 $('user-search').oninput = renderUsers;
 
-// MODAL TẶNG GÓI VIP, TIỀN THƯỞNG, Ô ĐẤT & CÂY TRỒNG CHO THÀNH VIÊN
+// MODAL TẶNG CHÍNH XÁC TỪNG GÓI VIP 0 -> VIP 8 HOÀN TRẢ THEO NGÀY & QUÀ TẶNG
 window.openGiftVipModal = (phone) => {
   const u = allUsersCache[phone];
   if (!u) return;
-  const isVip = Number(u.totalDeposited || 0) >= 20000;
+  const dep = Number(u.totalDeposited || 0);
+  const curLv = Math.max(Number(u.vipLevel || 0), getVipLevelByDeposit(dep));
+  const curTier = VIP_TIERS[curLv] || VIP_TIERS[0];
 
   $('modal').innerHTML = `
     <div class="row" style="margin-bottom:12px">
       <div>
-        <h3 style="margin:0;color:var(--green)">🎁 Tặng Gói VIP & Quà Đặc Quyền</h3>
-        <small style="color:var(--muted)">Thành viên: <b>${esc(u.name)}</b> (<code>${esc(u.phone)}</code>) · Trạng thái: ${isVip ? '👑 Đã VIP' : 'Chưa VIP'}</small>
+        <h3 style="margin:0;color:var(--green)">🎁 Tặng Gói Hoàn Trả VIP 0 → VIP 8</h3>
+        <small style="color:var(--muted)">Thành viên: <b>${esc(u.name)}</b> (<code>${esc(u.phone)}</code>) · Hiện tại: <b>${curTier.icon} ${curTier.name}</b> (${money(curTier.dailyRebate)}/ngày)</small>
       </div>
       <button class="secondary" onclick="$('modal-back').classList.remove('open')">Đóng</button>
     </div>
 
-    <label>1. Tặng nhanh gói đặc quyền (1 chạm)</label>
-    <div class="gift-preset-grid">
-      <button type="button" class="gift-preset-btn" onclick="grantVipQuick('${phone}', 20000, 0, 'Gói VIP Cơ Bản (Mở khóa toàn bộ hạt giống VIP)')">
-        <strong style="display:block;font-size:12px">👑 Kích hoạt VIP (Mốc 20k)</strong>
-        <small style="color:#667a54">Mở khóa trồng Đồng → Super Platinum</small>
-      </button>
-      <button type="button" class="gift-preset-btn" onclick="grantVipQuick('${phone}', 50000, 50000, 'Gói VIP + Tặng 50.000đ vốn')">
-        <strong style="display:block;font-size:12px">💎 VIP + Tặng 50.000đ ví</strong>
-        <small style="color:#667a54">Mở khóa VIP & cộng thẳng 50.000đ</small>
-      </button>
-      <button type="button" class="gift-preset-btn" onclick="grantAllPlots('${phone}')">
-        <strong style="display:block;font-size:12px">🏡 Mở khóa full 9 ô đất 3x3</strong>
-        <small style="color:#667a54">Tặng miễn phí toàn bộ ô đất #4 → #9</small>
-      </button>
-      <button type="button" class="gift-preset-btn" onclick="grantLevelBoost('${phone}', 10)">
-        <strong style="display:block;font-size:12px">⭐ Nâng ngay lên Level 10</strong>
-        <small style="color:#667a54">Tăng +45% lãi thu hoạch & mở Ô #2, #3</small>
-      </button>
+    <label>1. Chọn gói VIP muốn tặng / kích hoạt ngay cho thành viên (Chu kỳ tích lũy 5 ngày)</label>
+    <div class="vip-tier-select-grid">
+      ${VIP_TIERS.map(t => `
+        <button type="button" class="vip-tier-btn" onclick="grantSpecificVipTier('${phone}', ${t.level})">
+          <strong style="font-size:13px">${t.icon} Tặng ${t.name}</strong>
+          <span style="font-size:10px;color:#7a6021">Mốc: ${money(t.minDeposit)}</span>
+          <b style="font-size:11px;color:#2d6a1e">Hoàn: ${money(t.dailyRebate)}/ngày</b>
+        </button>
+      `).join('')}
     </div>
 
     <div style="border-top:1px dashed var(--line);padding-top:12px;margin-top:8px">
-      <label>2. Tặng tiền thưởng tùy chỉnh vào ví thành viên</label>
+      <label>2. Tặng nhanh đặc quyền Nông trại 3x3</label>
+      <div class="gift-preset-grid">
+        <button type="button" class="gift-preset-btn" onclick="grantAllPlots('${phone}')">
+          <strong style="display:block;font-size:12px">🏡 Mở khóa full 9 ô đất 3x3</strong>
+          <small style="color:#667a54">Tặng miễn phí toàn bộ ô đất #4 → #9</small>
+        </button>
+        <button type="button" class="gift-preset-btn" onclick="grantLevelBoost('${phone}', 10)">
+          <strong style="display:block;font-size:12px">⭐ Nâng ngay lên Level 10</strong>
+          <small style="color:#667a54">Tăng +45% lãi thu hoạch & mở Ô #2, #3</small>
+        </button>
+      </div>
+    </div>
+
+    <div style="border-top:1px dashed var(--line);padding-top:12px;margin-top:8px">
+      <label>3. Tặng tiền thưởng tùy chỉnh vào ví thành viên</label>
       <div class="grid-2">
         <input id="gift-custom-amt" type="number" placeholder="Nhập số tiền (VD: 100000)">
         <input id="gift-custom-note" value="Admin tặng quà tri ân VIP" placeholder="Lý do tặng...">
@@ -754,7 +789,7 @@ window.openGiftVipModal = (phone) => {
     </div>
 
     <div style="border-top:1px dashed var(--line);padding-top:12px;margin-top:14px">
-      <label>3. Tặng sẵn 1 cây / khoáng sản VIP vào ô đất nông trại</label>
+      <label>4. Tặng sẵn 1 cây / khoáng sản VIP vào ô đất nông trại</label>
       <div class="grid-3">
         <select id="gift-crop-id">
           ${Object.entries(CROP_NAMES).map(([k, v]) => `<option value="${k}">${v} (${money(CROP_COSTS[k])})</option>`).join('')}
@@ -773,21 +808,24 @@ window.openGiftVipModal = (phone) => {
   $('modal-back').classList.add('open');
 };
 
-window.grantVipQuick = async (phone, vipDepAmt, bonusBalance, pkgName) => {
-  const u = await Store.get('users/' + phone);
-  if (!u) return;
-  const newDep = Math.max(Number(u.totalDeposited || 0), vipDepAmt);
-  const newBal = Number(u.balance || 0) + Number(bonusBalance);
-  await Store.update('users/' + phone, { totalDeposited: newDep, balance: newBal });
+window.grantSpecificVipTier = async (phone, targetLv) => {
+  const tier = VIP_TIERS[targetLv] || VIP_TIERS[0];
+  const now = Date.now();
+  await Store.update('users/' + phone, {
+    vipLevel: tier.level,
+    totalDeposited: tier.minDeposit,
+    vipCycleStart: now,
+    vipLastClaimDate: ''
+  });
   await Store.push('history/' + phone, {
-    title: `Admin tặng: ${pkgName}`,
-    amount: bonusBalance > 0 ? `+${money(bonusBalance)} & VIP` : 'Mở khóa VIP',
-    icon: '👑',
-    detail: 'Đã mở khóa toàn bộ hạt giống VIP từ Đồng đến Super Platinum',
-    createdAt: Date.now()
+    title: `Admin tặng gói ${tier.icon} ${tier.name}`,
+    amount: tier.dailyRebate > 0 ? `Hoàn ${money(tier.dailyRebate)}/ngày` : 'VIP 0',
+    icon: tier.icon,
+    detail: `Đã kích hoạt ${tier.name} (Mốc tích lũy ${money(tier.minDeposit)} · Chu kỳ 5 ngày)`,
+    createdAt: now
   });
   $('modal-back').classList.remove('open');
-  alert(`✅ Đã tặng thành công ${pkgName} cho SĐT ${phone}!`);
+  alert(`✅ Đã cấp gói ${tier.icon} ${tier.name} (Hoàn trả ${money(tier.dailyRebate)}/ngày) cho SĐT ${phone}!`);
 };
 
 window.grantAllPlots = async (phone) => {
@@ -882,7 +920,7 @@ window.openSubordinatesModal = (phone) => {
         <span class="badge ${levelLabel === 'F1' ? 'open' : 'pending'}">${levelLabel}</span>
         <strong style="margin-left:4px">${esc(sub.name)}</strong> (<code>${esc(sub.phone)}</code>)<br>
         <small style="color:var(--muted)">
-          Ví: <b>${money(sub.balance)}</b> · Đã nạp: <b>${money(sub.totalDeposited || 0)}</b> · LV${sub.farmLevel || 1} · ĐK: ${new Date(sub.createdAt).toLocaleDateString('vi-VN')}
+          Ví: <b>${money(sub.balance)}</b> · Tích lũy VIP: <b>${money(sub.totalDeposited || 0)}</b> · LV${sub.farmLevel || 1} · ĐK: ${new Date(sub.createdAt).toLocaleDateString('vi-VN')}
         </small>
       </div>
       <div style="text-align:right">
@@ -922,6 +960,8 @@ window.openEditUserModal = (phone) => {
   const u = allUsersCache[phone];
   if (!u) return;
   const pPlots = u.purchasedPlots || {};
+  const curVipLv = Math.max(Number(u.vipLevel || 0), getVipLevelByDeposit(Number(u.totalDeposited || 0)));
+
   $('modal').innerHTML = `
     <h3>✏️ Chỉnh sửa toàn bộ dữ liệu: ${esc(u.name)} (${esc(u.phone)})</h3>
     <div class="grid-2">
@@ -934,13 +974,15 @@ window.openEditUserModal = (phone) => {
     </div>
     <div class="grid-3">
       <div><label>Số dư khả dụng (VNĐ)</label><input id="eu-balance" type="number" value="${Number(u.balance) || 0}"></div>
-      <div><label>Tổng đã nạp (≥20k mở VIP)</label><input id="eu-deposited" type="number" value="${Number(u.totalDeposited) || 0}"></div>
-      <div><label>Tổng đã rút (VNĐ)</label><input id="eu-withdrawn" type="number" value="${Number(u.withdrawn) || 0}"></div>
+      <div><label>Tích lũy VIP (Chu kỳ 5 ngày)</label><input id="eu-deposited" type="number" value="${Number(u.totalDeposited) || 0}"></div>
+      <div><label>Cấp bậc VIP (0-8)</label><select id="eu-vip-level">
+        ${VIP_TIERS.map(t => `<option value="${t.level}" ${curVipLv === t.level ? 'selected' : ''}>${t.icon} ${t.name} (${money(t.dailyRebate)}/ngày)</option>`).join('')}
+      </select></div>
     </div>
     <div class="grid-3">
       <div><label>Level Nông trại</label><input id="eu-lv" type="number" min="1" value="${Number(u.farmLevel) || 1}"></div>
       <div><label>Điểm kinh nghiệm (EXP)</label><input id="eu-exp" type="number" min="0" value="${Number(u.farmExp) || 0}"></div>
-      <div><label>Tổng thu từ nông trại</label><input id="eu-farm-earned" type="number" min="0" value="${Number(u.farmEarned) || 0}"></div>
+      <div><label>Tổng đã rút (VNĐ)</label><input id="eu-withdrawn" type="number" value="${Number(u.withdrawn) || 0}"></div>
     </div>
     <label>Trạng thái mở khóa các ô đất mở rộng (Ô #4 đến Ô #9)</label>
     <div class="plot-check-grid">
@@ -962,6 +1004,11 @@ window.openEditUserModal = (phone) => {
 
 window.saveUserFull = async (phone) => {
   const newBalance = Number($('eu-balance').value) || 0;
+  const chosenVipLv = Number($('eu-vip-level').value) || 0;
+  const tierInfo = VIP_TIERS[chosenVipLv] || VIP_TIERS[0];
+  const rawDep = Number($('eu-deposited').value) || 0;
+  const finalDep = Math.max(rawDep, tierInfo.minDeposit);
+
   const purchasedPlots = {};
   [4,5,6,7,8,9].forEach(i => {
     if ($('eu-plot-' + i).checked) purchasedPlots['p' + i] = true;
@@ -973,18 +1020,19 @@ window.saveUserFull = async (phone) => {
     password: $('eu-pass').value.trim(),
     pin: $('eu-pin').value.trim(),
     balance: newBalance,
-    totalDeposited: Number($('eu-deposited').value) || 0,
+    totalDeposited: finalDep,
+    vipLevel: chosenVipLv,
+    vipCycleStart: Date.now(),
     withdrawn: Number($('eu-withdrawn').value) || 0,
     farmLevel: Math.max(1, Number($('eu-lv').value) || 1),
     farmExp: Math.max(0, Number($('eu-exp').value) || 0),
-    farmEarned: Math.max(0, Number($('eu-farm-earned').value) || 0),
     purchasedPlots,
     locked: $('eu-locked').value === 'true'
   });
 
   await Store.push('history/' + phone, {
     title: 'Quản trị viên cập nhật tài khoản',
-    amount: `Số dư: ${money(newBalance)}`,
+    amount: `Số dư: ${money(newBalance)} · ${tierInfo.name}`,
     icon: '⚙️',
     detail: 'Cập nhật thông tin từ hệ thống Admin',
     createdAt: Date.now()
@@ -1002,13 +1050,19 @@ window.approveDeposit = async (key, phone, amount) => {
   await Store.update('deposits/' + key, { status: 'verified' });
   const u = await Store.get('users/' + phone);
   if (u) {
+    const newTotalDep = (u.totalDeposited || 0) + Number(amount);
+    const newVipLv = Math.max(Number(u.vipLevel || 0), getVipLevelByDeposit(newTotalDep));
+    const tierInfo = VIP_TIERS[newVipLv] || VIP_TIERS[0];
+
     await Store.update('users/' + phone, {
       balance: (u.balance || 0) + Number(amount),
-      totalDeposited: (u.totalDeposited || 0) + Number(amount)
+      totalDeposited: newTotalDep,
+      vipLevel: newVipLv,
+      vipCycleStart: Date.now()
     });
     await Store.push('history/' + phone, {
       title: 'Nạp tiền thành công (VietQR)', amount: `+${money(amount)}`, icon: '💳',
-      detail: 'Đã cộng số dư & mở khóa gói VIP nông trại', createdAt: Date.now()
+      detail: `Tích lũy VIP: ${money(newTotalDep)} (${tierInfo.name})`, createdAt: Date.now()
     });
   }
 };
