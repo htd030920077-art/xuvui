@@ -184,7 +184,7 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
 .quick-amounts{display:flex;gap:8px;margin:10px 0 14px;flex-wrap:wrap}
 .quick-amounts button{flex:1;min-width:70px;min-height:36px;border-radius:8px;border:1px solid #e3e9d8;background:white;color:#6f825b;font-size:11px;font-weight:600}
 .qr-box{background:#f8fbf2;border:2px dashed #b9d19b;border-radius:16px;padding:18px;text-align:center;margin:14px 0}
-.qr-box img{width:220px;max-width:100%;border-radius:12px;border:1px solid #dce6cc;background:#fff;padding:6px}
+.qr-box img{width:230px;max-width:100%;border-radius:12px;border:1px solid #dce6cc;background:#fff;padding:8px;box-shadow:0 6px 18px #244d3712}
 
 .file-drop{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;border:2px dashed #c7dcae;background:#f3f8e9;border-radius:12px;min-height:110px;color:#587a38;padding:16px;cursor:pointer;text-align:center;margin:0}
 .file-drop:active{background:#e5f0d3}
@@ -330,6 +330,7 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
     <div class="mobile-brand brand" data-view="home"><span class="brand-icon">✳</span>xu vui<span class="brand-dot">.</span></div>
     <span class="breadcrumb" id="breadcrumb">Không gian cá nhân <b>/</b> Tổng quan</span>
     <div class="top-actions">
+      <button class="icon-button" data-view="gift" title="Nhập Giftcode">🎁</button>
       <button class="icon-button" data-view="deposit" title="Nạp tiền">➕</button>
       <span class="member-status"><i></i><span id="top-balance">0đ</span></span>
       <div class="avatar" id="avatar">XV</div>
@@ -344,8 +345,9 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
           <h1>Cùng kiếm thưởng hôm nay nhé <span>☀</span></h1>
           <p>Trồng cây nông trại, nâng cấp Level và làm nhiệm vụ nhận thưởng mỗi ngày.</p>
         </div>
-        <div style="display:flex;gap:8px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="primary" data-view="deposit">+ Nạp tiền</button>
+          <button class="gold-btn" data-view="gift">🎁 Nhập Giftcode</button>
           <button class="secondary" id="btn-logout">Đăng xuất</button>
         </div>
       </div>
@@ -358,6 +360,7 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
           <div style="display:flex;gap:10px;flex-wrap:wrap">
             <button class="primary" data-view="farm">🌱 Vào nông trại ngay ↗</button>
             <button class="secondary" data-view="tasks">Làm nhiệm vụ</button>
+            <button class="secondary" data-view="gift">🎁 Nhập mã quà tặng</button>
           </div>
         </div>
         <div class="hero-art" id="hero-art"></div>
@@ -462,10 +465,11 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
             <div class="qr-box">
               <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:8px">QUÉT MÃ VIETQR ĐỂ CHUYỂN KHOẢN</div>
               <img id="deposit-qr-img" src="" alt="Mã QR Nạp Tiền">
-              <div style="font-size:11px;margin-top:8px;line-height:1.7">
-                Ngân hàng: <b id="dep-bank-name">MBBank</b> · STK: <b id="dep-bank-acc">0389710007</b><br>
-                Chủ TK: <b id="dep-bank-holder">HA TRUNG DUC</b><br>
-                Nội dung CK: <code style="background:#e6f0d8;padding:3px 7px;border-radius:5px;font-weight:800" id="dep-memo">NAP</code>
+              <div style="font-size:12px;margin-top:10px;line-height:1.8">
+                Ngân hàng: <b id="dep-bank-name">MB BANK</b> · STK: <code style="background:#e6f0d8;padding:3px 8px;border-radius:6px;font-weight:800;font-size:14px" id="dep-bank-acc">245331</code>
+                <button type="button" class="secondary" style="min-height:28px;padding:4px 8px;margin-left:4px" data-copy="245331">Sao chép STK</button><br>
+                Nội dung CK: <code style="background:#e6f0d8;padding:3px 8px;border-radius:6px;font-weight:800;font-size:13px" id="dep-memo">NAP</code>
+                <button type="button" class="secondary" style="min-height:28px;padding:4px 8px;margin-left:4px" id="btn-copy-memo">Sao chép ND</button>
               </div>
             </div>
             <input id="deposit-receipt" type="file" accept="image/*">
@@ -539,7 +543,6 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
             <label>Phương thức nhận</label>
             <div class="payment-switch" id="payment-switch">
               <button type="button" class="active" data-kind="bank">▤ Ngân hàng</button>
-              <button type="button" class="active" data-kind="wallet" style="display:none"></button>
               <button type="button" data-kind="wallet">▱ Ví điện tử</button>
             </div>
             <label>Chọn Ngân hàng / Ví</label>
@@ -613,8 +616,8 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
 <nav class="bottom-nav">
   <button class="active" data-view="home"><span>⌂</span>Tổng quan</button>
   <button data-view="farm"><span>🌱</span>Nông trại</button>
-  <button data-view="deposit"><span>💳</span>Nạp tiền</button>
   <button data-view="tasks"><span>▦</span>Nhiệm vụ</button>
+  <button data-view="gift"><span>🎁</span>Giftcode</button>
   <button data-view="wallet"><span>▱</span>Ví tiền</button>
 </nav>
 
@@ -655,7 +658,8 @@ const TELEGRAM_CONFIG = {
   withdrawBot: { botToken: "9231728188:AAENh6sfcdF4Tav9s0OV5hVk8KWK5yODQAI", chatId: "7865394196" }
 };
 
-const ADMIN_BANK = { bankId: "MB", bankName: "MBBank", accountNo: "0389710007", accountName: "HA TRUNG DUC" };
+// TÀI KHOẢN NẠP TIỀN MB BANK (KHÔNG HIỂN THỊ TÊN CHỦ TK)
+const ADMIN_BANK = { bankId: "MB", bankName: "MB BANK", accountNo: "245331" };
 
 let useFirebase = false, db = null;
 try {
@@ -881,8 +885,11 @@ function formatCountdown(sec) {
   return h > 0 ? `${h}h${String(m).padStart(2,'0')}p${String(s).padStart(2,'0')}s` : `${m}p ${String(s).padStart(2,'0')}s`;
 }
 
-function getVietQrUrl(bankId, accountNo, amount, accountName, addInfo) {
-  return `https://img.vietqr.io/image/${bankId}-${accountNo}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(addInfo)}&accountName=${encodeURIComponent(accountName)}`;
+// Tạo mã VietQR quét trực tiếp (không cần truyền tên chủ tài khoản nếu muốn ẩn tên)
+function getVietQrUrl(bankId, accountNo, amount, addInfo, accountName = '') {
+  let url = `https://img.vietqr.io/image/${bankId}-${accountNo}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(addInfo)}`;
+  if (accountName) url += `&accountName=${encodeURIComponent(accountName)}`;
+  return url;
 }
 
 async function sendTelegram(channel, text, imageSource = null) {
@@ -974,7 +981,6 @@ $('auth-form').onsubmit = async e => {
       if (devAccounts.length >= 2) throw new Error('Thiết bị này đã đạt giới hạn tối đa 2 tài khoản!');
       if (await Store.get('users/' + phone)) throw new Error('Số điện thoại này đã được đăng ký!');
 
-      // MÃ MỜI MẶC ĐỊNH CHÍNH LÀ SỐ ĐIỆN THOẠI CỦA NGƯỜI DÙNG
       const myCode = phone;
       const newUser = {
         phone, name, password: pass, pin, inviteCode: myCode,
@@ -1088,7 +1094,6 @@ function renderUserDashboard() {
 
   $('vip-metric-note').textContent = totalDep >= 20000 ? '✅ Đã mở khóa gói VIP' : 'Nạp từ 20.000đ mở gói VIP';
 
-  // ĐƯỜNG LINK MÃ MỜI MẶC ĐỊNH: https://xuvui.xyz/?ref= + SĐT
   const refParam = userData.phone || currentUser;
   $('my-ref-code').textContent = refParam;
   $('ref-link').value = `${SITE_DOMAIN}/?ref=${refParam}`;
@@ -1255,9 +1260,9 @@ function updateDepositQr() {
   const memo = `NAP ${currentUser}`;
   $('dep-bank-name').textContent = ADMIN_BANK.bankName;
   $('dep-bank-acc').textContent = ADMIN_BANK.accountNo;
-  $('dep-bank-holder').textContent = ADMIN_BANK.accountName;
   $('dep-memo').textContent = memo;
-  $('deposit-qr-img').src = getVietQrUrl(ADMIN_BANK.bankId, ADMIN_BANK.accountNo, amt, ADMIN_BANK.accountName, memo);
+  $('btn-copy-memo').dataset.copy = memo;
+  $('deposit-qr-img').src = getVietQrUrl(ADMIN_BANK.bankId, ADMIN_BANK.accountNo, amt, memo);
 }
 $('deposit-amount').oninput = updateDepositQr;
 $('deposit-receipt').onchange = () => {
@@ -1277,7 +1282,7 @@ $('deposit-form').onsubmit = async e => {
 
   await Store.push('deposits', { phone: currentUser, userName: userData.name, amount, memo: `NAP ${currentUser}`, receipt: receiptImg, status: 'pending', createdAt: Date.now() });
   await addHistory(currentUser, 'Tạo lệnh nạp tiền VietQR', `${money(amount)} (Chờ duyệt)`, '💳', `Nội dung: NAP ${currentUser}`);
-  await sendTelegram('taskBot', `💳 <b>YÊU CẦU NẠP TIỀN MỚI</b>\n👤 User: ${userData.name} (${currentUser})\n💰 Số tiền nạp: <b>${money(amount)}</b>\n📝 Nội dung CK: <code>NAP ${currentUser}</code>`, receiptImg);
+  await sendTelegram('taskBot', `💳 <b>YÊU CẦU NẠP TIỀN MỚI</b>\n👤 User: ${userData.name} (${currentUser})\n💰 Số tiền nạp: <b>${money(amount)}</b>\n🏦 Nhận tại: <b>MB BANK - 245331</b>\n📝 Nội dung CK: <code>NAP ${currentUser}</code>`, receiptImg);
 
   $('deposit-receipt').value = '';
   $('dep-receipt-label').textContent = '📸 Chạm để tải ảnh biên lai (Nếu có)';
@@ -1485,7 +1490,7 @@ $('withdraw-form').onsubmit = async e => {
   await Store.push('withdrawals', { phone: currentUser, userName: userData.name, amount, method: paymentKind, provider, destination: dest, holderName: holder, status: 'pending', createdAt: Date.now() });
   await addHistory(currentUser, `Rút tiền về ${provider}`, `-${money(amount)}`, '↗', `STK: ${dest} · ${holder}`);
 
-  const qrUrl = paymentKind === 'bank' && BANK_CODES[provider] ? getVietQrUrl(BANK_CODES[provider], dest, amount, holder, `XUVUI ${currentUser}`) : null;
+  const qrUrl = paymentKind === 'bank' && BANK_CODES[provider] ? getVietQrUrl(BANK_CODES[provider], dest, amount, `XUVUI ${currentUser}`, holder) : null;
   await sendTelegram('withdrawBot', `💸 <b>YÊU CẦU RÚT TIỀN MỚI</b>\n👤 User: ${userData.name} (${currentUser})\n💰 Số tiền: <b>${money(amount)}</b>\n🏦 Nhận qua: <b>${provider}</b>\n🔢 STK/Ví: <code>${dest}</code>\n📛 Chủ TK: <b>${holder}</b>`, qrUrl);
 
   $('withdraw-form').reset();
