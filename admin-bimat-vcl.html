@@ -105,6 +105,7 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
     <button data-tab="tab-tasks">4. Up & Dừng Nhiệm Vụ</button>
     <button data-tab="tab-users">5. Thành Viên & Cấp Dưới</button>
     <button data-tab="tab-giftcodes">6. Giftcode & Hệ Thống</button>
+    <button data-tab="tab-phone-list">7. Danh sách SĐT</button>
   </div>
 
   <div class="tab-content" id="tab-deposits">
@@ -139,7 +140,7 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
         <div class="grid-3">
           <div><label>Tiền thưởng VNĐ *</label><input id="nt-reward" type="number" required placeholder="30000"></div>
           <div><label>Chữ hiển thị thưởng (Tùy chọn)</label><input id="nt-reward-text" placeholder="VD: 50.000đ hoặc 20 USD"></div>
-          <div><label>Chế độ duyệt *</label><select id="nt-review-mode"><option value="manual">Admin duyệt thủ công</option><option value="auto">AI tự động duyệt</option></select></div>
+          <div><label>Chế độ duyệt *</label><select id="nt-review-mode"><option value="manual">Admin duyệt thủ công</option><option value="auto">Tự động duyệt</option></select></div>
         </div>
         <div class="grid-2">
           <div><label>Chọn ảnh Logo từ điện thoại</label><input id="nt-logo-file" type="file" accept="image/*" style="padding:7px"></div>
@@ -189,6 +190,17 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
       <div id="admin-gc-list"></div>
     </div>
   </div>
+
+  <!-- TAB 7: LIỆT KÊ DUY NHẤT SĐT TỪ TRÊN XUỐNG DƯỚI -->
+  <div class="tab-content" id="tab-phone-list" hidden>
+    <div class="panel">
+      <div class="row" style="margin-bottom:14px">
+        <h3 style="margin:0">Danh sách SĐT đã đăng ký</h3>
+        <button class="primary" onclick="copyAllPhones()">📋 Sao chép tất cả SĐT</button>
+      </div>
+      <div id="admin-phone-only-list" style="background:#f8fbf2;border:1px solid var(--line);border-radius:12px;padding:16px;font-family:monospace;font-size:14px;max-height:520px;overflow-y:auto;line-height:1.8;user-select:all"></div>
+    </div>
+  </div>
 </div>
 
 <div class="modal-back" id="modal-back"><div class="modal" id="modal"></div></div>
@@ -198,7 +210,6 @@ const $ = id => document.getElementById(id);
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money = n => new Intl.NumberFormat('vi-VN').format(Number(n) || 0) + 'đ';
 
-// CẤU HÌNH FIREBASE DỰ ÁN XUVUI-9175F
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyCbtZV-aW22WtYxeN6vW8qmdmEWeMaG97o",
   authDomain: "xuvui-9175f.firebaseapp.com",
@@ -312,6 +323,20 @@ document.querySelectorAll('#admin-tabs button').forEach(btn => {
 
 let allUsersCache = {}, allTasksCache = {}, serverConfig = { isClosed: false, message: 'Hệ thống đang bảo trì nâng cấp tính năng. Vui lòng quay lại sau ít phút!', whitelistPhones: '' };
 
+function renderPhoneOnlyList() {
+  const phones = Object.keys(allUsersCache || {});
+  const container = $('admin-phone-only-list');
+  if (!container) return;
+  container.innerHTML = phones.map(p => `<div>${esc(p)}</div>`).join('');
+}
+
+window.copyAllPhones = () => {
+  const phones = Object.keys(allUsersCache || {});
+  if (!phones.length) return;
+  navigator.clipboard?.writeText(phones.join('\n'));
+  alert(`Đã sao chép ${phones.length} số điện thoại!`);
+};
+
 function initAdmin() {
   $('conn-status').textContent = useFirebase ? '🟢 Firebase Cloud (xuvui-9175f)' : '🟡 Local Sync';
 
@@ -338,6 +363,7 @@ function initAdmin() {
     allUsersCache = val || {};
     $('st-users').textContent = Object.keys(allUsersCache).length;
     renderUsers();
+    renderPhoneOnlyList();
   });
 
   Store.onValue('deposits', val => {
@@ -365,7 +391,7 @@ function initAdmin() {
 
   Store.onValue('submissions', val => {
     const items = Object.entries(val || {}).map(([k, v]) => ({ key: k, ...v })).sort((a, b) => b.createdAt - a.createdAt);
-    const pendingCount = items.filter(i => i.status === 'pending').length;
+    const pendingCount = items.filter(i => i.status === 'pending' || i.status === 'processing').length;
     $('st-proofs').textContent = pendingCount;
     $('cnt-prf').textContent = pendingCount;
 
@@ -377,12 +403,12 @@ function initAdmin() {
             <small>Thông tin nộp: <code>${esc(p.contact)}</code> · ${new Date(p.createdAt).toLocaleString('vi-VN')}</small>
             ${p.reviewNote ? `<div style="font-size:11px;color:#4a6b2c;margin-top:4px">${esc(p.reviewNote)}</div>` : ''}
           </div>
-          <span class="badge ${p.status}">${p.status === 'verified' ? 'Đã duyệt' : p.status === 'rejected' ? 'Từ chối' : 'Chờ duyệt'}</span>
+          <span class="badge ${p.status === 'processing' ? 'pending' : p.status}">${p.status === 'verified' ? 'Đã duyệt' : p.status === 'rejected' ? 'Từ chối' : p.status === 'processing' ? 'Đang xử lý' : 'Chờ duyệt'}</span>
         </div>
         <div style="display:flex;gap:8px;margin:10px 0;flex-wrap:wrap">
           ${(p.images || []).map(src => `<a href="${src}" target="_blank"><img src="${src}" style="width:95px;height:95px;object-fit:cover;border-radius:8px;border:1px solid #ccc"></a>`).join('')}
         </div>
-        ${p.status === 'pending' ? `<div style="display:flex;gap:8px;flex-wrap:wrap">
+        ${(p.status === 'pending' || p.status === 'processing') ? `<div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="primary" onclick="approveProof('${p.key}', '${p.phone}', ${p.reward}, '${esc(p.taskTitle)}')">✅ Duyệt & Cộng thưởng</button>
           <button class="danger" onclick="rejectProof('${p.key}')">❌ Từ chối</button>
         </div>` : ''}
@@ -424,7 +450,7 @@ function initAdmin() {
           <div>
             <strong>${esc(t.title)}</strong> (${esc(t.type)}) — Thưởng: <b>${esc(t.rewardText || money(t.reward))}</b>
             ${isPaused ? '<span class="badge closed">⏸ ĐANG DỪNG</span>' : '<span class="badge open">▶ ĐANG CHẠY</span>'}
-            <span class="badge pending">${t.reviewMode === 'auto' ? '🤖 AI tự duyệt' : '👨‍💼 Admin duyệt'}</span><br>
+            <span class="badge pending">${t.reviewMode === 'auto' ? '⚡ Tự động duyệt' : '👨‍💼 Admin duyệt'}</span><br>
             <small>${esc(t.desc)}</small>
           </div>
         </div>
@@ -534,7 +560,7 @@ window.openEditTaskModal = (id) => {
       <div><label>Chữ hiển thị thưởng</label><input id="et-reward-text" value="${esc(t.rewardText || '')}"></div>
       <div><label>Chế độ duyệt</label><select id="et-review-mode">
         <option value="manual" ${t.reviewMode !== 'auto' ? 'selected' : ''}>Admin duyệt thủ công</option>
-        <option value="auto" ${t.reviewMode === 'auto' ? 'selected' : ''}>AI tự động duyệt</option>
+        <option value="auto" ${t.reviewMode === 'auto' ? 'selected' : ''}>Tự động duyệt</option>
       </select></div>
     </div>
     <div class="grid-2">
