@@ -8,7 +8,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap');
-:root{--bg:#f4f7ee;--ink:#243d30;--green:#244d37;--line:#dfe6d7;--lime:#d5f19a;--muted:#7b8c6c;--red:#c94a38;--gold:#d49b27}
+:root{--bg:#f4f7ee;--ink:#243d30;--green:#244d37;--line:#dfe6d7;--lime:#d5f19a;--muted:#7b8c6c;--red:#c94a38;--gold:#d49b27;--blue:#2563eb}
 *{box-sizing:border-box;max-width:100%}
 html,body{margin:0;padding:0;width:100%;overflow-x:hidden;background:var(--bg);color:var(--ink);font:13px 'Be Vietnam Pro',system-ui,sans-serif}
 button,input,select,textarea{font:inherit}
@@ -19,6 +19,7 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .primary{background:var(--green);color:#fff}
 .danger{background:var(--red);color:#fff}
 .gold{background:var(--gold);color:#fff}
+.blue{background:var(--blue);color:#fff}
 .secondary{background:#fff;border:1px solid var(--line);color:var(--green)}
 header{background:var(--green);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:20}
 .container{max-width:1240px;margin:20px auto;padding:0 14px 60px}
@@ -49,12 +50,15 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
 .plot-check-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;background:#f4f8ec;padding:12px;border-radius:12px;margin-bottom:14px}
 .plot-check-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;background:#fff;padding:8px;border-radius:8px;border:1px solid var(--line)}
 .plot-check-item input{width:16px;height:16px;margin:0}
+.gift-preset-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.gift-preset-btn{background:#f4f8ec;border:1px solid #cde0b2;color:var(--green);text-align:left;padding:12px;border-radius:12px}
+.gift-preset-btn:hover{background:#e5f0d3}
 .login-overlay{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;z-index:50;padding:16px}
 .login-box{background:#fff;padding:28px;border-radius:20px;border:1px solid var(--line);width:360px;max-width:100%}
 .modal-back{position:fixed;inset:0;background:#1d342e80;backdrop-filter:blur(4px);z-index:60;display:none;align-items:center;justify-content:center;padding:14px}
 .modal-back.open{display:flex}
 .modal{background:#fff;border-radius:20px;padding:22px;width:580px;max-width:100%;max-height:92vh;overflow-y:auto}
-@media(max-width:850px){.stats{grid-template-columns:1fr 1fr}.grid-2,.grid-3{grid-template-columns:1fr}}
+@media(max-width:850px){.stats{grid-template-columns:1fr 1fr}.grid-2,.grid-3,.gift-preset-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -104,14 +108,14 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
     <button data-tab="tab-proofs">2. Duyệt Nhiệm Vụ <em id="cnt-prf">0</em></button>
     <button data-tab="tab-withdraws">3. Duyệt Rút Tiền <em id="cnt-wdr">0</em></button>
     <button data-tab="tab-tasks">4. Up & Dừng Nhiệm Vụ</button>
-    <button data-tab="tab-users">5. Thành Viên & Cấp Dưới</button>
+    <button data-tab="tab-users">5. Thành Viên & Tặng VIP</button>
     <button data-tab="tab-giftcodes">6. Giftcode & Hệ Thống</button>
     <button data-tab="tab-phone-list">7. Danh sách SĐT</button>
   </div>
 
   <div class="tab-content" id="tab-deposits">
     <div class="panel">
-      <h3>Danh sách yêu cầu nạp tiền (Duyệt sẽ cộng ví & mở khóa gói VIP ≥ 20.000đ)</h3>
+      <h3>Danh sách yêu cầu nạp tiền (MB BANK: 245331 · Duyệt mở khóa VIP ≥ 20.000đ)</h3>
       <div id="admin-deposit-list"></div>
     </div>
   </div>
@@ -133,15 +137,16 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
   <div class="tab-content" id="tab-tasks" hidden>
     <div class="panel">
       <h3>➕ Đăng nhiệm vụ mới lên trang chủ</h3>
+      <p style="font-size:11px;color:var(--muted);margin-bottom:12px">Mẹo: Nhiệm vụ có chữ <b>Zalo</b> trong tiêu đề sẽ tự động duyệt sau 60–120 giây. Các nhiệm vụ khác sẽ chuyển Admin duyệt thủ công.</p>
       <form id="new-task-form">
         <div class="grid-2">
-          <div><label>Tên ứng dụng / Nhiệm vụ *</label><input id="nt-title" required placeholder="Ví dụ: Tải app Cake by VPBank"></div>
+          <div><label>Tên ứng dụng / Nhiệm vụ *</label><input id="nt-title" required placeholder="Ví dụ: Tham gia nhóm Zalo 2 hoặc Cake"></div>
           <div><label>Danh mục *</label><select id="nt-type"><option>Ngân hàng</option><option>Ví điện tử</option><option>Tiền mã hóa</option><option>Giải trí</option><option>Cộng đồng</option></select></div>
         </div>
         <div class="grid-3">
           <div><label>Tiền thưởng VNĐ *</label><input id="nt-reward" type="number" required placeholder="30000"></div>
           <div><label>Chữ hiển thị thưởng (Tùy chọn)</label><input id="nt-reward-text" placeholder="VD: 50.000đ hoặc 20 USD"></div>
-          <div><label>Chế độ duyệt *</label><select id="nt-review-mode"><option value="manual">Admin duyệt thủ công</option><option value="auto">Tự động duyệt</option></select></div>
+          <div><label>Chế độ duyệt *</label><select id="nt-review-mode"><option value="manual">Admin duyệt thủ công</option><option value="auto">Tự động duyệt (Zalo 60-120s)</option></select></div>
         </div>
         <div class="grid-2">
           <div><label>Chọn ảnh Logo từ điện thoại</label><input id="nt-logo-file" type="file" accept="image/*" style="padding:7px"></div>
@@ -174,7 +179,7 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
   <div class="tab-content" id="tab-users" hidden>
     <div class="panel">
       <div class="row" style="margin-bottom:14px">
-        <h3 style="margin:0">Quản lý Thành viên, Sửa dữ liệu & Xem cấp dưới (F1/F2)</h3>
+        <h3 style="margin:0">Quản lý Thành viên, Tặng Gói VIP & Xem cấp dưới (F1/F2)</h3>
         <input id="user-search" placeholder="Tìm theo SĐT, tên hoặc mã mời..." style="max-width:280px;margin:0">
       </div>
       <div id="admin-user-list"></div>
@@ -227,6 +232,8 @@ const ADMIN_PASSWORDS = ["admin123", "123456"];
 
 const BANK_CODES = {"Vietcombank":"VCB","MBBank":"MB","Techcombank":"TCB","BIDV":"BIDV","VietinBank":"ICB","Agribank":"VBA","ACB":"ACB","VPBank":"VPB","TPBank":"TPB","Sacombank":"STB","HDBank":"HDB","VIB":"VIB","SHB":"SHB","MSB":"MSB","OCB":"OCB","CAKE":"CAKE","Timo":"TIMO","SeABank":"SEAB","LPBank":"LPB"};
 const CROP_NAMES = {rice:'Lúa nước',corn:'Ngô ngọt',wheat:'Lúa mì vàng',bronze:'Cây Đồng',silver:'Cây Bạc',gold:'Cây Vàng',diamond:'Kim cương',platinum:'Platinum',super_platinum:'Super Platinum'};
+const CROP_DURATIONS = {rice:150,corn:600,wheat:1800,bronze:3600,silver:18000,gold:43200,diamond:86400,platinum:180000,super_platinum:324000};
+const CROP_COSTS = {rice:1000,corn:2500,wheat:5000,bronze:10000,silver:20000,gold:50000,diamond:100000,platinum:200000,super_platinum:500000};
 
 let useFirebase = false, db = null;
 try {
@@ -291,7 +298,6 @@ const Store = {
   }
 };
 
-// Hàm nén ảnh an toàn có giới hạn thời gian 3 giây (không bao giờ treo form)
 function compressImgAdmin(file, maxW = 400) {
   return new Promise(resolve => {
     if (!file) return resolve('');
@@ -428,7 +434,7 @@ function initAdmin() {
             <small>Thông tin nộp: <code>${esc(p.contact)}</code> · ${new Date(p.createdAt).toLocaleString('vi-VN')}</small>
             ${p.reviewNote ? `<div style="font-size:11px;color:#4a6b2c;margin-top:4px">${esc(p.reviewNote)}</div>` : ''}
           </div>
-          <span class="badge ${p.status === 'processing' ? 'pending' : p.status}">${p.status === 'verified' ? 'Đã duyệt' : p.status === 'rejected' ? 'Từ chối' : p.status === 'processing' ? 'Đang xử lý' : 'Chờ duyệt'}</span>
+          <span class="badge ${p.status === 'processing' ? 'pending' : p.status}">${p.status === 'verified' ? 'Đã duyệt' : p.status === 'rejected' ? 'Từ chối' : p.status === 'processing' ? 'Đang xử lý (Zalo)' : 'Chờ duyệt'}</span>
         </div>
         <div style="display:flex;gap:8px;margin:10px 0;flex-wrap:wrap">
           ${(p.images || []).map(src => `<a href="${src}" target="_blank"><img src="${src}" style="width:95px;height:95px;object-fit:cover;border-radius:8px;border:1px solid #ccc"></a>`).join('')}
@@ -470,13 +476,14 @@ function initAdmin() {
     $('admin-task-list').innerHTML = list.map(t => {
       const isPaused = t.status === 'paused';
       const titleSafe = esc(t.title || 'Nhiệm vụ');
+      const isZalo = String(t.id).toLowerCase().includes('zalo') || String(t.title).toLowerCase().includes('zalo');
       return `<div class="card row">
         <div style="display:flex;gap:12px;align-items:center;flex:1;min-width:220px">
-          ${t.image ? `<img src="${esc(t.image)}" style="width:46px;height:46px;border-radius:10px;object-fit:cover;border:1px solid #ddd">` : `<div style="width:46px;height:46px;border-radius:10px;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:800">${titleSafe.slice(0,2).toUpperCase()}</div>`}
+          ${t.image ? `<img src="${esc(t.image)}" style="width:46px;height:46px;border-radius:10px;object-fit:cover;border:1px solid #ddd">` : `<div style="width:46px;height:46px;border-radius:10px;background:${isZalo ? '#078bff' : 'var(--green)'};color:#fff;display:grid;place-items:center;font-weight:800">${isZalo ? 'Zalo' : titleSafe.slice(0,2).toUpperCase()}</div>`}
           <div>
             <strong>${titleSafe}</strong> (${esc(t.type || 'Khác')}) — Thưởng: <b>${esc(t.rewardText || money(t.reward))}</b>
             ${isPaused ? '<span class="badge closed">⏸ ĐANG DỪNG</span>' : '<span class="badge open">▶ ĐANG CHẠY</span>'}
-            <span class="badge pending">${t.reviewMode === 'auto' ? '⚡ Tự động duyệt' : '👨‍💼 Admin duyệt'}</span><br>
+            <span class="badge pending">${isZalo ? '⚡ Zalo tự động (60-120s)' : '👨‍💼 Admin duyệt'}</span><br>
             <small>${esc(t.desc || '')}</small>
           </div>
         </div>
@@ -540,7 +547,6 @@ window.saveServerConfig = async () => {
   $('modal-back').classList.remove('open');
 };
 
-// SỬA LỖI ĐĂNG NHIỆM VỤ MỚI (CÓ BẮT LỖI & TRẠNG THÁI NÚT RÕ RÀNG)
 $('new-task-form').onsubmit = async e => {
   e.preventDefault();
   const btn = $('btn-submit-task');
@@ -549,7 +555,10 @@ $('new-task-form').onsubmit = async e => {
   btn.textContent = '⏳ Đang xử lý & đăng nhiệm vụ...';
 
   try {
-    const id = 'task_' + Date.now();
+    const titleVal = $('nt-title').value.trim();
+    const isZalo = titleVal.toLowerCase().includes('zalo');
+    const id = (isZalo ? 'zalo_' : 'task_') + Date.now();
+
     let image = $('nt-logo-url').value.trim();
     if ($('nt-logo-file').files && $('nt-logo-file').files[0]) {
       const compressedLogo = await compressImgAdmin($('nt-logo-file').files[0], 180);
@@ -567,11 +576,11 @@ $('new-task-form').onsubmit = async e => {
 
     const taskPayload = {
       id,
-      title: $('nt-title').value.trim(),
+      title: titleVal,
       type: $('nt-type').value || 'Khác',
       reward: Number($('nt-reward').value) || 0,
       rewardText: $('nt-reward-text').value.trim(),
-      reviewMode: $('nt-review-mode').value || 'manual',
+      reviewMode: isZalo ? 'auto' : ($('nt-review-mode').value || 'manual'),
       image: image || '',
       guideImage: guideImage || '',
       code: $('nt-code').value.trim(),
@@ -589,7 +598,6 @@ $('new-task-form').onsubmit = async e => {
     $('new-task-form').reset();
     alert('✅ Đăng nhiệm vụ thành công lên trang chủ!');
   } catch (err) {
-    console.error('Lỗi đăng nhiệm vụ:', err);
     alert('❌ Lỗi không đăng được nhiệm vụ: ' + (err.message || 'Kiểm tra kết nối Firebase Rules'));
   } finally {
     btn.disabled = false;
@@ -671,7 +679,7 @@ function renderUsers() {
       ? plots.map(([k, p]) => `${k.toUpperCase()}: ${CROP_NAMES[p.crop] || p.crop} (${Date.now() >= p.readyAt ? 'Đã chín' : 'Đang lớn'})`).join(' | ')
       : 'Chưa gieo cây nào';
 
-    const f1Count = allUsersArr.filter(x => x.referredBy && x.referredBy === u.inviteCode).length;
+    const f1Count = allUsersArr.filter(x => x.referredBy && (x.referredBy === u.phone || x.referredBy === u.inviteCode)).length;
 
     return `<div class="card">
       <div class="row">
@@ -681,8 +689,9 @@ function renderUsers() {
           ${u.locked ? '<span class="badge closed">ĐÃ KHÓA</span>' : ''}
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="gold" onclick="openGiftVipModal('${u.phone}')">🎁 Tặng VIP & Quà</button>
           <button class="secondary" onclick="openSubordinatesModal('${u.phone}')">👥 Cấp dưới (${f1Count})</button>
-          <button class="primary" onclick="openEditUserModal('${u.phone}')">✏️ Sửa toàn bộ thông tin</button>
+          <button class="primary" onclick="openEditUserModal('${u.phone}')">✏️ Sửa chi tiết</button>
           <button class="${u.locked ? 'secondary' : 'danger'}" onclick="Store.update('users/${u.phone}', {locked: ${!u.locked}})">${u.locked ? 'Mở khóa TK' : 'Khóa TK'}</button>
         </div>
       </div>
@@ -692,7 +701,7 @@ function renderUsers() {
         <div>↗ Đã rút: <b>${money(u.withdrawn || 0)}</b></div>
         <div>⭐ Nông trại: <b>Level ${u.farmLevel || 1}</b> (${u.farmExp || 0} EXP)</div>
         <div>🌾 Thu nông trại: <b>${money(u.farmEarned || 0)}</b></div>
-        <div>🔑 Mã mời: <b>${esc(u.inviteCode)}</b> (F1 của: ${esc(u.referredBy || 'Không')})</div>
+        <div>🔑 Mã mời: <b>${esc(u.inviteCode || u.phone)}</b> (F1 của: ${esc(u.referredBy || 'Không')})</div>
       </div>
       <div style="font-size:11px;color:#4f683a">🌱 <b>Đang trồng:</b> ${esc(plotText)}</div>
     </div>`;
@@ -700,14 +709,172 @@ function renderUsers() {
 }
 $('user-search').oninput = renderUsers;
 
+// MODAL TẶNG GÓI VIP, TIỀN THƯỞNG, Ô ĐẤT & CÂY TRỒNG CHO THÀNH VIÊN
+window.openGiftVipModal = (phone) => {
+  const u = allUsersCache[phone];
+  if (!u) return;
+  const isVip = Number(u.totalDeposited || 0) >= 20000;
+
+  $('modal').innerHTML = `
+    <div class="row" style="margin-bottom:12px">
+      <div>
+        <h3 style="margin:0;color:var(--green)">🎁 Tặng Gói VIP & Quà Đặc Quyền</h3>
+        <small style="color:var(--muted)">Thành viên: <b>${esc(u.name)}</b> (<code>${esc(u.phone)}</code>) · Trạng thái: ${isVip ? '👑 Đã VIP' : 'Chưa VIP'}</small>
+      </div>
+      <button class="secondary" onclick="$('modal-back').classList.remove('open')">Đóng</button>
+    </div>
+
+    <label>1. Tặng nhanh gói đặc quyền (1 chạm)</label>
+    <div class="gift-preset-grid">
+      <button type="button" class="gift-preset-btn" onclick="grantVipQuick('${phone}', 20000, 0, 'Gói VIP Cơ Bản (Mở khóa toàn bộ hạt giống VIP)')">
+        <strong style="display:block;font-size:12px">👑 Kích hoạt VIP (Mốc 20k)</strong>
+        <small style="color:#667a54">Mở khóa trồng Đồng → Super Platinum</small>
+      </button>
+      <button type="button" class="gift-preset-btn" onclick="grantVipQuick('${phone}', 50000, 50000, 'Gói VIP + Tặng 50.000đ vốn')">
+        <strong style="display:block;font-size:12px">💎 VIP + Tặng 50.000đ ví</strong>
+        <small style="color:#667a54">Mở khóa VIP & cộng thẳng 50.000đ</small>
+      </button>
+      <button type="button" class="gift-preset-btn" onclick="grantAllPlots('${phone}')">
+        <strong style="display:block;font-size:12px">🏡 Mở khóa full 9 ô đất 3x3</strong>
+        <small style="color:#667a54">Tặng miễn phí toàn bộ ô đất #4 → #9</small>
+      </button>
+      <button type="button" class="gift-preset-btn" onclick="grantLevelBoost('${phone}', 10)">
+        <strong style="display:block;font-size:12px">⭐ Nâng ngay lên Level 10</strong>
+        <small style="color:#667a54">Tăng +45% lãi thu hoạch & mở Ô #2, #3</small>
+      </button>
+    </div>
+
+    <div style="border-top:1px dashed var(--line);padding-top:12px;margin-top:8px">
+      <label>2. Tặng tiền thưởng tùy chỉnh vào ví thành viên</label>
+      <div class="grid-2">
+        <input id="gift-custom-amt" type="number" placeholder="Nhập số tiền (VD: 100000)">
+        <input id="gift-custom-note" value="Admin tặng quà tri ân VIP" placeholder="Lý do tặng...">
+      </div>
+      <button class="primary" style="width:100%" onclick="grantCustomMoney('${phone}')">💰 Tặng tiền vào ví ngay</button>
+    </div>
+
+    <div style="border-top:1px dashed var(--line);padding-top:12px;margin-top:14px">
+      <label>3. Tặng sẵn 1 cây / khoáng sản VIP vào ô đất nông trại</label>
+      <div class="grid-3">
+        <select id="gift-crop-id">
+          ${Object.entries(CROP_NAMES).map(([k, v]) => `<option value="${k}">${v} (${money(CROP_COSTS[k])})</option>`).join('')}
+        </select>
+        <select id="gift-plot-num">
+          ${[1,2,3,4,5,6,7,8,9].map(i => `<option value="${i}">Ô đất #${i}</option>`).join('')}
+        </select>
+        <select id="gift-crop-ready">
+          <option value="ready">✨ Chín sẵn (Thu ngay)</option>
+          <option value="growing">🌱 Đang trồng (Chờ chín)</option>
+        </select>
+      </div>
+      <button class="gold" style="width:100%" onclick="grantCropToPlot('${phone}')">🌾 Gieo tặng cây vào ô đất</button>
+    </div>
+  `;
+  $('modal-back').classList.add('open');
+};
+
+window.grantVipQuick = async (phone, vipDepAmt, bonusBalance, pkgName) => {
+  const u = await Store.get('users/' + phone);
+  if (!u) return;
+  const newDep = Math.max(Number(u.totalDeposited || 0), vipDepAmt);
+  const newBal = Number(u.balance || 0) + Number(bonusBalance);
+  await Store.update('users/' + phone, { totalDeposited: newDep, balance: newBal });
+  await Store.push('history/' + phone, {
+    title: `Admin tặng: ${pkgName}`,
+    amount: bonusBalance > 0 ? `+${money(bonusBalance)} & VIP` : 'Mở khóa VIP',
+    icon: '👑',
+    detail: 'Đã mở khóa toàn bộ hạt giống VIP từ Đồng đến Super Platinum',
+    createdAt: Date.now()
+  });
+  $('modal-back').classList.remove('open');
+  alert(`✅ Đã tặng thành công ${pkgName} cho SĐT ${phone}!`);
+};
+
+window.grantAllPlots = async (phone) => {
+  const purchasedPlots = { p4: true, p5: true, p6: true, p7: true, p8: true, p9: true };
+  await Store.update('users/' + phone, { purchasedPlots });
+  await Store.push('history/' + phone, {
+    title: 'Admin tặng gói mở rộng Full 9 ô đất',
+    amount: 'Mở 9 ô vuông',
+    icon: '🏡',
+    detail: 'Quà tặng đặc quyền nâng cấp nông trại 3x3',
+    createdAt: Date.now()
+  });
+  $('modal-back').classList.remove('open');
+  alert(`✅ Đã mở khóa miễn phí toàn bộ 9 ô đất cho SĐT ${phone}!`);
+};
+
+window.grantLevelBoost = async (phone, targetLv) => {
+  const u = await Store.get('users/' + phone);
+  if (!u) return;
+  const finalLv = Math.max(Number(u.farmLevel || 1), targetLv);
+  await Store.update('users/' + phone, { farmLevel: finalLv, farmExp: 0 });
+  await Store.push('history/' + phone, {
+    title: `Admin tặng gói thăng cấp Level ${finalLv}`,
+    amount: `LEVEL ${finalLv}`,
+    icon: '⭐',
+    detail: `Tăng thưởng thu hoạch +${(finalLv - 1) * 5}%`,
+    createdAt: Date.now()
+  });
+  $('modal-back').classList.remove('open');
+  alert(`✅ Đã nâng cấp SĐT ${phone} lên Level ${finalLv}!`);
+};
+
+window.grantCustomMoney = async (phone) => {
+  const amt = Number($('gift-custom-amt').value) || 0;
+  const note = $('gift-custom-note').value.trim() || 'Admin tặng quà';
+  if (amt <= 0) return alert('Vui lòng nhập số tiền lớn hơn 0!');
+  const u = await Store.get('users/' + phone);
+  if (!u) return;
+  await Store.update('users/' + phone, { balance: Number(u.balance || 0) + amt });
+  await Store.push('history/' + phone, {
+    title: note,
+    amount: `+${money(amt)}`,
+    icon: '🎁',
+    detail: 'Quà tặng trực tiếp từ Quản trị viên',
+    createdAt: Date.now()
+  });
+  $('modal-back').classList.remove('open');
+  alert(`✅ Đã tặng +${money(amt)} vào ví SĐT ${phone}!`);
+};
+
+window.grantCropToPlot = async (phone) => {
+  const cropId = $('gift-crop-id').value;
+  const plotIdx = Number($('gift-plot-num').value);
+  const isReady = $('gift-crop-ready').value === 'ready';
+  const durationSec = CROP_DURATIONS[cropId] || 150;
+  const readyAt = isReady ? (Date.now() - 1000) : (Date.now() + durationSec * 1000);
+
+  const updates = {
+    [`plots/p${plotIdx}`]: {
+      crop: cropId,
+      cost: CROP_COSTS[cropId] || 1000,
+      plantedAt: Date.now(),
+      readyAt
+    }
+  };
+  if (plotIdx >= 4) updates[`purchasedPlots/p${plotIdx}`] = true;
+
+  await Store.update('users/' + phone, updates);
+  await Store.push('history/' + phone, {
+    title: `Admin tặng cây ${CROP_NAMES[cropId]} tại Ô #${plotIdx}`,
+    amount: isReady ? 'Chín sẵn' : 'Đang lớn',
+    icon: '🌾',
+    detail: 'Vào Nông trại 3x3 để thu hoạch ngay',
+    createdAt: Date.now()
+  });
+  $('modal-back').classList.remove('open');
+  alert(`✅ Đã tặng ${CROP_NAMES[cropId]} vào Ô #${plotIdx} của SĐT ${phone}!`);
+};
+
 window.openSubordinatesModal = (phone) => {
   const u = allUsersCache[phone];
   if (!u) return;
 
   const allUsersArr = Object.values(allUsersCache);
-  const f1Users = allUsersArr.filter(x => x.referredBy && x.referredBy === u.inviteCode);
-  const f1Codes = f1Users.map(x => x.inviteCode).filter(Boolean);
-  const f2Users = allUsersArr.filter(x => x.referredBy && f1Codes.includes(x.referredBy));
+  const f1Users = allUsersArr.filter(x => x.referredBy && (x.referredBy === u.phone || x.referredBy === u.inviteCode));
+  const f1Keys = f1Users.flatMap(x => [x.phone, x.inviteCode]).filter(Boolean);
+  const f2Users = allUsersArr.filter(x => x.referredBy && f1Keys.includes(x.referredBy));
 
   const renderSubRow = (sub, levelLabel) => `
     <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:#fcfdf9">
@@ -731,7 +898,7 @@ window.openSubordinatesModal = (phone) => {
     <div class="row" style="margin-bottom:12px">
       <div>
         <h3 style="margin:0">👥 Hệ thống cấp dưới của ${esc(u.name)}</h3>
-        <small style="color:var(--muted)">SĐT: <b>${esc(u.phone)}</b> · Mã giới thiệu: <code>${esc(u.inviteCode)}</code></small>
+        <small style="color:var(--muted)">SĐT: <b>${esc(u.phone)}</b> · Mã giới thiệu: <code>${esc(u.inviteCode || u.phone)}</code></small>
       </div>
       <button class="secondary" onclick="$('modal-back').classList.remove('open')">Đóng</button>
     </div>
@@ -759,7 +926,7 @@ window.openEditUserModal = (phone) => {
     <h3>✏️ Chỉnh sửa toàn bộ dữ liệu: ${esc(u.name)} (${esc(u.phone)})</h3>
     <div class="grid-2">
       <div><label>Tên hiển thị</label><input id="eu-name" value="${esc(u.name)}"></div>
-      <div><label>Mã giới thiệu riêng</label><input id="eu-code" value="${esc(u.inviteCode || '')}"></div>
+      <div><label>Mã giới thiệu riêng</label><input id="eu-code" value="${esc(u.inviteCode || u.phone)}"></div>
     </div>
     <div class="grid-2">
       <div><label>Mật khẩu đăng nhập</label><input id="eu-pass" value="${esc(u.password || '')}"></div>
@@ -802,7 +969,7 @@ window.saveUserFull = async (phone) => {
 
   await Store.update('users/' + phone, {
     name: $('eu-name').value.trim(),
-    inviteCode: $('eu-code').value.trim().toUpperCase(),
+    inviteCode: $('eu-code').value.trim(),
     password: $('eu-pass').value.trim(),
     pin: $('eu-pin').value.trim(),
     balance: newBalance,
@@ -864,7 +1031,7 @@ window.approveProof = async (key, phone, defaultReward, title) => {
 
     if (u.referredBy && !u.f1Rewarded) {
       await Store.update('users/' + phone, { f1Rewarded: true });
-      const inviter = Object.values(allUsersCache).find(x => x.inviteCode === u.referredBy);
+      const inviter = Object.values(allUsersCache).find(x => x.phone === u.referredBy || (x.inviteCode && x.inviteCode.toUpperCase() === u.referredBy.toUpperCase()));
       if (inviter) {
         await Store.update('users/' + inviter.phone, { balance: (inviter.balance || 0) + 200 });
         await Store.update(`users/${inviter.phone}/invited/${phone}`, { qualified: true });
