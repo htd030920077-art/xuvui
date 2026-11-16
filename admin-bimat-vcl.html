@@ -14,6 +14,7 @@ html,body{margin:0;padding:0;width:100%;overflow-x:hidden;background:var(--bg);c
 button,input,select,textarea{font:inherit}
 button{cursor:pointer;border:0;border-radius:10px;padding:10px 14px;font-weight:700;font-size:11px;transition:transform .15s,opacity .15s}
 button:active{transform:translateY(1px)}
+button:disabled{opacity:.6;cursor:not-allowed}
 [hidden]{display:none!important}
 .primary{background:var(--green);color:#fff}
 .danger{background:var(--red);color:#fff}
@@ -144,21 +145,23 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
         </div>
         <div class="grid-2">
           <div><label>Chọn ảnh Logo từ điện thoại</label><input id="nt-logo-file" type="file" accept="image/*" style="padding:7px"></div>
-          <div><label>Hoặc dán Link ảnh Logo (URL)</label><input id="nt-logo-url" type="url" placeholder="https://..."></div>
+          <div><label>Hoặc dán Link ảnh Logo (URL)</label><input id="nt-logo-url" type="text" placeholder="https://..."></div>
         </div>
         <div class="grid-2">
           <div><label>Mã mời (Nếu có)</label><input id="nt-code" placeholder="Ví dụ: HF3009"></div>
           <div><label>Nhãn thông tin user cần nhập *</label><input id="nt-contact" value="Số điện thoại đăng ký" required></div>
         </div>
         <label>Mô tả ngắn gọn *</label><input id="nt-desc" required placeholder="Đăng ký tài khoản và phát sinh giao dịch đầu tiên">
-        <label>Link tham gia nhiệm vụ *</label><input id="nt-url" type="url" required placeholder="https://...">
+        <label>Link tham gia nhiệm vụ *</label><input id="nt-url" type="text" required placeholder="https://...">
         <label>Các bước hướng dẫn (Mỗi bước xuống 1 dòng) *</label><textarea id="nt-steps" rows="4" required placeholder="B1: Tải app qua link&#10;B2: Nhập mã mời&#10;B3: Chụp ảnh gửi xác minh"></textarea>
         <div class="grid-2">
           <div><label>Yêu cầu ảnh bằng chứng</label><input id="nt-proof" value="Ảnh chụp màn hình hoàn thành nhiệm vụ rõ nét."></div>
           <div><label>Ảnh hướng dẫn minh họa (Tùy chọn)</label><input id="nt-guide-file" type="file" accept="image/*" style="padding:7px"></div>
         </div>
+        <label>Hoặc dán Link ảnh minh họa (URL - Khuyên dùng cho nhẹ máy)</label>
+        <input id="nt-guide-url" type="text" placeholder="https://...">
         <label>Ghi chú / Cảnh báo điều kiện (Tùy chọn)</label><input id="nt-note" placeholder="Lưu ý về thời gian đối soát hoặc điều kiện đặc biệt">
-        <button type="submit" class="primary" style="width:100%">🚀 Đăng nhiệm vụ lên trang web ngay ↗</button>
+        <button type="submit" class="primary" id="btn-submit-task" style="width:100%">🚀 Đăng nhiệm vụ lên trang web ngay ↗</button>
       </form>
     </div>
 
@@ -191,7 +194,6 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
     </div>
   </div>
 
-  <!-- TAB 7: LIỆT KÊ DUY NHẤT SĐT TỪ TRÊN XUỐNG DƯỚI -->
   <div class="tab-content" id="tab-phone-list" hidden>
     <div class="panel">
       <div class="row" style="margin-bottom:14px">
@@ -260,11 +262,17 @@ const Store = {
     return this._localGet(path);
   },
   async set(path, val) {
-    if (useFirebase) { try { await db.ref(path).set(val); return; } catch { useFirebase = false; } }
+    if (useFirebase) {
+      await db.ref(path).set(val);
+      return;
+    }
     this._localSet(path, val);
   },
   async update(path, obj) {
-    if (useFirebase) { try { await db.ref(path).update(obj); return; } catch { useFirebase = false; } }
+    if (useFirebase) {
+      await db.ref(path).update(obj);
+      return;
+    }
     const cur = this._localGet(path) || {};
     Object.entries(obj).forEach(([k, v]) => {
       if (k.includes('/')) this._localSet(path + '/' + k, v);
@@ -283,21 +291,38 @@ const Store = {
   }
 };
 
-function compressImgAdmin(file, maxW = 450) {
+// Hàm nén ảnh an toàn có giới hạn thời gian 3 giây (không bao giờ treo form)
+function compressImgAdmin(file, maxW = 400) {
   return new Promise(resolve => {
-    const r = new FileReader();
-    r.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        const c = document.createElement('canvas');
-        const s = img.width > maxW ? maxW / img.width : 1;
-        c.width = img.width * s; c.height = img.height * s;
-        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-        resolve(c.toDataURL('image/jpeg', 0.72));
+    if (!file) return resolve('');
+    const timer = setTimeout(() => resolve(''), 3000);
+    try {
+      const r = new FileReader();
+      r.onerror = () => { clearTimeout(timer); resolve(''); };
+      r.onload = e => {
+        const img = new Image();
+        img.onerror = () => { clearTimeout(timer); resolve(''); };
+        img.onload = () => {
+          try {
+            const c = document.createElement('canvas');
+            const s = img.width > maxW ? maxW / img.width : 1;
+            c.width = Math.round(img.width * s);
+            c.height = Math.round(img.height * s);
+            c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+            clearTimeout(timer);
+            resolve(c.toDataURL('image/jpeg', 0.68));
+          } catch {
+            clearTimeout(timer);
+            resolve('');
+          }
+        };
+        img.src = e.target.result;
       };
-      img.src = e.target.result;
-    };
-    r.readAsDataURL(file);
+      r.readAsDataURL(file);
+    } catch {
+      clearTimeout(timer);
+      resolve('');
+    }
   });
 }
 
@@ -444,14 +469,15 @@ function initAdmin() {
     const list = Object.values(allTasksCache);
     $('admin-task-list').innerHTML = list.map(t => {
       const isPaused = t.status === 'paused';
+      const titleSafe = esc(t.title || 'Nhiệm vụ');
       return `<div class="card row">
         <div style="display:flex;gap:12px;align-items:center;flex:1;min-width:220px">
-          ${t.image ? `<img src="${esc(t.image)}" style="width:46px;height:46px;border-radius:10px;object-fit:cover;border:1px solid #ddd">` : `<div style="width:46px;height:46px;border-radius:10px;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:800">${esc(t.title.slice(0,2).toUpperCase())}</div>`}
+          ${t.image ? `<img src="${esc(t.image)}" style="width:46px;height:46px;border-radius:10px;object-fit:cover;border:1px solid #ddd">` : `<div style="width:46px;height:46px;border-radius:10px;background:var(--green);color:#fff;display:grid;place-items:center;font-weight:800">${titleSafe.slice(0,2).toUpperCase()}</div>`}
           <div>
-            <strong>${esc(t.title)}</strong> (${esc(t.type)}) — Thưởng: <b>${esc(t.rewardText || money(t.reward))}</b>
+            <strong>${titleSafe}</strong> (${esc(t.type || 'Khác')}) — Thưởng: <b>${esc(t.rewardText || money(t.reward))}</b>
             ${isPaused ? '<span class="badge closed">⏸ ĐANG DỪNG</span>' : '<span class="badge open">▶ ĐANG CHẠY</span>'}
             <span class="badge pending">${t.reviewMode === 'auto' ? '⚡ Tự động duyệt' : '👨‍💼 Admin duyệt'}</span><br>
-            <small>${esc(t.desc)}</small>
+            <small>${esc(t.desc || '')}</small>
           </div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -514,34 +540,61 @@ window.saveServerConfig = async () => {
   $('modal-back').classList.remove('open');
 };
 
+// SỬA LỖI ĐĂNG NHIỆM VỤ MỚI (CÓ BẮT LỖI & TRẠNG THÁI NÚT RÕ RÀNG)
 $('new-task-form').onsubmit = async e => {
   e.preventDefault();
-  const id = 'task_' + Date.now();
-  let image = $('nt-logo-url').value.trim();
-  if ($('nt-logo-file').files[0]) image = await compressImgAdmin($('nt-logo-file').files[0], 200);
-  let guideImage = '';
-  if ($('nt-guide-file').files[0]) guideImage = await compressImgAdmin($('nt-guide-file').files[0], 650);
+  const btn = $('btn-submit-task');
+  const origText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = '⏳ Đang xử lý & đăng nhiệm vụ...';
 
-  await Store.set('tasks/' + id, {
-    id,
-    title: $('nt-title').value.trim(),
-    type: $('nt-type').value,
-    reward: Number($('nt-reward').value),
-    rewardText: $('nt-reward-text').value.trim(),
-    reviewMode: $('nt-review-mode').value,
-    image,
-    guideImage,
-    code: $('nt-code').value.trim(),
-    contactLabel: $('nt-contact').value.trim(),
-    desc: $('nt-desc').value.trim(),
-    url: $('nt-url').value.trim(),
-    steps: $('nt-steps').value.split('\n').map(s => s.trim()).filter(Boolean),
-    proof: $('nt-proof').value.trim(),
-    note: $('nt-note').value.trim(),
-    status: 'active',
-    createdAt: Date.now()
-  });
-  $('new-task-form').reset();
+  try {
+    const id = 'task_' + Date.now();
+    let image = $('nt-logo-url').value.trim();
+    if ($('nt-logo-file').files && $('nt-logo-file').files[0]) {
+      const compressedLogo = await compressImgAdmin($('nt-logo-file').files[0], 180);
+      if (compressedLogo) image = compressedLogo;
+    }
+
+    let guideImage = $('nt-guide-url').value.trim();
+    if ($('nt-guide-file').files && $('nt-guide-file').files[0]) {
+      const compressedGuide = await compressImgAdmin($('nt-guide-file').files[0], 550);
+      if (compressedGuide) guideImage = compressedGuide;
+    }
+
+    let url = $('nt-url').value.trim();
+    if (url && !/^https?:\/\//i.test(url)) url = 'https://' + url;
+
+    const taskPayload = {
+      id,
+      title: $('nt-title').value.trim(),
+      type: $('nt-type').value || 'Khác',
+      reward: Number($('nt-reward').value) || 0,
+      rewardText: $('nt-reward-text').value.trim(),
+      reviewMode: $('nt-review-mode').value || 'manual',
+      image: image || '',
+      guideImage: guideImage || '',
+      code: $('nt-code').value.trim(),
+      contactLabel: $('nt-contact').value.trim() || 'Số điện thoại đăng ký',
+      desc: $('nt-desc').value.trim(),
+      url: url,
+      steps: $('nt-steps').value.split('\n').map(s => s.trim()).filter(Boolean),
+      proof: $('nt-proof').value.trim() || 'Ảnh chụp màn hình hoàn thành nhiệm vụ.',
+      note: $('nt-note').value.trim(),
+      status: 'active',
+      createdAt: Date.now()
+    };
+
+    await Store.set('tasks/' + id, taskPayload);
+    $('new-task-form').reset();
+    alert('✅ Đăng nhiệm vụ thành công lên trang chủ!');
+  } catch (err) {
+    console.error('Lỗi đăng nhiệm vụ:', err);
+    alert('❌ Lỗi không đăng được nhiệm vụ: ' + (err.message || 'Kiểm tra kết nối Firebase Rules'));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = origText;
+  }
 };
 
 window.openEditTaskModal = (id) => {
@@ -572,6 +625,7 @@ window.openEditTaskModal = (id) => {
     </div>
     <label>Mô tả ngắn</label><input id="et-desc" value="${esc(t.desc || '')}">
     <label>Link tham gia</label><input id="et-url" value="${esc(t.url || '')}">
+    <label>Link ảnh minh họa (URL)</label><input id="et-guide-url" value="${esc(t.guideImage && !t.guideImage.startsWith('data:') ? t.guideImage : '')}" placeholder="https://...">
     <label>Các bước hướng dẫn (Mỗi bước 1 dòng)</label><textarea id="et-steps" rows="4">${esc((t.steps || []).join('\n'))}</textarea>
     <label>Ghi chú thêm</label><input id="et-note" value="${esc(t.note || '')}">
     <div style="display:flex;gap:8px;margin-top:10px">
@@ -583,6 +637,8 @@ window.openEditTaskModal = (id) => {
 };
 
 window.saveTaskEdit = async (id) => {
+  const cur = allTasksCache[id] || {};
+  const newGuideUrl = $('et-guide-url').value.trim();
   await Store.update('tasks/' + id, {
     title: $('et-title').value.trim(),
     type: $('et-type').value,
@@ -593,6 +649,7 @@ window.saveTaskEdit = async (id) => {
     code: $('et-code').value.trim(),
     desc: $('et-desc').value.trim(),
     url: $('et-url').value.trim(),
+    guideImage: newGuideUrl || cur.guideImage || '',
     steps: $('et-steps').value.split('\n').map(s => s.trim()).filter(Boolean),
     note: $('et-note').value.trim()
   });
