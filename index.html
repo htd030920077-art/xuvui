@@ -1380,53 +1380,56 @@ function openTaskModal(id) {
       $('photo-previews').innerHTML = '';
       [...$('proof-files').files].slice(0, 2).forEach(f => { const img = document.createElement('img'); img.src = URL.createObjectURL(f); $('photo-previews').appendChild(img); });
     };
+    
+    // ĐÃ TỐI ƯU GỬI NGAY LẬP TỨC KHÔNG BAO GIỜ BỊ TREO NÚT
     $('proof-form').onsubmit = async e => {
       e.preventDefault();
       const files = [...$('proof-files').files].slice(0, 2);
-      if (!files.length) return toast('Vui lòng chạm vào khung xanh để chọn ít nhất 1 ảnh bằng chứng!');
-      $('proof-submit').disabled = true;
-      $('proof-submit').textContent = 'Đang gửi hồ sơ lên hệ thống...';
+      if (!files.length) return toast('Vui lòng chọn ít nhất 1 ảnh bằng chứng!');
+      
+      const submitBtn = $('proof-submit');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Đang gửi lên hệ thống...';
 
-      const images = [];
-      for (const f of files) images.push(await compressImage(f));
-      const contact = $('proof-contact').value.trim();
+      try {
+        const images = [];
+        for (const f of files) images.push(await compressImage(f));
+        const contact = $('proof-contact').value.trim();
 
-      const isZalo = t.id === 'zalo';
-      const targetDuration = isZalo ? (60000 + Math.floor(Math.random() * 60000)) : 0;
+        const isZalo = t.id === 'zalo';
+        const targetDuration = isZalo ? (60000 + Math.floor(Math.random() * 60000)) : 0;
 
-      await Store.push('submissions', {
-        phone: currentUser,
-        userName: userData.name,
-        taskId: t.id,
-        taskTitle: t.title,
-        reward: Number(t.reward),
-        rewardDisplay: formatTaskReward(t),
-        contact,
-        images,
-        status: isZalo ? 'processing' : 'pending',
-        reviewNote: isZalo ? 'Đang xử lý tự động (60-120s)' : 'Chờ Admin duyệt thủ công',
-        targetDuration,
-        createdAt: Date.now()
-      });
+        await Store.push('submissions', {
+          phone: currentUser,
+          userName: userData.name,
+          taskId: t.id,
+          taskTitle: t.title,
+          reward: Number(t.reward),
+          rewardDisplay: formatTaskReward(t),
+          contact,
+          images,
+          status: isZalo ? 'processing' : 'pending',
+          reviewNote: isZalo ? 'Đang xử lý tự động (60-120s)' : 'Chờ Admin duyệt thủ công',
+          targetDuration,
+          createdAt: Date.now()
+        });
 
-      if (isZalo) {
-        await sendTelegram(
-          'taskBot',
-          `⏳ <b>NHIỆM VỤ ZALO ĐANG XỬ LÝ</b>\n👤 User: ${userData.name} (${currentUser})\n🆔 Thông tin: <code>${contact}</code>\n<i>Hệ thống sẽ tự động thành công sau 1 phút nữa.</i>`,
-          images[0]
-        );
+        if (isZalo) {
+          sendTelegram('taskBot', `⏳ <b>NHIỆM VỤ ZALO ĐANG XỬ LÝ</b>\n👤 User: ${userData.name} (${currentUser})\n🆔 Thông tin: <code>${contact}</code>`, images[0]);
+          toast('Đã gửi! Nhiệm vụ Zalo đang xử lý tự động.');
+        } else {
+          sendTelegram('taskBot', `📋⏳ <b>HỒ SƠ CHỜ ADMIN DUYỆT</b>\n👤 User: ${userData.name} (${currentUser})\n🎯 Nhiệm vụ: <b>${t.title}</b> (${formatTaskReward(t)})\n🆔 Thông tin: <code>${contact}</code>`, images[0]);
+          toast('Đã gửi hồ sơ thành công! Vui lòng chờ Admin đối soát.');
+        }
+
         $('modal-back').classList.remove('open');
-        toast('Đã gửi! Nhiệm vụ Zalo đang xử lý và sẽ tự động thành công sau 60-120 giây.');
-      } else {
-        await sendTelegram(
-          'taskBot',
-          `📋⏳ <b>HỒ SƠ CHỜ ADMIN DUYỆT</b>\n👤 User: ${userData.name} (${currentUser})\n🎯 Nhiệm vụ: <b>${t.title}</b> (${formatTaskReward(t)})\n🆔 Thông tin: <code>${contact}</code>`,
-          images[0]
-        );
-        $('modal-back').classList.remove('open');
-        toast('Đã gửi hồ sơ thành công! Vui lòng chờ Admin đối soát.');
+        navigate('proofs');
+      } catch (err) {
+        console.error("Submit error:", err);
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Gửi hồ sơ xác nhận ↗';
+        toast('Có lỗi xảy ra, vui lòng thử lại!');
       }
-      navigate('proofs');
     };
   }
 }
