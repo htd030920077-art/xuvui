@@ -41,8 +41,9 @@ h1,h2,h3,h4,p{margin-top:0;word-wrap:break-word}
 .topbar{height:72px;padding:0 24px;background:#ffffffe0;backdrop-filter:blur(8px);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:9}
 .breadcrumb{font-size:11px;color:#98a28e}
 .breadcrumb b{padding:0 8px;font-weight:400}
-.top-actions{display:flex;align-items:center;gap:10px}
-.icon-button{background:white;border:1px solid var(--line);border-radius:11px;width:38px;height:38px;color:var(--green);font-size:18px;display:grid;place-items:center;flex-shrink:0}
+.top-actions{display:flex;align-items:center;gap:8px}
+.icon-button{background:white;border:1px solid var(--line);border-radius:11px;width:36px;height:36px;color:var(--green);font-size:16px;display:grid;place-items:center;flex-shrink:0}
+.vip-pill{background:linear-gradient(135deg,#f5d061,#d4981e);color:#fff;font-size:10px;font-weight:800;padding:5px 9px;border-radius:8px;letter-spacing:.4px;box-shadow:0 3px 10px #d4981e40;white-space:nowrap;cursor:pointer}
 .member-status{font-size:11px;color:#557242;display:flex;align-items:center;gap:6px;background:#edf3e2;padding:7px 11px;border-radius:10px;font-weight:700;white-space:nowrap}
 .member-status i{width:6px;height:6px;border-radius:50%;background:#6fa33a}
 .avatar{width:34px;height:34px;border-radius:50%;background:var(--green);color:var(--lime);display:grid;place-items:center;font-size:11px;font-weight:700;flex-shrink:0}
@@ -67,6 +68,7 @@ h3{font-size:15px;letter-spacing:-.2px}
 .text-button{background:none;color:#6e8758;min-height:38px;font-size:11px;font-weight:600;padding:6px}
 label{display:block;font-size:11px;color:#5a7049;margin:12px 0 6px;font-weight:600}
 input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px 13px;background:#fdfefa;color:#2c4728;font-size:13px;min-height:44px}
+input[readonly]{background:#f1f5ea;font-weight:800;color:var(--green)}
 .panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:18px;width:100%}
 .panel-heading{display:flex;gap:12px;align-items:center;margin-bottom:18px}
 .small-icon{background:#eff4e6;color:#71904f;border-radius:12px;display:inline-grid;place-items:center;width:40px;height:40px;font-size:20px;flex-shrink:0}
@@ -99,6 +101,19 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
 .section-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 14px;flex-wrap:wrap}
 .section-heading p{font-size:10px;color:var(--muted);margin:0}
 
+/* VIP REBATE SYSTEM STYLES */
+.vip-hero-card{background:linear-gradient(135deg,#2b2416,#4a3a19,#70541e);color:#fff;border-radius:22px;padding:22px;margin-bottom:18px;box-shadow:0 12px 30px #3d2f1230;border:1px solid #d4af3760}
+.vip-tier-badge{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#ffe270,#e0a928);color:#3b2703;font-weight:800;padding:6px 14px;border-radius:20px;font-size:13px}
+.vip-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.vip-card{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:16px;position:relative;display:flex;flex-direction:column;justify-content:space-between}
+.vip-card.current-vip{border-color:#d4981e;background:linear-gradient(180deg,#fffdf5,#fdf5de);box-shadow:0 6px 18px #d4981e25}
+.vip-card.unlocked-vip{border-color:#a5c982}
+.vip-icon-big{font-size:32px;line-height:1}
+.vip-tag{position:absolute;top:12px;right:12px;font-size:9px;font-weight:800;padding:3px 8px;border-radius:6px}
+.vip-tag.cur{background:#f5c84c;color:#4a3303}
+.vip-tag.done{background:#e2f3ce;color:#3e6b21}
+.vip-tag.lock{background:#f0f2ec;color:#8a947e}
+
 .task-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 .task-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column}
 .task-card-top{display:flex;align-items:flex-start;gap:12px}
@@ -123,7 +138,7 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
 .search input{border:0!important;background:transparent!important;padding:9px!important;font-size:11px!important;min-height:36px}
 .all-task-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 
-/* NÔNG TRẠI 3x3 VUÔNG GỌN & ĐẸP */
+/* NÔNG TRẠI 3x3 */
 .farm-header-card{background:linear-gradient(135deg,#1e4430,#2f6647);color:#fff;border-radius:20px;padding:18px;margin-bottom:16px;box-shadow:0 10px 25px #1e443025}
 .level-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px}
 .level-badge{background:#d5f19a;color:#1e4430;font-weight:800;padding:5px 12px;border-radius:20px;font-size:12px;display:inline-flex;align-items:center;gap:6px}
@@ -185,6 +200,7 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
 .quick-amounts button{flex:1;min-width:70px;min-height:36px;border-radius:8px;border:1px solid #e3e9d8;background:white;color:#6f825b;font-size:11px;font-weight:600}
 .qr-box{background:#f8fbf2;border:2px dashed #b9d19b;border-radius:16px;padding:18px;text-align:center;margin:14px 0}
 .qr-box img{width:230px;max-width:100%;border-radius:12px;border:1px solid #dce6cc;background:#fff;padding:8px;box-shadow:0 6px 18px #244d3712}
+.first-withdraw-banner{background:#fff7e0;border:1.5px solid #f2cd6d;color:#7a5305;border-radius:12px;padding:12px;font-size:11px;margin-bottom:12px;line-height:1.6}
 
 .file-drop{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;border:2px dashed #c7dcae;background:#f3f8e9;border-radius:12px;min-height:110px;color:#587a38;padding:16px;cursor:pointer;text-align:center;margin:0}
 .file-drop:active{background:#e5f0d3}
@@ -252,7 +268,7 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
   .metric{padding:14px}
   .metric strong{font-size:20px}
   .metric:last-child{grid-column:1/-1}
-  .home-columns,.wallet-layout,.gift-layout,.seed-grid,.form-row{grid-template-columns:1fr}
+  .home-columns,.wallet-layout,.gift-layout,.seed-grid,.vip-grid,.form-row{grid-template-columns:1fr}
   .farm-plots{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
   .task-grid,.all-task-grid{grid-template-columns:1fr}
   .checkin-grid{grid-template-columns:repeat(4,1fr)}
@@ -277,10 +293,10 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
 <div class="auth-screen" id="auth-screen">
   <div class="auth-card">
     <div class="brand" style="justify-content:center"><span class="brand-icon">✳</span>xu vui<span class="brand-dot">.</span></div>
-    <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:6px">Nông trại kiếm thưởng · Nhiệm vụ uy tín</p>
+    <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:6px">Tặng ngay 2.000đ rút liền tay cho thành viên mới</p>
     <div class="auth-tabs">
       <button type="button" class="active" id="tab-login">Đăng nhập</button>
-      <button type="button" id="tab-register">Đăng ký mới</button>
+      <button type="button" id="tab-register">Đăng ký mới (+2.000đ)</button>
     </div>
     <form id="auth-form">
       <div id="reg-name-wrap" hidden>
@@ -308,6 +324,7 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
   <p class="nav-caption">KHÔNG GIAN CỦA BẠN</p>
   <nav class="side-nav">
     <button class="nav active" data-view="home"><span>⌂</span>Tổng quan</button>
+    <button class="nav" data-view="vip"><span>👑</span>Đặc quyền VIP 0-8</button>
     <button class="nav" data-view="farm"><span>🌱</span>Nông trại 3x3</button>
     <button class="nav" data-view="deposit"><span>💳</span>Nạp tiền</button>
     <button class="nav" data-view="tasks"><span>▦</span>Nhiệm vụ<em id="nav-task-count">0</em></button>
@@ -318,9 +335,9 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
     <button class="nav" data-view="history"><span>◷</span>Lịch sử giao dịch</button>
   </nav>
   <div class="side-gift">
-    <span>🌾</span><strong>Nông trại 9 ô vuông</strong>
-    <p>Nạp từ 20.000đ mở khóa kho báu Đồng, Bạc, Vàng, Kim Cương, Platinum!</p>
-    <button data-view="farm">Vào nông trại <b>↗</b></button>
+    <span>👑</span><strong>Hoàn trả VIP mỗi ngày</strong>
+    <p>Lên VIP nhận hoàn trả tự động lên đến 700.000đ mỗi ngày!</p>
+    <button data-view="vip">Xem bảng VIP <b>↗</b></button>
   </div>
   <div class="side-footer">✳ Xu Vui Platform · 2026</div>
 </aside>
@@ -330,6 +347,7 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
     <div class="mobile-brand brand" data-view="home"><span class="brand-icon">✳</span>xu vui<span class="brand-dot">.</span></div>
     <span class="breadcrumb" id="breadcrumb">Không gian cá nhân <b>/</b> Tổng quan</span>
     <div class="top-actions">
+      <span class="vip-pill" id="top-vip-badge" data-view="vip">🌱 VIP 0</span>
       <button class="icon-button" data-view="gift" title="Nhập Giftcode">🎁</button>
       <button class="icon-button" data-view="deposit" title="Nạp tiền">➕</button>
       <span class="member-status"><i></i><span id="top-balance">0đ</span></span>
@@ -341,35 +359,35 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
     <section class="view active" id="home">
       <div class="page-heading">
         <div>
-          <div class="eyebrow">XIN CHÀO, <span id="user-greeting">BẠN</span> · <span id="home-level-tag" style="color:var(--green)">LEVEL 1</span></div>
+          <div class="eyebrow">XIN CHÀO, <span id="user-greeting">BẠN</span> · <span id="home-level-tag" style="color:var(--green)">LEVEL 1</span> · <span id="home-vip-tag" style="color:#b87b09">🌱 VIP 0</span></div>
           <h1>Cùng kiếm thưởng hôm nay nhé <span>☀</span></h1>
-          <p>Trồng cây nông trại, nâng cấp Level và làm nhiệm vụ nhận thưởng mỗi ngày.</p>
+          <p>Nhận thưởng 2.000đ rút ngay lần đầu, hoàn trả VIP mỗi ngày và trồng nông trại 3x3.</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="primary" data-view="deposit">+ Nạp tiền</button>
-          <button class="gold-btn" data-view="gift">🎁 Nhập Giftcode</button>
+          <button class="gold-btn" data-view="vip">👑 Hoàn trả VIP</button>
           <button class="secondary" id="btn-logout">Đăng xuất</button>
         </div>
       </div>
 
       <div class="hero">
         <div class="hero-copy">
-          <span class="hero-kicker"><i></i> NÔNG TRẠI SINH LỜI · NHIỆM VỤ ĐA DẠNG</span>
-          <h2>Gieo hạt hôm nay,<br>thu hoạch <span>lãi lớn.</span></h2>
-          <p>Trải nghiệm 9 cấp độ hạt giống từ Lúa nước đến Super Platinum.<br>Nạp tối thiểu 20.000đ để mở khóa toàn bộ gói khoáng sản VIP!</p>
+          <span class="hero-kicker"><i></i> TẶNG TÂN THỦ 2.000Đ · HOÀN TRẢ VIP 1 → VIP 8</span>
+          <h2>Gieo hạt hôm nay,<br>nhận hoàn trả <span>mỗi ngày.</span></h2>
+          <p>Thành viên mới nhận ngay 2.000đ rút liền tay lần đầu. Tích lũy nạp lên VIP 1 – VIP 8 nhận hoàn trả hằng ngày lên tới 700.000đ!</p>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <button class="primary" data-view="farm">🌱 Vào nông trại ngay ↗</button>
-            <button class="secondary" data-view="tasks">Làm nhiệm vụ</button>
-            <button class="secondary" data-view="gift">🎁 Nhập mã quà tặng</button>
+            <button class="primary" data-view="vip">👑 Nhận hoàn trả VIP ↗</button>
+            <button class="secondary" data-view="farm">🌱 Nông trại 3x3</button>
+            <button class="secondary" data-view="wallet">💸 Rút tiền</button>
           </div>
         </div>
         <div class="hero-art" id="hero-art"></div>
       </div>
 
       <div class="metrics">
-        <div class="metric featured"><span>Số dư khả dụng <i>◈</i></span><strong data-stat="balance">0đ</strong><small>Dùng mua hạt giống hoặc rút tiền</small></div>
-        <div class="metric"><span>Tổng đã nạp <i>💳</i></span><strong data-stat="totalDeposited">0đ</strong><small id="vip-metric-note">Nạp từ 20.000đ mở gói VIP</small></div>
-        <div class="metric"><span>Đã rút thành công <i>↗</i></span><strong data-stat="withdrawn">0đ</strong><small>Chuyển khoản ngân hàng / ví</small></div>
+        <div class="metric featured"><span>Số dư khả dụng <i>◈</i></span><strong data-stat="balance">0đ</strong><small id="home-withdraw-hint">Sẵn sàng rút tiền</small></div>
+        <div class="metric"><span>Tích lũy VIP (Chu kỳ 5 ngày) <i>👑</i></span><strong data-stat="vipProgress">0đ</strong><small id="vip-metric-note">VIP 0 · Nạp 200.000đ lên VIP 1</small></div>
+        <div class="metric"><span>Đã rút thành công <i>↗</i></span><strong data-stat="withdrawn">0đ</strong><small>Hạn mức rút 250.000đ / ngày</small></div>
       </div>
 
       <div class="home-columns">
@@ -385,6 +403,39 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
             <button data-view="friends">Lấy link giới thiệu ↗</button>
           </div>
         </aside>
+      </div>
+    </section>
+
+    <!-- TAB ĐẶC QUYỀN VIP 0 - VIP 8 HOÀN TRẢ THEO NGÀY -->
+    <section class="view" id="vip">
+      <div class="page-heading">
+        <div><div class="eyebrow">HỆ THỐNG CẤP BẬC VIP</div><h1>Hoàn trả VIP mỗi ngày <span>👑</span></h1><p>Tích lũy nạp trong 5 ngày để thăng cấp VIP và nhận thưởng hoàn trả hằng ngày.</p></div>
+        <button class="primary" data-view="deposit">+ Nạp thăng cấp VIP</button>
+      </div>
+
+      <div class="vip-hero-card">
+        <div class="level-row">
+          <div>
+            <span class="vip-tier-badge" id="vip-cur-badge">🌱 VIP 0</span>
+            <span style="font-size:12px;margin-left:10px;opacity:.95" id="vip-daily-reward-text">Hoàn trả hôm nay: <b>0đ / ngày</b></span>
+          </div>
+          <button class="gold-btn" id="btn-claim-vip" disabled>Chưa đạt VIP 1</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:12px;background:#ffffff14;padding:12px;border-radius:14px;font-size:11px">
+          <div>💰 Tích lũy chu kỳ hiện tại: <b id="vip-cycle-deposit">0đ</b></div>
+          <div>🎯 Mốc tiếp theo: <b id="vip-next-target">200.000đ (VIP 1)</b></div>
+          <div>⏳ Thời hạn chu kỳ 5 ngày: <b id="vip-cycle-countdown">--</b></div>
+        </div>
+        <p style="font-size:10px;opacity:.85;margin:10px 0 0">
+          * Lưu ý quy tắc 5 ngày: Tích lũy nạp có hiệu lực trong 5 ngày. Nếu sau 5 ngày chưa đủ điều kiện lên mốc VIP tiếp theo, cấp VIP hiện tại của bạn vẫn được giữ nguyên và số tiền tích lũy sẽ đặt lại về đúng mốc chuẩn của cấp VIP đó.
+        </p>
+      </div>
+
+      <div class="panel">
+        <div class="section-heading">
+          <div><h2>Bảng quyền lợi & Hoàn trả VIP 0 → VIP 8</h2><p>Biểu tượng cấp bậc và mức thưởng nhận mỗi ngày</p></div>
+        </div>
+        <div class="vip-grid" id="vip-tier-list"></div>
       </div>
     </section>
 
@@ -448,19 +499,19 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
 
     <section class="view" id="deposit">
       <div class="page-heading">
-        <div><div class="eyebrow">NẠP VỐN & MỞ KHÓA VIP</div><h1>Nạp tiền vào tài khoản <span>💳</span></h1><p>Nạp tối thiểu 20.000đ để mở khóa toàn bộ gói từ Đồng đến Super Platinum.</p></div>
+        <div><div class="eyebrow">NẠP VỐN & THĂNG CẤP VIP</div><h1>Nạp tiền vào tài khoản <span>💳</span></h1><p>Tích lũy nạp lên cấp VIP 1 – VIP 8 để nhận hoàn trả tiền mỗi ngày.</p></div>
       </div>
       <div class="wallet-layout">
         <div class="panel">
           <div class="panel-heading"><span class="small-icon">💳</span><div><h2>Tạo lệnh nạp tiền</h2><p>Chọn số tiền và quét mã VietQR để nạp nhanh</p></div></div>
           <form id="deposit-form">
             <label>Số tiền muốn nạp (Tối thiểu 20.000đ)</label>
-            <input id="deposit-amount" type="number" min="20000" step="1000" value="20000" required>
+            <input id="deposit-amount" type="number" min="20000" step="1000" value="200000" required>
             <div class="quick-amounts">
-              <button type="button" data-dep-amt="20000">20.000đ (Mở VIP)</button>
-              <button type="button" data-dep-amt="50000">50.000đ</button>
-              <button type="button" data-dep-amt="100000">100.000đ</button>
-              <button type="button" data-dep-amt="200000">200.000đ</button>
+              <button type="button" data-dep-amt="20000">20.000đ</button>
+              <button type="button" data-dep-amt="200000">200k (VIP 1)</button>
+              <button type="button" data-dep-amt="500000">500k (VIP 2)</button>
+              <button type="button" data-dep-amt="1000000">1Tr (VIP 3)</button>
             </div>
             <div class="qr-box">
               <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:8px">QUÉT MÃ VIETQR ĐỂ CHUYỂN KHOẢN</div>
@@ -483,7 +534,7 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
 
         <div class="panel">
           <h2>Lịch sử nạp tiền của bạn</h2>
-          <p style="font-size:11px;color:var(--muted)">Sau khi Admin xác nhận giao dịch, tiền sẽ cộng vào ví và tự động mở khóa gói VIP từ Đồng trở lên.</p>
+          <p style="font-size:11px;color:var(--muted)">Sau khi Admin xác nhận, số tiền nạp sẽ cộng vào ví và tự động tính vào tích lũy thăng cấp VIP.</p>
           <div id="deposit-history-list"></div>
         </div>
       </div>
@@ -532,13 +583,17 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
           </div>
           <div class="panel withdrawal-rules">
             <h3>Quy định rút tiền</h3>
-            <div><span>Rút tối thiểu</span><b>30.000đ</b></div>
-            <div><span>Rút tối đa / ngày</span><b>100.000đ</b></div>
+            <div><span>Rút lần đầu (Tân thủ)</span><b>Cố định 2.000đ (1 lần)</b></div>
+            <div><span>Rút từ lần 2 trở đi</span><b>Tối thiểu 30.000đ</b></div>
+            <div><span>Rút tối đa / ngày</span><b>250.000đ</b></div>
             <div><span>Thời gian xử lý</span><b>5 - 30 phút</b></div>
           </div>
         </div>
         <div class="panel">
           <div class="panel-heading"><span class="small-icon">↗</span><div><h2>Tạo lệnh rút tiền</h2><p>Nhập chính xác thông tin tài khoản nhận tiền.</p></div></div>
+          <div class="first-withdraw-banner" id="first-withdraw-banner" hidden>
+            🎁 <b>ƯU ĐÃI RÚT TIỀN LẦN ĐẦU:</b> Bạn đang ở lượt rút trải nghiệm lần đầu dành cho thành viên mới. Số tiền rút được cố định là <b>2.000đ</b> (duy nhất 1 lần). Từ lần rút thứ 2 trở đi, mức rút tối thiểu sẽ là <b>30.000đ</b> và tối đa <b>250.000đ/ngày</b>.
+          </div>
           <form id="withdraw-form">
             <label>Phương thức nhận</label>
             <div class="payment-switch" id="payment-switch">
@@ -552,13 +607,13 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
               <div><label>Tên chủ tài khoản</label><input id="holder" required placeholder="NGUYEN VAN A"></div>
             </div>
             <div class="form-row">
-              <div><label>Số tiền rút (đ)</label><input id="withdraw-amount" type="number" min="30000" max="100000" step="1000" required placeholder="Tối thiểu 30.000"></div>
+              <div><label id="withdraw-amt-label">Số tiền rút (đ)</label><input id="withdraw-amount" type="number" min="30000" max="250000" step="1000" required placeholder="Tối thiểu 30.000"></div>
               <div><label>Mã PIN rút tiền (4 số)</label><input id="withdraw-pin" type="password" maxlength="4" inputmode="numeric" required placeholder="••••"></div>
             </div>
-            <div class="quick-amounts">
+            <div class="quick-amounts" id="withdraw-quick-amounts">
               <button type="button" data-amount="30000">30.000đ</button>
-              <button type="button" data-amount="50000">50.000đ</button>
               <button type="button" data-amount="100000">100.000đ</button>
+              <button type="button" data-amount="250000">250.000đ</button>
             </div>
             <button type="submit" class="primary full" id="withdraw-submit">Gửi yêu cầu rút tiền ↗</button>
           </form>
@@ -606,7 +661,7 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
 
     <section class="view" id="history">
       <div class="page-heading">
-        <div><div class="eyebrow">SAO KÊ MINH BẠCH</div><h1>Toàn bộ lịch sử giao dịch</h1><p>Ghi nhận chi tiết mọi giao dịch mua hạt giống, mở ô đất, thu hoạch, nạp/rút tiền và thưởng nhiệm vụ.</p></div>
+        <div><div class="eyebrow">SAO KÊ MINH BẠCH</div><h1>Toàn bộ lịch sử giao dịch</h1><p>Ghi nhận chi tiết mọi giao dịch mua hạt giống, mở ô đất, thu hoạch, nạp/rút tiền, hoàn trả VIP và thưởng nhiệm vụ.</p></div>
       </div>
       <div class="panel" id="activity-list"></div>
     </section>
@@ -615,9 +670,9 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
 
 <nav class="bottom-nav">
   <button class="active" data-view="home"><span>⌂</span>Tổng quan</button>
+  <button data-view="vip"><span>👑</span>VIP</button>
   <button data-view="farm"><span>🌱</span>Nông trại</button>
   <button data-view="tasks"><span>▦</span>Nhiệm vụ</button>
-  <button data-view="gift"><span>🎁</span>Giftcode</button>
   <button data-view="wallet"><span>▱</span>Ví tiền</button>
 </nav>
 
@@ -635,15 +690,33 @@ const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt
 const money = n => new Intl.NumberFormat('vi-VN').format(Number(n) || 0) + 'đ';
 const formatTaskReward = t => t.rewardText ? t.rewardText : (t.currency === 'USD' ? `${t.reward} USD` : '+' + money(t.reward));
 const todayStr = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
-function toast(msg) { const el = $('toast'); if (!el) return; el.textContent = msg; el.style.display = 'block'; clearTimeout(window._tt); window._tt = setTimeout(() => el.style.display = 'none', 3800); }
+function toast(msg) { const el = $('toast'); if (!el) return; el.textContent = msg; el.style.display = 'block'; clearTimeout(window._tt); window._tt = setTimeout(() => el.style.display = 'none', 4200); }
 
-// Nhận diện tất cả nhiệm vụ Zalo (bao gồm Zalo mặc định và Zalo mới đăng từ Admin)
 const isZaloTask = (id, title = '') => String(id).toLowerCase().includes('zalo') || String(title).toLowerCase().includes('zalo');
-
-// TÊN MIỀN MẶC ĐỊNH CHO LINK MÃ MỜI
 const SITE_DOMAIN = "https://xuvui.xyz";
 
-// CẤU HÌNH FIREBASE DỰ ÁN XUVUI-9175F
+// CẤU HÌNH HỆ THỐNG VIP 0 -> VIP 8 HOÀN TRẢ THEO NGÀY (CHU KỲ TÍCH LŨY 5 NGÀY)
+const VIP_TIERS = [
+  { level: 0, name: 'VIP 0', icon: '🌱', minDeposit: 0, dailyRebate: 0 },
+  { level: 1, name: 'VIP 1', icon: '🥉', minDeposit: 200000, dailyRebate: 2500 },
+  { level: 2, name: 'VIP 2', icon: '🥈', minDeposit: 500000, dailyRebate: 7500 },
+  { level: 3, name: 'VIP 3', icon: '🥇', minDeposit: 1000000, dailyRebate: 10000 },
+  { level: 4, name: 'VIP 4', icon: '💠', minDeposit: 3000000, dailyRebate: 30000 },
+  { level: 5, name: 'VIP 5', icon: '💎', minDeposit: 5000000, dailyRebate: 70000 },
+  { level: 6, name: 'VIP 6', icon: '👑', minDeposit: 10000000, dailyRebate: 150000 },
+  { level: 7, name: 'VIP 7', icon: '🔥', minDeposit: 20000000, dailyRebate: 350000 },
+  { level: 8, name: 'VIP 8', icon: '🐉', minDeposit: 50000000, dailyRebate: 700000 }
+];
+const FIVE_DAYS_MS = 5 * 24 * 60 * 60 * 1000;
+
+function getVipLevelByDeposit(dep) {
+  let lv = 0;
+  for (const t of VIP_TIERS) {
+    if (dep >= t.minDeposit) lv = t.level;
+  }
+  return lv;
+}
+
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyCbtZV-aW22WtYxeN6vW8qmdmEWeMaG97o",
   authDomain: "xuvui-9175f.firebaseapp.com",
@@ -655,13 +728,11 @@ const FIREBASE_CONFIG = {
   measurementId: "G-ZEH3GKR3CY"
 };
 
-// CẤU HÌNH 2 BOT TELEGRAM
 const TELEGRAM_CONFIG = {
   taskBot: { botToken: "9236061614:AAGsiXwoQVswM1KQurX5nMi0769g1q9NOCA", chatId: "7865394196" },
   withdrawBot: { botToken: "9231728188:AAENh6sfcdF4Tav9s0OV5hVk8KWK5yODQAI", chatId: "7865394196" }
 };
 
-// TÀI KHOẢN NẠP TIỀN MB BANK (KHÔNG HIỂN THỊ TÊN CHỦ TK)
 const ADMIN_BANK = { bankId: "MB", bankName: "MB BANK", accountNo: "245331" };
 
 let useFirebase = false, db = null;
@@ -933,6 +1004,7 @@ function compressImage(file) {
 
 let currentUser = null, userData = null, tasksList = [], myProofs = [], myWithdrawals = [], myDeposits = [], myHistory = [];
 let authMode = 'login', currentCategory = 'Tất cả', proofFilter = 'all', paymentKind = 'bank', selectedSeed = 'rice';
+let lastNotifiedHistoryId = null;
 
 function getDeviceId() {
   let did = localStorage.getItem('xv_device_id');
@@ -954,7 +1026,7 @@ $('tab-register').onclick = () => {
   $('tab-register').classList.add('active'); $('tab-login').classList.remove('active');
   $('reg-name-wrap').hidden = false; $('reg-pin-wrap').hidden = false;
   $('auth-ref').value = localStorage.getItem('xv_saved_ref') || '';
-  $('auth-status').textContent = ''; $('auth-submit').textContent = 'Tạo tài khoản mới ↗';
+  $('auth-status').textContent = ''; $('auth-submit').textContent = 'Đăng ký & Nhận ngay 2.000đ ↗';
 };
 
 $('auth-form').onsubmit = async e => {
@@ -984,25 +1056,36 @@ $('auth-form').onsubmit = async e => {
       if (await Store.get('users/' + phone)) throw new Error('Số điện thoại này đã được đăng ký!');
 
       const myCode = phone;
+      const now = Date.now();
+      // THƯỞNG 2.000Đ CHO THÀNH VIÊN MỚI TẠO TÀI KHOẢN + MỞ LƯỢT RÚT 2.000Đ LẦN ĐẦU
       const newUser = {
         phone, name, password: pass, pin, inviteCode: myCode,
         referredBy: refBy || '', f1Rewarded: false,
-        balance: 0, totalDeposited: 0, withdrawn: 0,
+        balance: 2000,
+        firstWithdrawUsed: false,
+        totalDeposited: 0,
+        vipLevel: 0,
+        vipCycleStart: now,
+        vipLastClaimDate: '',
+        withdrawn: 0,
         farmEarned: 0, farmLevel: 1, farmExp: 0,
         purchasedPlots: {},
-        deviceId, locked: false, createdAt: Date.now()
+        deviceId, locked: false, createdAt: now
       };
       await Store.set('users/' + phone, newUser);
       await Store.set('devices/' + deviceId, [...devAccounts, phone]);
+      await addHistory(phone, 'Thưởng chào mừng thành viên mới', '+2.000đ', '🎁', 'Có thể rút ngay 2.000đ ở lần rút đầu tiên');
+
       if (refBy) {
         const allUsers = (await Store.get('users')) || {};
         const inviter = Object.values(allUsers).find(x => x.phone === refBy || (x.inviteCode && x.inviteCode.toUpperCase() === refBy.toUpperCase()));
         if (inviter && inviter.phone !== phone) {
-          await Store.set(`users/${inviter.phone}/invited/${phone}`, { phone, name, createdAt: Date.now(), qualified: false });
+          await Store.set(`users/${inviter.phone}/invited/${phone}`, { phone, name, createdAt: now, qualified: false });
         }
       }
       localStorage.setItem('xv_logged_phone', phone);
       startApp(phone);
+      setTimeout(() => toast('🎉 Đăng ký thành công! Bạn được tặng +2.000đ vào ví!'), 500);
     }
   } catch (err) {
     statusEl.classList.add('error'); statusEl.textContent = err.message; btn.disabled = false;
@@ -1023,7 +1106,6 @@ async function startApp(phone) {
   currentUser = phone;
   $('auth-screen').hidden = true;
 
-  // Chỉ khởi tạo DEFAULT_TASKS nếu database chưa có nhiệm vụ nào (không ghi đè nhiệm vụ Admin đã tạo/sửa)
   const curTasks = await Store.get('tasks');
   if (!curTasks || Object.keys(curTasks).length === 0) {
     const initObj = {};
@@ -1037,11 +1119,12 @@ async function startApp(phone) {
     renderCategories(); renderTasks();
   });
 
-  Store.onValue('users/' + phone, val => {
+  Store.onValue('users/' + phone, async val => {
+    if (!val) return;
+    if (val.locked) { alert('Tài khoản đã bị khóa!'); localStorage.removeItem('xv_logged_phone'); location.reload(); return; }
     userData = val;
-    if (!userData) return;
-    if (userData.locked) { alert('Tài khoản đã bị khóa!'); localStorage.removeItem('xv_logged_phone'); location.reload(); }
-    renderUserDashboard(); renderFarm(); renderCheckin(); updateDepositQr();
+    await evaluateVipCycle();
+    renderUserDashboard(); renderVipSystem(); renderFarm(); renderCheckin(); updateDepositQr(); updateWithdrawRulesUI();
   });
 
   Store.onValue('submissions', val => {
@@ -1053,6 +1136,7 @@ async function startApp(phone) {
   Store.onValue('withdrawals', val => {
     myWithdrawals = Object.entries(val || {}).map(([k, v]) => ({ key: k, ...v })).filter(x => x.phone === phone).sort((a, b) => b.createdAt - a.createdAt);
     renderWithdrawals();
+    if (userData) updateWithdrawRulesUI();
   });
 
   Store.onValue('deposits', val => {
@@ -1061,7 +1145,16 @@ async function startApp(phone) {
   });
 
   Store.onValue('history/' + phone, val => {
-    myHistory = Object.values(val || {}).sort((a, b) => b.createdAt - a.createdAt);
+    const entries = Object.entries(val || {}).map(([k, v]) => ({ key: k, ...v })).sort((a, b) => b.createdAt - a.createdAt);
+    if (entries.length > 0) {
+      const latest = entries[0];
+      if (lastNotifiedHistoryId && lastNotifiedHistoryId !== latest.key && String(latest.title).includes('Admin')) {
+        FarmAudio.sfxLevelUp();
+        toast(`🎁 ${latest.title} (${latest.amount})`);
+      }
+      lastNotifiedHistoryId = latest.key;
+    }
+    myHistory = entries;
     renderHistory();
   });
 
@@ -1072,27 +1165,148 @@ function addHistory(phone, title, amount, icon = '◈', detail = '') {
   return Store.push('history/' + phone, { title, amount, icon, detail, createdAt: Date.now() });
 }
 
+// KIỂM TRA & ĐỒNG BỘ CẤP ĐỘ VIP + CHU KỲ TÍCH LŨY 5 NGÀY
+async function evaluateVipCycle() {
+  if (!userData || !currentUser) return;
+  const now = Date.now();
+  const dep = Number(userData.totalDeposited || 0);
+  const storedVip = Number(userData.vipLevel || 0);
+  const calcVip = getVipLevelByDeposit(dep);
+  const effectiveVip = Math.max(storedVip, calcVip);
+  const cycleStart = Number(userData.vipCycleStart || userData.createdAt || now);
+
+  // Nếu vừa thăng hạng VIP cao hơn -> cập nhật vipLevel và làm mới chu kỳ 5 ngày
+  if (calcVip > storedVip) {
+    userData.vipLevel = calcVip;
+    userData.vipCycleStart = now;
+    await Store.update('users/' + currentUser, { vipLevel: calcVip, vipCycleStart: now });
+    return;
+  }
+
+  // Nếu sau 5 ngày chưa tăng lên mốc VIP tiếp theo -> giữ VIP nhưng reset tổng nạp về mốc vừa đủ của VIP hiện tại
+  if (now - cycleStart >= FIVE_DAYS_MS) {
+    const tierInfo = VIP_TIERS[effectiveVip] || VIP_TIERS[0];
+    const baseDeposit = tierInfo.minDeposit;
+    userData.vipLevel = effectiveVip;
+    userData.totalDeposited = baseDeposit;
+    userData.vipCycleStart = now;
+    await Store.update('users/' + currentUser, {
+      vipLevel: effectiveVip,
+      totalDeposited: baseDeposit,
+      vipCycleStart: now
+    });
+    if (dep > baseDeposit) {
+      await addHistory(currentUser, `Làm mới chu kỳ 5 ngày (${tierInfo.name})`, `Mốc: ${money(baseDeposit)}`, '🔄', 'Giữ nguyên cấp VIP & đặt lại tích lũy về mốc chuẩn');
+    }
+  }
+}
+
+function renderVipSystem() {
+  if (!userData) return;
+  const dep = Number(userData.totalDeposited || 0);
+  const curLv = Math.max(Number(userData.vipLevel || 0), getVipLevelByDeposit(dep));
+  const curTier = VIP_TIERS[curLv] || VIP_TIERS[0];
+  const nextTier = VIP_TIERS[curLv + 1] || null;
+  const today = todayStr();
+  const claimedToday = userData.vipLastClaimDate === today;
+
+  $('vip-cur-badge').textContent = `${curTier.icon} ${curTier.name}`;
+  $('vip-daily-reward-text').innerHTML = `Hoàn trả mỗi ngày: <b>${money(curTier.dailyRebate)}</b>`;
+  $('vip-cycle-deposit').textContent = money(dep);
+  $('vip-next-target').textContent = nextTier ? `${money(nextTier.minDeposit)} (${nextTier.name})` : 'Đã đạt cấp tối đa VIP 8';
+
+  const cycleStart = Number(userData.vipCycleStart || userData.createdAt || Date.now());
+  const leftMs = Math.max(0, FIVE_DAYS_MS - (Date.now() - cycleStart));
+  const leftDays = Math.floor(leftMs / (24 * 3600 * 1000));
+  const leftHours = Math.floor((leftMs % (24 * 3600 * 1000)) / (3600 * 1000));
+  $('vip-cycle-countdown').textContent = `${leftDays} ngày ${leftHours} giờ`;
+
+  const claimBtn = $('btn-claim-vip');
+  if (curLv === 0 || curTier.dailyRebate <= 0) {
+    claimBtn.disabled = true;
+    claimBtn.textContent = 'Nạp 200k lên VIP 1 để nhận';
+  } else if (claimedToday) {
+    claimBtn.disabled = true;
+    claimBtn.textContent = `✅ Đã nhận ${money(curTier.dailyRebate)} hôm nay`;
+  } else {
+    claimBtn.disabled = false;
+    claimBtn.textContent = `🎁 Nhận hoàn trả +${money(curTier.dailyRebate)} ngay`;
+  }
+
+  $('vip-tier-list').innerHTML = VIP_TIERS.map(t => {
+    const isCurrent = t.level === curLv;
+    const isUnlocked = t.level < curLv;
+    return `<div class="vip-card ${isCurrent ? 'current-vip' : (isUnlocked ? 'unlocked-vip' : '')}">
+      <span class="vip-tag ${isCurrent ? 'cur' : (isUnlocked ? 'done' : 'lock')}">${isCurrent ? 'Đang sở hữu' : (isUnlocked ? 'Đã vượt qua' : (t.level === 0 ? 'Mặc định' : 'Chưa mở'))}</span>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <span class="vip-icon-big">${t.icon}</span>
+        <div>
+          <strong style="font-size:15px;display:block">${t.name}</strong>
+          <small style="color:var(--muted);font-size:10px">${t.minDeposit === 0 ? 'Không cần nạp' : 'Tích lũy: ' + money(t.minDeposit)}</small>
+        </div>
+      </div>
+      <div style="border-top:1px dashed var(--line);padding-top:8px;display:flex;justify-content:space-between;align-items:center;font-size:11px">
+        <span style="color:var(--muted)">Hoàn trả ngày:</span>
+        <strong style="color:${t.dailyRebate > 0 ? '#2d6a1e' : '#8a947e'};font-size:13px">${t.dailyRebate > 0 ? '+' + money(t.dailyRebate) : '0đ'}</strong>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+$('btn-claim-vip').onclick = async () => {
+  if (!userData) return;
+  const dep = Number(userData.totalDeposited || 0);
+  const curLv = Math.max(Number(userData.vipLevel || 0), getVipLevelByDeposit(dep));
+  const curTier = VIP_TIERS[curLv] || VIP_TIERS[0];
+  const today = todayStr();
+
+  if (curLv === 0 || curTier.dailyRebate <= 0) return toast('Bạn cần đạt tối thiểu VIP 1 (nạp 200.000đ) để nhận hoàn trả!');
+  if (userData.vipLastClaimDate === today) return toast('Hôm nay bạn đã nhận thưởng hoàn trả VIP rồi!');
+
+  $('btn-claim-vip').disabled = true;
+  await Store.update('users/' + currentUser, {
+    balance: (userData.balance || 0) + curTier.dailyRebate,
+    vipLastClaimDate: today
+  });
+  await addHistory(currentUser, `Hoàn trả ${curTier.name} hằng ngày`, `+${money(curTier.dailyRebate)}`, curTier.icon, `Đặc quyền hoàn trả mỗi ngày của ${curTier.name}`);
+  FarmAudio.sfxHarvest();
+  toast(`🎉 Nhận thành công hoàn trả ${curTier.name}: +${money(curTier.dailyRebate)}!`);
+};
+
 function renderUserDashboard() {
+  const totalDep = Number(userData.totalDeposited || 0);
+  const curLv = Math.max(Number(userData.vipLevel || 0), getVipLevelByDeposit(totalDep));
+  const curTier = VIP_TIERS[curLv] || VIP_TIERS[0];
+  const nextTier = VIP_TIERS[curLv + 1] || null;
+  const hasWithdrawnBefore = Boolean(userData.firstWithdrawUsed) || myWithdrawals.length > 0;
+
   $('user-greeting').textContent = userData.name.toUpperCase();
   $('avatar').textContent = userData.name.slice(0, 2).toUpperCase();
   $('top-balance').textContent = money(userData.balance);
   $('farm-wallet-mini').textContent = money(userData.balance);
   $('home-level-tag').textContent = `LEVEL ${userData.farmLevel || 1}`;
 
+  $('top-vip-badge').textContent = `${curTier.icon} ${curTier.name}`;
+  $('home-vip-tag').textContent = `${curTier.icon} ${curTier.name}`;
+
   const f1List = userData.invited ? Object.values(userData.invited) : [];
   const pendingW = myWithdrawals.filter(w => w.status === 'pending').reduce((s, w) => s + Number(w.amount), 0);
-  const totalDep = Number(userData.totalDeposited || 0);
 
   document.querySelectorAll('[data-stat]').forEach(el => {
     const k = el.dataset.stat;
     if (k === 'balance') el.textContent = money(userData.balance);
     if (k === 'withdrawn') el.textContent = money(userData.withdrawn || 0);
-    if (k === 'totalDeposited') el.textContent = money(totalDep);
-    if (k === 'f1Count') el.textContent = f1List.length;
+    if (k === 'vipProgress') el.textContent = money(totalDep);
     if (k === 'pendingWithdraw') el.textContent = money(pendingW);
   });
 
-  $('vip-metric-note').textContent = totalDep >= 20000 ? '✅ Đã mở khóa gói VIP' : 'Nạp từ 20.000đ mở gói VIP';
+  $('home-withdraw-hint').textContent = !hasWithdrawnBefore
+    ? '🎁 Được rút cố định 2.000đ lần đầu'
+    : 'Rút từ 30.000đ – 250.000đ/ngày';
+
+  $('vip-metric-note').textContent = nextTier
+    ? `${curTier.name} · Cần ${money(nextTier.minDeposit)} lên ${nextTier.name}`
+    : `${curTier.name} · Hoàn trả ${money(curTier.dailyRebate)}/ngày`;
 
   const refParam = userData.phone || currentUser;
   $('my-ref-code').textContent = refParam;
@@ -1131,7 +1345,7 @@ function renderFarm() {
   const banner = $('vip-banner');
   if (isVipUnlocked) {
     banner.classList.add('unlocked');
-    $('vip-banner-title').textContent = `🔓 ĐÃ MỞ KHÓA TOÀN BỘ GÓI VIP (Đã nạp ${money(totalDep)})`;
+    $('vip-banner-title').textContent = `👑 ĐÃ MỞ KHÓA TOÀN BỘ HẠT GIỐNG VIP (Tích lũy: ${money(totalDep)})`;
     $('vip-banner-desc').textContent = 'Bạn đã đủ điều kiện gieo trồng từ gói Đồng, Bạc, Vàng, Kim Cương, Platinum & Super Platinum!';
     $('vip-banner-btn').hidden = true;
   } else {
@@ -1476,29 +1690,87 @@ function renderProviders() {
   $('provider-select').innerHTML = list.map(n => `<option value="${n}">${n}</option>`).join('');
 }
 
+// CẬP NHẬT GIAO DIỆN RÚT TIỀN: LẦN ĐẦU CỐ ĐỊNH 2.000Đ, LẦN 2 TRỞ ĐI TỐI THIỂU 30.000Đ - TỐI ĐA 250.000Đ/NGÀY
+function updateWithdrawRulesUI() {
+  if (!userData) return;
+  const isFirstWithdraw = !userData.firstWithdrawUsed && myWithdrawals.length === 0;
+  const amtInput = $('withdraw-amount');
+  const banner = $('first-withdraw-banner');
+  const quickBox = $('withdraw-quick-amounts');
+  const label = $('withdraw-amt-label');
+
+  if (isFirstWithdraw) {
+    banner.hidden = false;
+    label.textContent = 'Số tiền rút lần đầu (Cố định 2.000đ)';
+    amtInput.value = 2000;
+    amtInput.min = 2000;
+    amtInput.max = 2000;
+    amtInput.readOnly = true;
+    quickBox.hidden = true;
+  } else {
+    banner.hidden = true;
+    label.textContent = 'Số tiền rút (30.000đ – 250.000đ)';
+    amtInput.min = 30000;
+    amtInput.max = 250000;
+    amtInput.readOnly = false;
+    if (Number(amtInput.value) === 2000) amtInput.value = '';
+    quickBox.hidden = false;
+  }
+}
+
 $('withdraw-form').onsubmit = async e => {
   e.preventDefault();
-  const amount = Number($('withdraw-amount').value);
+  const isFirstWithdraw = !userData.firstWithdrawUsed && myWithdrawals.length === 0;
+  const amount = isFirstWithdraw ? 2000 : Number($('withdraw-amount').value);
   const pin = $('withdraw-pin').value.trim();
   const provider = $('provider-select').value;
   const dest = $('destination').value.trim();
   const holder = $('holder').value.trim().toUpperCase();
 
   if (pin !== userData.pin) return toast('❌ Mã PIN rút tiền không chính xác!');
-  if (amount < 30000 || amount > 100000) return toast('Số tiền rút từ 30.000đ đến 100.000đ!');
+
+  if (isFirstWithdraw) {
+    if (amount !== 2000) return toast('Lần rút đầu tiên chỉ được rút cố định 2.000đ!');
+  } else {
+    if (amount < 30000 || amount > 250000) return toast('Số tiền rút từ 30.000đ đến 250.000đ / ngày!');
+    const today = todayStr();
+    const todayWithdrawn = myWithdrawals
+      .filter(w => w.status !== 'rejected' && new Date(w.createdAt).toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' }) === today)
+      .reduce((s, w) => s + Number(w.amount), 0);
+    if (todayWithdrawn + amount > 250000) {
+      return toast(`Bạn đã vượt quá hạn mức rút tối đa 250.000đ/ngày! (Hôm nay đã rút ${money(todayWithdrawn)})`);
+    }
+  }
+
   if ((userData.balance || 0) < amount) return toast('Số dư khả dụng không đủ!');
 
   $('withdraw-submit').disabled = true;
-  await Store.update('users/' + currentUser, { balance: userData.balance - amount });
-  await Store.push('withdrawals', { phone: currentUser, userName: userData.name, amount, method: paymentKind, provider, destination: dest, holderName: holder, status: 'pending', createdAt: Date.now() });
-  await addHistory(currentUser, `Rút tiền về ${provider}`, `-${money(amount)}`, '↗', `STK: ${dest} · ${holder}`);
+  await Store.update('users/' + currentUser, {
+    balance: userData.balance - amount,
+    firstWithdrawUsed: true
+  });
+  await Store.push('withdrawals', {
+    phone: currentUser,
+    userName: userData.name,
+    amount,
+    isFirstWithdraw,
+    method: paymentKind,
+    provider,
+    destination: dest,
+    holderName: holder,
+    status: 'pending',
+    createdAt: Date.now()
+  });
+  await addHistory(currentUser, isFirstWithdraw ? `Rút tiền lần đầu về ${provider}` : `Rút tiền về ${provider}`, `-${money(amount)}`, '↗', `STK: ${dest} · ${holder}`);
 
   const qrUrl = paymentKind === 'bank' && BANK_CODES[provider] ? getVietQrUrl(BANK_CODES[provider], dest, amount, `XUVUI ${currentUser}`, holder) : null;
-  await sendTelegram('withdrawBot', `💸 <b>YÊU CẦU RÚT TIỀN MỚI</b>\n👤 User: ${userData.name} (${currentUser})\n💰 Số tiền: <b>${money(amount)}</b>\n🏦 Nhận qua: <b>${provider}</b>\n🔢 STK/Ví: <code>${dest}</code>\n📛 Chủ TK: <b>${holder}</b>`, qrUrl);
+  await sendTelegram('withdrawBot', `💸 <b>YÊU CẦU RÚT TIỀN MỚI ${isFirstWithdraw ? '(LẦN ĐẦU 2K)' : ''}</b>\n👤 User: ${userData.name} (${currentUser})\n💰 Số tiền: <b>${money(amount)}</b>\n🏦 Nhận qua: <b>${provider}</b>\n🔢 STK/Ví: <code>${dest}</code>\n📛 Chủ TK: <b>${holder}</b>`, qrUrl);
 
   $('withdraw-form').reset();
   $('withdraw-submit').disabled = false;
-  toast('Đã gửi yêu cầu rút tiền!');
+  toast(isFirstWithdraw
+    ? 'Đã gửi lệnh rút 2.000đ lần đầu! Từ lần sau mức rút tối thiểu là 30.000đ.'
+    : 'Đã gửi yêu cầu rút tiền thành công!');
 };
 
 function renderWithdrawals() {
@@ -1537,7 +1809,7 @@ function renderHistory() {
     </div>`).join('') : '<div class="empty-state">Chưa có lịch sử giao dịch.</div>';
 }
 
-const viewLabels = {home:'Tổng quan',farm:'Nông trại 3x3',deposit:'Nạp tiền',tasks:'Nhiệm vụ',proofs:'Hồ sơ nhiệm vụ',wallet:'Ví & rút tiền',friends:'Mời bạn bè',gift:'Nhập giftcode',history:'Lịch sử giao dịch'};
+const viewLabels = {home:'Tổng quan',vip:'Đặc quyền VIP 0-8',farm:'Nông trại 3x3',deposit:'Nạp tiền',tasks:'Nhiệm vụ',proofs:'Hồ sơ nhiệm vụ',wallet:'Ví & rút tiền',friends:'Mời bạn bè',gift:'Nhập giftcode',history:'Lịch sử giao dịch'};
 function navigate(target) {
   if (!viewLabels[target]) return;
   document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.id === target));
@@ -1556,7 +1828,7 @@ document.addEventListener('click', async e => {
   if (el.dataset.copy) { navigator.clipboard?.writeText(el.dataset.copy); toast('Đã sao chép!'); }
   if (el.dataset.proofFilter) { proofFilter = el.dataset.proofFilter; document.querySelectorAll('[data-proof-filter]').forEach(x => x.classList.toggle('active', x === el)); renderProofs(); }
   if (el.dataset.kind) { paymentKind = el.dataset.kind; document.querySelectorAll('[data-kind]').forEach(x => x.classList.toggle('active', x === el)); $('destination-label').textContent = paymentKind === 'bank' ? 'Số tài khoản' : 'Số điện thoại ví'; renderProviders(); }
-  if (el.dataset.amount) $('withdraw-amount').value = el.dataset.amount;
+  if (el.dataset.amount && !$('withdraw-amount').readOnly) $('withdraw-amount').value = el.dataset.amount;
   if (el.dataset.depAmt) { $('deposit-amount').value = el.dataset.depAmt; updateDepositQr(); }
 
   if (el.dataset.buyPlot) {
