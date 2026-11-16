@@ -294,8 +294,8 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
       <div id="reg-pin-wrap" hidden>
         <label>Mã PIN rút tiền (4 số)</label>
         <input id="auth-pin" type="password" maxlength="4" inputmode="numeric" placeholder="Ví dụ: 1234">
-        <label>Mã giới thiệu (Không bắt buộc)</label>
-        <input id="auth-ref" placeholder="Nhập mã người mời nếu có">
+        <label>Mã giới thiệu (SĐT người mời - Không bắt buộc)</label>
+        <input id="auth-ref" placeholder="Nhập SĐT hoặc mã người mời nếu có">
       </div>
       <p class="inline-status" id="auth-status"></p>
       <button type="submit" class="primary full" id="auth-submit">Đăng nhập ngay ↗</button>
@@ -539,6 +539,7 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
             <label>Phương thức nhận</label>
             <div class="payment-switch" id="payment-switch">
               <button type="button" class="active" data-kind="bank">▤ Ngân hàng</button>
+              <button type="button" class="active" data-kind="wallet" style="display:none"></button>
               <button type="button" data-kind="wallet">▱ Ví điện tử</button>
             </div>
             <label>Chọn Ngân hàng / Ví</label>
@@ -570,7 +571,7 @@ input,select{width:100%;border:1px solid #dce4d2;border-radius:10px;padding:11px
       <div class="panel" style="text-align:center">
         <span class="small-icon" style="margin-bottom:12px">♧</span>
         <h2>Liên kết giới thiệu của bạn</h2>
-        <p style="font-size:11px;color:var(--muted)">Mã giới thiệu: <strong id="my-ref-code" style="color:var(--green);font-size:14px">---</strong></p>
+        <p style="font-size:11px;color:var(--muted)">Mã giới thiệu mặc định (SĐT): <strong id="my-ref-code" style="color:var(--green);font-size:14px">---</strong></p>
         <div class="referral-link">
           <input id="ref-link" readonly style="flex:1;min-width:200px">
           <button class="primary" id="copy-ref">Sao chép link ↗</button>
@@ -632,6 +633,9 @@ const money = n => new Intl.NumberFormat('vi-VN').format(Number(n) || 0) + 'đ';
 const formatTaskReward = t => t.rewardText ? t.rewardText : (t.currency === 'USD' ? `${t.reward} USD` : '+' + money(t.reward));
 const todayStr = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
 function toast(msg) { const el = $('toast'); if (!el) return; el.textContent = msg; el.style.display = 'block'; clearTimeout(window._tt); window._tt = setTimeout(() => el.style.display = 'none', 3800); }
+
+// TÊN MIỀN MẶC ĐỊNH CHO LINK MÃ MỜI
+const SITE_DOMAIN = "https://xuvui.xyz";
 
 // CẤU HÌNH FIREBASE DỰ ÁN XUVUI-9175F
 const FIREBASE_CONFIG = {
@@ -928,7 +932,7 @@ function getDeviceId() {
 }
 
 const urlRef = new URLSearchParams(location.search).get('ref');
-if (urlRef) localStorage.setItem('xv_saved_ref', urlRef.toUpperCase());
+if (urlRef) localStorage.setItem('xv_saved_ref', urlRef.trim());
 
 $('tab-login').onclick = () => {
   authMode = 'login';
@@ -961,7 +965,7 @@ $('auth-form').onsubmit = async e => {
     } else {
       const name = $('auth-name').value.trim() || ('Thành viên ' + phone.slice(-4));
       const pin = $('auth-pin').value.trim();
-      const refBy = $('auth-ref').value.trim().toUpperCase();
+      const refBy = $('auth-ref').value.trim();
       if (!/^[0-9]{9,11}$/.test(phone)) throw new Error('Số điện thoại phải gồm 9-11 chữ số!');
       if (!/^[0-9]{4}$/.test(pin)) throw new Error('Vui lòng nhập mã PIN gồm 4 chữ số!');
 
@@ -970,7 +974,8 @@ $('auth-form').onsubmit = async e => {
       if (devAccounts.length >= 2) throw new Error('Thiết bị này đã đạt giới hạn tối đa 2 tài khoản!');
       if (await Store.get('users/' + phone)) throw new Error('Số điện thoại này đã được đăng ký!');
 
-      const myCode = 'XV' + phone.slice(-4) + Math.floor(10 + Math.random() * 89);
+      // MÃ MỜI MẶC ĐỊNH CHÍNH LÀ SỐ ĐIỆN THOẠI CỦA NGƯỜI DÙNG
+      const myCode = phone;
       const newUser = {
         phone, name, password: pass, pin, inviteCode: myCode,
         referredBy: refBy || '', f1Rewarded: false,
@@ -983,8 +988,10 @@ $('auth-form').onsubmit = async e => {
       await Store.set('devices/' + deviceId, [...devAccounts, phone]);
       if (refBy) {
         const allUsers = (await Store.get('users')) || {};
-        const inviter = Object.values(allUsers).find(x => x.inviteCode === refBy);
-        if (inviter) await Store.set(`users/${inviter.phone}/invited/${phone}`, { phone, name, createdAt: Date.now(), qualified: false });
+        const inviter = Object.values(allUsers).find(x => x.phone === refBy || (x.inviteCode && x.inviteCode.toUpperCase() === refBy.toUpperCase()));
+        if (inviter && inviter.phone !== phone) {
+          await Store.set(`users/${inviter.phone}/invited/${phone}`, { phone, name, createdAt: Date.now(), qualified: false });
+        }
       }
       localStorage.setItem('xv_logged_phone', phone);
       startApp(phone);
@@ -1080,8 +1087,11 @@ function renderUserDashboard() {
   });
 
   $('vip-metric-note').textContent = totalDep >= 20000 ? '✅ Đã mở khóa gói VIP' : 'Nạp từ 20.000đ mở gói VIP';
-  $('my-ref-code').textContent = userData.inviteCode;
-  $('ref-link').value = `${location.origin}${location.pathname}?ref=${userData.inviteCode}`;
+
+  // ĐƯỜNG LINK MÃ MỜI MẶC ĐỊNH: https://xuvui.xyz/?ref= + SĐT
+  const refParam = userData.phone || currentUser;
+  $('my-ref-code').textContent = refParam;
+  $('ref-link').value = `${SITE_DOMAIN}/?ref=${refParam}`;
 
   $('invite-history').innerHTML = f1List.length
     ? f1List.map(f => `<div class="record"><div class="record-main"><span class="record-icon">♧</span><div><strong>${esc(f.name)}</strong> (${esc(f.phone.slice(0,3)+'****'+f.phone.slice(-3))})<small>${new Date(f.createdAt).toLocaleString('vi-VN')}</small></div></div><strong>${f.qualified ? '✅ Đã nhận 200đ' : '⏳ Chờ làm nhiệm vụ'}</strong></div>`).join('')
@@ -1324,7 +1334,7 @@ async function checkZaloAutoProcessing() {
         if (userData.referredBy && !userData.f1Rewarded) {
           await Store.update('users/' + currentUser, { f1Rewarded: true });
           const allUsers = (await Store.get('users')) || {};
-          const inviter = Object.values(allUsers).find(x => x.inviteCode === userData.referredBy);
+          const inviter = Object.values(allUsers).find(x => x.phone === userData.referredBy || (x.inviteCode && x.inviteCode.toUpperCase() === userData.referredBy.toUpperCase()));
           if (inviter) {
             await Store.update('users/' + inviter.phone, { balance: (inviter.balance || 0) + 200 });
             await Store.update(`users/${inviter.phone}/invited/${currentUser}`, { qualified: true });
@@ -1381,7 +1391,6 @@ function openTaskModal(id) {
       [...$('proof-files').files].slice(0, 2).forEach(f => { const img = document.createElement('img'); img.src = URL.createObjectURL(f); $('photo-previews').appendChild(img); });
     };
     
-    // ĐÃ TỐI ƯU GỬI NGAY LẬP TỨC KHÔNG BAO GIỜ BỊ TREO NÚT
     $('proof-form').onsubmit = async e => {
       e.preventDefault();
       const files = [...$('proof-files').files].slice(0, 2);
@@ -1425,7 +1434,6 @@ function openTaskModal(id) {
         $('modal-back').classList.remove('open');
         navigate('proofs');
       } catch (err) {
-        console.error("Submit error:", err);
         submitBtn.disabled = false;
         submitBtn.textContent = 'Gửi hồ sơ xác nhận ↗';
         toast('Có lỗi xảy ra, vui lòng thử lại!');
