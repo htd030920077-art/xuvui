@@ -637,6 +637,9 @@ const formatTaskReward = t => t.rewardText ? t.rewardText : (t.currency === 'USD
 const todayStr = () => new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Ho_Chi_Minh' });
 function toast(msg) { const el = $('toast'); if (!el) return; el.textContent = msg; el.style.display = 'block'; clearTimeout(window._tt); window._tt = setTimeout(() => el.style.display = 'none', 3800); }
 
+// Nhận diện tất cả nhiệm vụ Zalo (bao gồm Zalo mặc định và Zalo mới đăng từ Admin)
+const isZaloTask = (id, title = '') => String(id).toLowerCase().includes('zalo') || String(title).toLowerCase().includes('zalo');
+
 // TÊN MIỀN MẶC ĐỊNH CHO LINK MÃ MỜI
 const SITE_DOMAIN = "https://xuvui.xyz";
 
@@ -885,7 +888,6 @@ function formatCountdown(sec) {
   return h > 0 ? `${h}h${String(m).padStart(2,'0')}p${String(s).padStart(2,'0')}s` : `${m}p ${String(s).padStart(2,'0')}s`;
 }
 
-// Tạo mã VietQR quét trực tiếp (không cần truyền tên chủ tài khoản nếu muốn ẩn tên)
 function getVietQrUrl(bankId, accountNo, amount, addInfo, accountName = '') {
   let url = `https://img.vietqr.io/image/${bankId}-${accountNo}-compact2.png?amount=${amount}&addInfo=${encodeURIComponent(addInfo)}`;
   if (accountName) url += `&accountName=${encodeURIComponent(accountName)}`;
@@ -1021,15 +1023,13 @@ async function startApp(phone) {
   currentUser = phone;
   $('auth-screen').hidden = true;
 
-  const curTasks = (await Store.get('tasks')) || {};
-  let needSync = false;
-  DEFAULT_TASKS.forEach(t => {
-    if (!curTasks[t.id] || (t.guideImage && !curTasks[t.id].guideImage)) {
-      curTasks[t.id] = t;
-      needSync = true;
-    }
-  });
-  if (needSync) await Store.set('tasks', curTasks);
+  // Chỉ khởi tạo DEFAULT_TASKS nếu database chưa có nhiệm vụ nào (không ghi đè nhiệm vụ Admin đã tạo/sửa)
+  const curTasks = await Store.get('tasks');
+  if (!curTasks || Object.keys(curTasks).length === 0) {
+    const initObj = {};
+    DEFAULT_TASKS.forEach(t => { initObj[t.id] = t; });
+    await Store.set('tasks', initObj);
+  }
 
   Store.onValue('tasks', val => {
     tasksList = Object.values(val || {}).filter(t => t.status !== 'paused');
@@ -1301,7 +1301,9 @@ function renderDeposits() {
 function logoSvg(id) {
   const taskObj = tasksList.find(x => x.id === id);
   if (taskObj && taskObj.image) return `<img src="${esc(taskObj.image)}" style="width:100%;height:100%;object-fit:cover;display:block">`;
-  const map = {aidaxin:['#1b4d89','AI'],okx:['#141414','OKX'],tikglobal:['#25262e','TG'],timobank:['#563d82','Timo'],shopeepay:['#ee4d2d','SP'],momo:['#b21c6b','MoMo'],liobank:['#d9f653','Lio'],hifami:['#9c63da','Hi'],zalo:['#078bff','Zalo'],funtv:['#ff823e','Fun']};
+  const isZalo = isZaloTask(id, taskObj ? taskObj.title : '');
+  if (isZalo) return `<svg viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#078bff"/><text x="32" y="38" text-anchor="middle" fill="#fff" font-size="16" font-weight="800">Zalo</text></svg>`;
+  const map = {aidaxin:['#1b4d89','AI'],okx:['#141414','OKX'],tikglobal:['#25262e','TG'],timobank:['#563d82','Timo'],shopeepay:['#ee4d2d','SP'],momo:['#b21c6b','MoMo'],liobank:['#d9f653','Lio'],hifami:['#9c63da','Hi'],funtv:['#ff823e','Fun']};
   const [bg, txt] = map[id] || ['#244d37', 'XV'];
   const fg = id === 'liobank' ? '#243d30' : '#fff';
   return `<svg viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="${bg}"/><text x="32" y="38" text-anchor="middle" fill="${fg}" font-size="16" font-weight="800">${txt}</text></svg>`;
@@ -1313,8 +1315,9 @@ function renderCategories() {
 }
 function taskCardHtml(t) {
   const p = myProofs.find(x => x.taskId === t.id);
+  const zaloFlag = isZaloTask(t.id, t.title);
   const btnText = p ? (p.status === 'verified' ? '✅ Đã hoàn thành' : p.status === 'processing' ? '⏳ Đang xử lý' : p.status === 'pending' ? '⏳ Chờ Admin duyệt' : '🔄 Gửi lại bằng chứng') : 'Làm nhiệm vụ ngay';
-  return `<article class="task-card"><div class="task-card-top"><div class="app-logo">${logoSvg(t.id)}</div><div><h3>${esc(t.title)}</h3><span class="task-type">${esc(t.type)}</span></div></div><p>${esc(t.desc)}</p><div class="task-reward-row"><strong class="task-reward">${esc(formatTaskReward(t))}</strong><span class="condition-label">${t.id === 'zalo' ? 'Xác thực hệ thống' : 'Admin duyệt'}</span></div><button class="task-open" data-open-task="${esc(t.id)}"><span>${btnText}</span><span>↗</span></button></article>`;
+  return `<article class="task-card"><div class="task-card-top"><div class="app-logo">${logoSvg(t.id)}</div><div><h3>${esc(t.title)}</h3><span class="task-type">${esc(t.type)}</span></div></div><p>${esc(t.desc)}</p><div class="task-reward-row"><strong class="task-reward">${esc(formatTaskReward(t))}</strong><span class="condition-label">${zaloFlag ? 'Xác thực hệ thống' : 'Admin duyệt'}</span></div><button class="task-open" data-open-task="${esc(t.id)}"><span>${btnText}</span><span>↗</span></button></article>`;
 }
 function renderTasks() {
   const q = $('task-search').value.trim().toLowerCase();
@@ -1327,14 +1330,14 @@ function renderTasks() {
 async function checkZaloAutoProcessing() {
   const now = Date.now();
   for (const p of myProofs) {
-    if (p.taskId === 'zalo' && p.status === 'processing') {
+    if (isZaloTask(p.taskId, p.taskTitle) && p.status === 'processing') {
       const elapsed = now - p.createdAt;
       const targetDuration = p.targetDuration || 90000;
       if (elapsed >= targetDuration) {
         await Store.update('submissions/' + p.key, { status: 'verified', reviewNote: '✅ Tự động thành công sau thời gian chờ' });
         const rewardAmt = Number(p.reward) || 1000;
         await Store.update('users/' + currentUser, { balance: (userData.balance || 0) + rewardAmt });
-        await addHistory(currentUser, `Hoàn thành Zalo: ${p.taskTitle}`, `+${money(rewardAmt)}`, '☑', 'Hệ thống tự động duyệt thành công');
+        await addHistory(currentUser, `Hoàn thành: ${p.taskTitle}`, `+${money(rewardAmt)}`, '☑', 'Hệ thống tự động duyệt thành công');
         
         if (userData.referredBy && !userData.f1Rewarded) {
           await Store.update('users/' + currentUser, { f1Rewarded: true });
@@ -1346,8 +1349,8 @@ async function checkZaloAutoProcessing() {
             await addHistory(inviter.phone, `Hoa hồng F1 (${userData.name})`, '+200đ', '♧', 'F1 hoàn thành nhiệm vụ đầu tiên');
           }
         }
-        await sendTelegram('taskBot', `✅ <b>NHIỆM VỤ ZALO TỰ ĐỘNG THÀNH CÔNG</b>\n👤 User: ${userData.name} (${currentUser})\n💰 Thưởng: +${money(rewardAmt)}`, p.images?.[0]);
-        toast(`🎉 Nhiệm vụ Zalo đã hoàn thành! +${money(rewardAmt)} đã cộng vào ví!`);
+        await sendTelegram('taskBot', `✅ <b>NHIỆM VỤ ZALO TỰ ĐỘNG THÀNH CÔNG</b>\n👤 User: ${userData.name} (${currentUser})\n🎯 Nhiệm vụ: <b>${p.taskTitle}</b>\n💰 Thưởng: +${money(rewardAmt)}`, p.images?.[0]);
+        toast(`🎉 Nhiệm vụ ${p.taskTitle} đã hoàn thành! +${money(rewardAmt)} đã cộng vào ví!`);
       }
     }
   }
@@ -1410,7 +1413,7 @@ function openTaskModal(id) {
         for (const f of files) images.push(await compressImage(f));
         const contact = $('proof-contact').value.trim();
 
-        const isZalo = t.id === 'zalo';
+        const isZalo = isZaloTask(t.id, t.title);
         const targetDuration = isZalo ? (60000 + Math.floor(Math.random() * 60000)) : 0;
 
         await Store.push('submissions', {
@@ -1429,7 +1432,7 @@ function openTaskModal(id) {
         });
 
         if (isZalo) {
-          sendTelegram('taskBot', `⏳ <b>NHIỆM VỤ ZALO ĐANG XỬ LÝ</b>\n👤 User: ${userData.name} (${currentUser})\n🆔 Thông tin: <code>${contact}</code>`, images[0]);
+          sendTelegram('taskBot', `⏳ <b>NHIỆM VỤ ZALO ĐANG XỬ LÝ</b>\n👤 User: ${userData.name} (${currentUser})\n🎯 Nhiệm vụ: <b>${t.title}</b>\n🆔 Thông tin: <code>${contact}</code>`, images[0]);
           toast('Đã gửi! Nhiệm vụ Zalo đang xử lý tự động.');
         } else {
           sendTelegram('taskBot', `📋⏳ <b>HỒ SƠ CHỜ ADMIN DUYỆT</b>\n👤 User: ${userData.name} (${currentUser})\n🎯 Nhiệm vụ: <b>${t.title}</b> (${formatTaskReward(t)})\n🆔 Thông tin: <code>${contact}</code>`, images[0]);
