@@ -47,7 +47,7 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
 .badge.banned-dev{background:#1e293b;color:#f8fafc}
 .dup-ip-badge{display:inline-flex;align-items:center;justify-content:center;background:#e04f33;color:#fff;font-weight:800;font-size:11px;min-width:22px;height:20px;padding:0 6px;border-radius:99px;margin-left:4px;vertical-align:middle;box-shadow:0 2px 6px #e04f3340;cursor:help}
 .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;background:#f4f8ec;padding:10px 12px;border-radius:10px;margin:10px 0;font-size:11px}
-.control-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.control-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
 .server-banner{border-radius:16px;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border:2px solid}
 .server-banner.online{background:#ebf7e3;border-color:#9fd17b;color:#275914}
 .server-banner.offline{background:#fdecea;border-color:#eb9b91;color:#9c2b1e}
@@ -94,25 +94,33 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
 </header>
 
 <div class="container">
-  <!-- BẢNG ĐIỀU KHIỂN SERVER & THƯỞNG TÂN THỦ -->
+  <!-- BẢNG ĐIỀU KHIỂN NHANH: SERVER · KHÓA/MỞ RÚT TIỀN · THƯỞNG TÂN THỦ -->
   <div class="control-grid">
     <div class="server-banner online" id="server-banner">
       <div>
-        <strong style="font-size:14px" id="srv-title">🟢 SERVER ĐANG MỞ BÌNH THƯỜNG</strong>
-        <div style="font-size:11px;margin-top:3px" id="srv-desc">Người chơi đang truy cập và làm nhiệm vụ bình thường.</div>
+        <strong style="font-size:13px" id="srv-title">🟢 SERVER ĐANG MỞ</strong>
+        <div style="font-size:10.5px;margin-top:3px" id="srv-desc">Người chơi đang truy cập bình thường.</div>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="secondary" onclick="openServerModal()">⚙ Cài đặt TB</button>
+        <button class="secondary" onclick="openServerModal()">⚙ Cài đặt</button>
         <button class="danger" id="btn-toggle-server" onclick="toggleServerStatus()">🛑 Đóng Server</button>
       </div>
     </div>
 
+    <div class="server-banner online" id="withdraw-gate-banner">
+      <div>
+        <strong style="font-size:13px" id="wdr-gate-title">💸 RÚT TIỀN HỆ THỐNG: ĐANG MỞ</strong>
+        <div style="font-size:10.5px;margin-top:3px" id="wdr-gate-desc">Thành viên nạp ≥ 50k & xong 1 NV được rút.</div>
+      </div>
+      <button class="danger" id="btn-toggle-withdraw-gate" onclick="toggleGlobalWithdrawGate()">🚫 Khóa rút tiền</button>
+    </div>
+
     <div class="server-banner online" id="bonus-banner">
       <div>
-        <strong style="font-size:14px" id="bonus-title">🎁 THƯỞNG TẠO TÀI KHOẢN: ĐANG MỞ</strong>
-        <div style="font-size:11px;margin-top:3px" id="bonus-desc">TK đầu tiên nhận 2.000đ & được rút lần đầu 5.000đ.</div>
+        <strong style="font-size:13px" id="bonus-title">🎁 THƯỞNG TẠO TK: ĐANG MỞ</strong>
+        <div style="font-size:10.5px;margin-top:3px" id="bonus-desc">TK đầu nhận 2.000đ & rút lần đầu 5.000đ.</div>
       </div>
-      <button class="danger" id="btn-toggle-bonus" onclick="toggleSignupBonus()">🔒 Đóng thưởng (Về rút 30k)</button>
+      <button class="danger" id="btn-toggle-bonus" onclick="toggleSignupBonus()">🔒 Đóng thưởng 2k</button>
     </div>
   </div>
 
@@ -133,11 +141,12 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
     <button data-tab="tab-giftcodes">6. Giftcode (Hàng loạt & Ngẫu nhiên)</button>
     <button data-tab="tab-phone-list">7. Danh sách SĐT</button>
     <button data-tab="tab-dup-ip">8. Tài Khoản Trùng IP <em id="cnt-dup">0</em></button>
+    <button data-tab="tab-deposited-users">9. Danh Sách Đã Nạp Tiền <em id="cnt-paid-users">0</em></button>
   </div>
 
   <div class="tab-content" id="tab-deposits">
     <div class="panel">
-      <h3>Danh sách yêu cầu nạp tiền (MB BANK: 245331 · Duyệt tính tích lũy thăng cấp VIP 1-8)</h3>
+      <h3>Danh sách yêu cầu nạp tiền (MB BANK: 245331 · Nạp ≥ 50.000đ kích hoạt rút tiền)</h3>
       <div id="admin-deposit-list"></div>
     </div>
   </div>
@@ -202,7 +211,7 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
     <div class="panel">
       <div class="row" style="margin-bottom:14px">
         <div>
-          <h3 style="margin:0">Quản lý Thành viên, Tặng Gói VIP 0-8 & Khóa Thiết Bị</h3>
+          <h3 style="margin:0">Quản lý Thành viên, Tặng VIP 0-8, Khóa Rút & Khóa Thiết Bị</h3>
           <small style="color:var(--muted)">Các SĐT có số đỏ <span class="dup-ip-badge">2</span> bên cạnh là tài khoản phát hiện trùng IP / thiết bị</small>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
@@ -216,7 +225,6 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
     </div>
   </div>
 
-  <!-- TAB 6: PHÁT HÀNH GIFTCODE HÀNG LOẠT & NGẪU NHIÊN -->
   <div class="tab-content" id="tab-giftcodes" hidden>
     <div class="panel">
       <h3>🎁 Phát hành Giftcode (Tạo 1 mã, Tạo hàng loạt & Tiền thưởng ngẫu nhiên)</h3>
@@ -272,7 +280,6 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
         <button type="submit" class="primary" style="width:100%" id="btn-create-gc">✨ Phát hành Giftcode ngay</button>
       </form>
 
-      <!-- KHUNG HIỂN THỊ DANH SÁCH MÃ VỪA TẠO HÀNG LOẠT ĐỂ SAO CHÉP -->
       <div id="gc-batch-result" hidden style="margin-top:16px;background:#f3f8e9;border:1.5px solid #b9d19b;border-radius:14px;padding:14px">
         <div class="row" style="margin-bottom:8px">
           <strong style="color:var(--green)" id="gc-batch-result-title">✅ Đã tạo thành công danh sách mã:</strong>
@@ -313,6 +320,27 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
         </div>
       </div>
       <div id="admin-dup-ip-list"></div>
+    </div>
+  </div>
+
+  <!-- TAB 9: DANH SÁCH THÀNH VIÊN & LỊCH SỬ ĐÃ NẠP TIỀN -->
+  <div class="tab-content" id="tab-deposited-users" hidden>
+    <div class="panel">
+      <div class="row" style="margin-bottom:14px">
+        <div>
+          <h3 style="margin:0;color:var(--green)">💳 Danh sách thành viên đã nạp tiền & Kích hoạt rút tiền</h3>
+          <small style="color:var(--muted)">Xếp hạng từ cao xuống thấp theo tổng số tiền đã nạp của từng tài khoản</small>
+        </div>
+        <div id="deposited-users-summary" style="font-size:12px;font-weight:800;color:var(--green);background:#ebf7e3;padding:9px 14px;border-radius:10px">
+          Tổng đã nạp: 0đ
+        </div>
+      </div>
+      <div id="admin-deposited-users-list"></div>
+    </div>
+
+    <div class="panel">
+      <h3>📜 Chi tiết các giao dịch nạp tiền đã duyệt thành công</h3>
+      <div id="admin-verified-deposits-list"></div>
     </div>
   </div>
 </div>
@@ -479,9 +507,10 @@ document.querySelectorAll('#admin-tabs button').forEach(btn => {
   };
 });
 
-let allUsersCache = {}, allTasksCache = {}, allGiftcodesCache = {}, bannedDevicesCache = {}, bannedIpsCache = {};
+let allUsersCache = {}, allDepositsCache = {}, allTasksCache = {}, allGiftcodesCache = {}, bannedDevicesCache = {}, bannedIpsCache = {};
 let serverConfig = { isClosed: false, message: 'Hệ thống đang bảo trì nâng cấp tính năng. Vui lòng quay lại sau ít phút!', whitelistPhones: '' };
 let signupBonusEnabled = true;
+let globalWithdrawLocked = false;
 
 function renderPhoneOnlyList() {
   const phones = Object.keys(allUsersCache || {});
@@ -506,16 +535,36 @@ function initAdmin() {
     const btn = $('btn-toggle-server');
     if (serverConfig.isClosed) {
       banner.className = 'server-banner offline';
-      $('srv-title').textContent = '🔴 SERVER ĐANG ĐÓNG (BẢO TRÌ)';
-      $('srv-desc').textContent = `Thông báo: "${serverConfig.message}"`;
+      $('srv-title').textContent = '🔴 SERVER ĐANG ĐÓNG';
+      $('srv-desc').textContent = `TB: "${serverConfig.message}"`;
       btn.className = 'primary';
       btn.textContent = '🟢 Mở Server';
     } else {
       banner.className = 'server-banner online';
-      $('srv-title').textContent = '🟢 SERVER ĐANG MỞ BÌNH THƯỜNG';
-      $('srv-desc').textContent = 'Người chơi đang truy cập và làm nhiệm vụ bình thường.';
+      $('srv-title').textContent = '🟢 SERVER ĐANG MỞ';
+      $('srv-desc').textContent = 'Người chơi truy cập bình thường.';
       btn.className = 'danger';
       btn.textContent = '🛑 Đóng Server';
+    }
+  });
+
+  // LẮNG NGHE TRẠNG THÁI KHÓA / MỞ RÚT TIỀN TOÀN HỆ THỐNG
+  Store.onValue('system/withdrawLocked', val => {
+    globalWithdrawLocked = Boolean(val);
+    const wBanner = $('withdraw-gate-banner');
+    const wBtn = $('btn-toggle-withdraw-gate');
+    if (!globalWithdrawLocked) {
+      wBanner.className = 'server-banner online';
+      $('wdr-gate-title').textContent = '💸 RÚT TIỀN: ĐANG MỞ';
+      $('wdr-gate-desc').textContent = 'Nạp ≥ 50k & hoàn thành 1 NV được rút.';
+      wBtn.className = 'danger';
+      wBtn.textContent = '🚫 Khóa rút tiền';
+    } else {
+      wBanner.className = 'server-banner offline';
+      $('wdr-gate-title').textContent = '🚫 RÚT TIỀN: ĐÃ KHÓA';
+      $('wdr-gate-desc').textContent = 'Tạm khóa cổng rút tiền toàn hệ thống.';
+      wBtn.className = 'primary';
+      wBtn.textContent = '✅ Mở rút tiền';
     }
   });
 
@@ -525,16 +574,16 @@ function initAdmin() {
     const bBtn = $('btn-toggle-bonus');
     if (signupBonusEnabled) {
       bBanner.className = 'server-banner online';
-      $('bonus-title').textContent = '🎁 THƯỞNG TẠO TÀI KHOẢN: ĐANG MỞ';
-      $('bonus-desc').textContent = 'TK đầu tiên nhận 2.000đ & được rút lần đầu 5.000đ.';
+      $('bonus-title').textContent = '🎁 THƯỞNG TẠO TK: ĐANG MỞ';
+      $('bonus-desc').textContent = 'TK đầu nhận 2.000đ & rút lần đầu 5.000đ.';
       bBtn.className = 'danger';
-      bBtn.textContent = '🔒 Đóng thưởng (Về rút 30k)';
+      bBtn.textContent = '🔒 Đóng thưởng 2k';
     } else {
       bBanner.className = 'server-banner bonus-off';
-      $('bonus-title').textContent = '🔒 THƯỞNG TẠO TÀI KHOẢN: ĐÃ ĐÓNG';
-      $('bonus-desc').textContent = 'Không tặng 2.000đ tân thủ · Tất cả đều rút tối thiểu 30.000đ.';
+      $('bonus-title').textContent = '🔒 THƯỞNG TẠO TK: ĐÃ ĐÓNG';
+      $('bonus-desc').textContent = 'Không tặng 2k tân thủ · Rút tối thiểu 30k.';
       bBtn.className = 'primary';
-      bBtn.textContent = '🎁 Mở lại thưởng 2k';
+      bBtn.textContent = '🎁 Mở thưởng 2k';
     }
   });
 
@@ -556,10 +605,12 @@ function initAdmin() {
     renderUsers();
     renderPhoneOnlyList();
     renderDuplicateIpList();
+    renderDepositedUsersList();
   });
 
   Store.onValue('deposits', val => {
-    const items = Object.entries(val || {}).map(([k, v]) => ({ key: k, ...v })).sort((a, b) => b.createdAt - a.createdAt);
+    allDepositsCache = val || {};
+    const items = Object.entries(allDepositsCache).map(([k, v]) => ({ key: k, ...v })).sort((a, b) => b.createdAt - a.createdAt);
     const pendingCount = items.filter(i => i.status === 'pending').length;
     $('st-deposits').textContent = pendingCount;
     $('cnt-dep').textContent = pendingCount;
@@ -575,10 +626,12 @@ function initAdmin() {
         </div>
         ${d.receipt ? `<div style="margin:10px 0"><a href="${d.receipt}" target="_blank"><img src="${d.receipt}" style="width:100px;height:100px;object-fit:cover;border-radius:10px;border:1px solid #ccc"></a></div>` : ''}
         ${d.status === 'pending' ? `<div style="display:flex;gap:8px;margin-top:10px">
-          <button class="primary" onclick="approveDeposit('${d.key}', '${d.phone}', ${d.amount})">✅ Duyệt nạp +${money(d.amount)} (Cộng tích lũy VIP)</button>
+          <button class="primary" onclick="approveDeposit('${d.key}', '${d.phone}', ${d.amount})">✅ Duyệt nạp +${money(d.amount)} (Kích hoạt & VIP)</button>
           <button class="danger" onclick="rejectDeposit('${d.key}', '${d.phone}', ${d.amount})">❌ Từ chối</button>
         </div>` : ''}
       </div>`).join('') : '<p style="color:var(--muted)">Chưa có yêu cầu nạp tiền nào.</p>';
+
+    renderDepositedUsersList();
   });
 
   Store.onValue('submissions', val => {
@@ -679,6 +732,23 @@ function initAdmin() {
   });
 }
 
+// KHÓA / MỞ RÚT TIỀN TOÀN HỆ THỐNG
+window.toggleGlobalWithdrawGate = async () => {
+  const nextVal = !globalWithdrawLocked;
+  await Store.set('system/withdrawLocked', nextVal);
+  alert(nextVal
+    ? '🚫 Đã KHÓA cổng rút tiền toàn hệ thống!'
+    : '✅ Đã MỞ lại cổng rút tiền cho toàn bộ thành viên!');
+};
+
+// KHÓA / MỞ RÚT TIỀN CHỦ ĐỘNG CHO TỪNG THÀNH VIÊN
+window.toggleUserWithdrawLock = async (phone, shouldLock) => {
+  await Store.update('users/' + phone, { withdrawLocked: shouldLock });
+  alert(shouldLock
+    ? `🚫 Đã KHÓA rút tiền đối với SĐT ${phone}!`
+    : `✅ Đã MỞ khóa rút tiền cho SĐT ${phone}!`);
+};
+
 window.toggleSignupBonus = async () => {
   const nextVal = !signupBonusEnabled;
   await Store.set('system/signupBonusEnabled', nextVal);
@@ -686,6 +756,74 @@ window.toggleSignupBonus = async () => {
     ? '🎁 Đã MỞ thưởng tạo tài khoản mới (2.000đ tân thủ & rút lần đầu 5.000đ)!'
     : '🔒 Đã ĐÓNG thưởng tạo tài khoản mới! Tất cả đều chuyển sang mức rút tối thiểu 30.000đ.');
 };
+
+// RENDER TAB 9: DANH SÁCH THÀNH VIÊN ĐÃ NẠP TIỀN & LỊCH SỬ GIAO DỊCH NẠP
+function renderDepositedUsersList() {
+  const allUsersArr = Object.values(allUsersCache || {});
+  const allDepItems = Object.entries(allDepositsCache || {}).map(([k, v]) => ({ key: k, ...v }));
+  const verifiedDeps = allDepItems.filter(d => d.status === 'verified').sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+  // Gom những thành viên có totalDeposited > 0 hoặc có giao dịch nạp tiền đã duyệt
+  const paidUsers = allUsersArr
+    .filter(u => Number(u.totalDeposited || 0) > 0 || verifiedDeps.some(d => d.phone === u.phone))
+    .sort((a, b) => Number(b.totalDeposited || 0) - Number(a.totalDeposited || 0));
+
+  const totalDepositedSum = paidUsers.reduce((s, u) => s + Number(u.totalDeposited || 0), 0);
+
+  if ($('cnt-paid-users')) $('cnt-paid-users').textContent = paidUsers.length;
+  if ($('deposited-users-summary')) {
+    $('deposited-users-summary').textContent = `${paidUsers.length} thành viên đã nạp · Tổng: ${money(totalDepositedSum)}`;
+  }
+
+  const usersContainer = $('admin-deposited-users-list');
+  if (usersContainer) {
+    usersContainer.innerHTML = paidUsers.length ? paidUsers.map((u, idx) => {
+      const dep = Number(u.totalDeposited || 0);
+      const isActivated = dep >= 50000;
+      const curVipLv = Math.max(Number(u.vipLevel || 0), getVipLevelByDeposit(dep));
+      const vipInfo = VIP_TIERS[curVipLv] || VIP_TIERS[0];
+      const wdrLocked = Boolean(u.withdrawLocked);
+
+      return `<div class="card">
+        <div class="row">
+          <div>
+            <span class="badge open">#${idx + 1}</span>
+            <strong style="font-size:15px;margin-left:4px">${esc(u.name)}</strong> — SĐT: <code>${esc(u.phone)}</code>
+            <span class="badge vip">${vipInfo.icon} ${vipInfo.name}</span>
+            ${isActivated ? '<span class="badge verified">✅ Đã kích hoạt rút (≥50k)</span>' : '<span class="badge pending">⚠️ Chưa đủ 50k rút</span>'}
+            ${wdrLocked ? '<span class="badge closed">🚫 ĐANG KHÓA RÚT</span>' : ''}
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="${wdrLocked ? 'primary' : 'danger'}" onclick="toggleUserWithdrawLock('${u.phone}', ${!wdrLocked})">
+              ${wdrLocked ? '✅ Mở rút tiền' : '🚫 Khóa rút tiền'}
+            </button>
+            <button class="gold" onclick="openGiftVipModal('${u.phone}')">🎁 Tặng VIP</button>
+            <button class="secondary" onclick="openEditUserModal('${u.phone}')">✏️ Sửa</button>
+          </div>
+        </div>
+        <div class="info-grid">
+          <div>💳 Tổng đã nạp: <b style="color:var(--green)">${money(dep)}</b></div>
+          <div>💰 Số dư ví hiện tại: <b>${money(u.balance)}</b></div>
+          <div>↗ Tổng đã rút: <b>${money(u.withdrawn || 0)}</b></div>
+          <div>📅 Ngày tạo TK: <b>${new Date(u.createdAt).toLocaleDateString('vi-VN')}</b></div>
+        </div>
+      </div>`;
+    }).join('') : '<p style="color:var(--muted)">Chưa có thành viên nào nạp tiền.</p>';
+  }
+
+  const historyContainer = $('admin-verified-deposits-list');
+  if (historyContainer) {
+    historyContainer.innerHTML = verifiedDeps.length ? verifiedDeps.map(d => `
+      <div class="card row">
+        <div>
+          <strong style="color:var(--green)">+${money(d.amount)}</strong> — <b>${esc(d.userName)}</b> (<code>${esc(d.phone)}</code>)<br>
+          <small>Nội dung CK: <code>${esc(d.memo)}</code> · Thời gian: ${new Date(d.createdAt).toLocaleString('vi-VN')}</small>
+        </div>
+        <span class="badge verified">✅ Đã cộng tiền</span>
+      </div>
+    `).join('') : '<p style="color:var(--muted)">Chưa có giao dịch nạp tiền nào được duyệt.</p>';
+  }
+}
 
 $('gc-batch-mode').onchange = () => {
   const isBatch = $('gc-batch-mode').value === 'batch';
@@ -701,7 +839,6 @@ $('gc-reward-type').onchange = () => {
   $('gc-rand-max-wrap').hidden = !isRand;
 };
 
-// SỬA LỖI PATH RỖNG KHI TẠO GIFTCODE (CẬP NHẬT TRỰC TIẾP VÀO NODE 'giftcodes')
 $('new-gc-form').onsubmit = async e => {
   e.preventDefault();
   const btn = $('btn-create-gc');
@@ -1119,6 +1256,7 @@ function renderUsers() {
     const dupCount = sharedAccounts.length;
     const otherPhones = sharedAccounts.filter(p => p !== u.phone);
     const devBanned = isDeviceBannedForUser(u);
+    const wdrLocked = Boolean(u.withdrawLocked);
 
     const plots = u.plots ? Object.entries(u.plots) : [];
     const plotText = plots.length
@@ -1132,6 +1270,8 @@ function renderUsers() {
         <div>
           <strong style="font-size:15px">${esc(u.name)}</strong> — SĐT: <code>${esc(u.phone)}</code>${dupCount >= 2 ? `<span class="dup-ip-badge" title="Trùng IP/Thiết bị với SĐT: ${esc(otherPhones.join(', '))}">${dupCount}</span>` : ''} · MK: <code>${esc(u.password)}</code> · PIN: <code>${esc(u.pin)}</code>
           <span class="badge ${curVipLv > 0 ? 'vip' : 'pending'}">${vipInfo.icon} ${vipInfo.name} (${money(vipInfo.dailyRebate)}/ngày)</span>
+          ${dep >= 50000 ? '<span class="badge verified">✅ Đã kích hoạt rút</span>' : '<span class="badge pending">Chưa đủ 50k rút</span>'}
+          ${wdrLocked ? '<span class="badge closed">🚫 KHÓA RÚT</span>' : ''}
           ${devBanned ? '<span class="badge banned-dev">🔒 KHÓA THIẾT BỊ</span>' : ''}
           ${u.locked ? '<span class="badge closed">ĐÃ KHÓA TK</span>' : ''}
           ${dupCount >= 2 ? `<div style="font-size:10px;color:#c94a38;font-weight:700;margin-top:4px">⚠️ Trùng IP/Thiết bị (${dupCount} tài khoản): ${esc(sharedAccounts.join(' · '))}</div>` : ''}
@@ -1140,13 +1280,14 @@ function renderUsers() {
           <button class="gold" onclick="openGiftVipModal('${u.phone}')">🎁 Tặng VIP 0-8 & Quà</button>
           <button class="secondary" onclick="openSubordinatesModal('${u.phone}')">👥 Cấp dưới (${f1Count})</button>
           <button class="primary" onclick="openEditUserModal('${u.phone}')">✏️ Sửa chi tiết</button>
+          <button class="${wdrLocked ? 'blue' : 'gold'}" onclick="toggleUserWithdrawLock('${u.phone}', ${!wdrLocked})">${wdrLocked ? '✅ Mở rút tiền' : '🚫 Khóa rút tiền'}</button>
           <button class="${devBanned ? 'secondary' : 'dark'}" onclick="toggleBanDevice('${u.phone}', ${!devBanned})">${devBanned ? '🔓 Mở thiết bị' : '🔒 Khóa thiết bị'}</button>
           <button class="${u.locked ? 'secondary' : 'danger'}" onclick="Store.update('users/${u.phone}', {locked: ${!u.locked}})">${u.locked ? 'Mở khóa TK' : 'Khóa TK'}</button>
         </div>
       </div>
       <div class="info-grid">
         <div>💰 Số dư ví: <b>${money(u.balance)}</b></div>
-        <div>💳 Tích lũy VIP: <b>${money(dep)}</b></div>
+        <div>💳 Đã nạp / VIP: <b>${money(dep)}</b></div>
         <div>↗ Đã rút: <b>${money(u.withdrawn || 0)}</b></div>
         <div>⭐ Nông trại: <b>Level ${u.farmLevel || 1}</b> (${u.farmExp || 0} EXP)</div>
         <div>🌾 Thu nông trại: <b>${money(u.farmEarned || 0)}</b></div>
@@ -1395,7 +1536,7 @@ window.openEditUserModal = (phone) => {
     </div>
     <div class="grid-3">
       <div><label>Số dư khả dụng (VNĐ)</label><input id="eu-balance" type="number" value="${Number(u.balance) || 0}"></div>
-      <div><label>Tích lũy VIP (Chu kỳ 5 ngày)</label><input id="eu-deposited" type="number" value="${Number(u.totalDeposited) || 0}"></div>
+      <div><label>Đã nạp (≥50k kích hoạt rút)</label><input id="eu-deposited" type="number" value="${Number(u.totalDeposited) || 0}"></div>
       <div><label>Cấp bậc VIP (0-8)</label><select id="eu-vip-level">
         ${VIP_TIERS.map(t => `<option value="${t.level}" ${curVipLv === t.level ? 'selected' : ''}>${t.icon} ${t.name} (${money(t.dailyRebate)}/ngày)</option>`).join('')}
       </select></div>
@@ -1409,11 +1550,22 @@ window.openEditUserModal = (phone) => {
     <div class="plot-check-grid">
       ${[4,5,6,7,8,9].map(i => `<label class="plot-check-item"><input type="checkbox" id="eu-plot-${i}" ${pPlots['p'+i] ? 'checked' : ''}> Mở Ô đất #${i}</label>`).join('')}
     </div>
-    <label>Trạng thái tài khoản</label>
-    <select id="eu-locked">
-      <option value="false" ${!u.locked ? 'selected' : ''}>🟢 Đang hoạt động</option>
-      <option value="true" ${u.locked ? 'selected' : ''}>🔴 Khóa tài khoản</option>
-    </select>
+    <div class="grid-2">
+      <div>
+        <label>Quyền rút tiền của thành viên này</label>
+        <select id="eu-withdraw-locked">
+          <option value="false" ${!u.withdrawLocked ? 'selected' : ''}>✅ Cho phép rút tiền (khi đủ ĐK)</option>
+          <option value="true" ${u.withdrawLocked ? 'selected' : ''}>🚫 Khóa rút tiền chủ động</option>
+        </select>
+      </div>
+      <div>
+        <label>Trạng thái tài khoản</label>
+        <select id="eu-locked">
+          <option value="false" ${!u.locked ? 'selected' : ''}>🟢 Đang hoạt động</option>
+          <option value="true" ${u.locked ? 'selected' : ''}>🔴 Khóa tài khoản</option>
+        </select>
+      </div>
+    </div>
     <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
       <button class="primary" style="flex:1" onclick="saveUserFull('${phone}')">💾 Lưu toàn bộ thay đổi</button>
       <button class="danger" onclick="deleteUserAccount('${phone}')">🗑️ Xóa TK</button>
@@ -1448,6 +1600,7 @@ window.saveUserFull = async (phone) => {
     farmLevel: Math.max(1, Number($('eu-lv').value) || 1),
     farmExp: Math.max(0, Number($('eu-exp').value) || 0),
     purchasedPlots,
+    withdrawLocked: $('eu-withdraw-locked').value === 'true',
     locked: $('eu-locked').value === 'true'
   });
 
@@ -1483,7 +1636,7 @@ window.approveDeposit = async (key, phone, amount) => {
     });
     await Store.push('history/' + phone, {
       title: 'Nạp tiền thành công (VietQR)', amount: `+${money(amount)}`, icon: '💳',
-      detail: `Tích lũy VIP: ${money(newTotalDep)} (${tierInfo.name})`, createdAt: Date.now()
+      detail: `Tích lũy: ${money(newTotalDep)} (${tierInfo.name})${newTotalDep >= 50000 ? ' · Đã kích hoạt rút tiền' : ''}`, createdAt: Date.now()
     });
   }
 };
