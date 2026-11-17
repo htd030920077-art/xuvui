@@ -39,6 +39,7 @@ label{display:block;font-size:11px;font-weight:700;color:#4f663c;margin:6px 0 4p
 input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;padding:10px 12px;margin:0 0 12px;background:#fff}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .badge{padding:4px 9px;border-radius:6px;font-size:10px;font-weight:700;display:inline-block}
 .badge.pending{background:#fff1cc;color:#997014}
 .badge.verified,.badge.paid,.badge.open{background:#e2f3ce;color:#417519}
@@ -47,7 +48,7 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
 .badge.banned-dev{background:#1e293b;color:#f8fafc}
 .dup-ip-badge{display:inline-flex;align-items:center;justify-content:center;background:#e04f33;color:#fff;font-weight:800;font-size:11px;min-width:22px;height:20px;padding:0 6px;border-radius:99px;margin-left:4px;vertical-align:middle;box-shadow:0 2px 6px #e04f3340;cursor:help}
 .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;background:#f4f8ec;padding:10px 12px;border-radius:10px;margin:10px 0;font-size:11px}
-.control-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.control-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
 .server-banner{border-radius:16px;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border:2px solid}
 .server-banner.online{background:#ebf7e3;border-color:#9fd17b;color:#275914}
 .server-banner.offline{background:#fdecea;border-color:#eb9b91;color:#9c2b1e}
@@ -68,7 +69,7 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
 .modal-back{position:fixed;inset:0;background:#1d342e80;backdrop-filter:blur(4px);z-index:60;display:none;align-items:center;justify-content:center;padding:14px}
 .modal-back.open{display:flex}
 .modal{background:#fff;border-radius:20px;padding:22px;width:620px;max-width:100%;max-height:92vh;overflow-y:auto}
-@media(max-width:850px){.stats{grid-template-columns:1fr 1fr}.grid-2,.grid-3,.control-grid,.gift-preset-grid,.vip-tier-select-grid{grid-template-columns:1fr}}
+@media(max-width:850px){.stats{grid-template-columns:1fr 1fr}.grid-2,.grid-3,.grid-4,.control-grid,.gift-preset-grid,.vip-tier-select-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -94,7 +95,7 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
 </header>
 
 <div class="container">
-  <!-- BẢNG ĐIỀU KHIỂN NHANH: SERVER · KHÓA/MỞ RÚT TIỀN · THƯỞNG TÂN THỦ -->
+  <!-- BẢNG ĐIỀU KHIỂN NHANH -->
   <div class="control-grid">
     <div class="server-banner online" id="server-banner">
       <div>
@@ -109,8 +110,8 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
 
     <div class="server-banner online" id="withdraw-gate-banner">
       <div>
-        <strong style="font-size:13px" id="wdr-gate-title">💸 RÚT TIỀN HỆ THỐNG: ĐANG MỞ</strong>
-        <div style="font-size:10.5px;margin-top:3px" id="wdr-gate-desc">Thành viên nạp ≥ 50k & xong 1 NV được rút.</div>
+        <strong style="font-size:13px" id="wdr-gate-title">💸 RÚT TIỀN: ĐANG MỞ</strong>
+        <div style="font-size:10.5px;margin-top:3px" id="wdr-gate-desc">Kiểm soát cổng rút tiền toàn hệ thống.</div>
       </div>
       <button class="danger" id="btn-toggle-withdraw-gate" onclick="toggleGlobalWithdrawGate()">🚫 Khóa rút tiền</button>
     </div>
@@ -122,6 +123,37 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
       </div>
       <button class="danger" id="btn-toggle-bonus" onclick="toggleSignupBonus()">🔒 Đóng thưởng 2k</button>
     </div>
+  </div>
+
+  <!-- BẢNG TÙY CHỈNH THÔNG SỐ NẠP TỐI THIỂU & RÚT TỐI THIỂU -->
+  <div class="panel" style="padding:16px 20px;margin-bottom:18px">
+    <div class="row" style="margin-bottom:10px">
+      <div>
+        <h3 style="margin:0;color:var(--green)">⚙ Tùy Chỉnh Thông Số Nạp / Rút Hệ Thống</h3>
+        <small style="color:var(--muted)">Khi duyệt nạp tiền, hệ thống tự động giữ lại 90% phí kích hoạt nông trại (thực cộng 10% vào ví, ẩn với khách) và tính 100% vào tích lũy VIP.</small>
+      </div>
+    </div>
+    <form id="sys-params-form" class="grid-4" style="align-items:end">
+      <div>
+        <label>Nạp tiền tối thiểu (VNĐ)</label>
+        <input id="sp-min-deposit" type="number" min="1000" step="1000" value="50000" required style="margin:0">
+      </div>
+      <div>
+        <label>Rút tiền tối thiểu (VNĐ)</label>
+        <input id="sp-min-withdraw" type="number" min="1000" step="1000" value="50000" required style="margin:0">
+      </div>
+      <div>
+        <label>Rút tối đa / ngày (VNĐ)</label>
+        <input id="sp-max-withdraw" type="number" min="10000" step="1000" value="250000" required style="margin:0">
+      </div>
+      <div>
+        <label>Mốc nạp kích hoạt rút (VNĐ)</label>
+        <div style="display:flex;gap:8px">
+          <input id="sp-activate-deposit" type="number" min="0" step="1000" value="50000" required style="margin:0">
+          <button type="submit" class="primary" style="white-space:nowrap">💾 Lưu thông số</button>
+        </div>
+      </div>
+    </form>
   </div>
 
   <div class="stats">
@@ -146,7 +178,7 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
 
   <div class="tab-content" id="tab-deposits">
     <div class="panel">
-      <h3>Danh sách yêu cầu nạp tiền (MB BANK: 245331 · Nạp ≥ 50.000đ kích hoạt rút tiền)</h3>
+      <h3>Danh sách yêu cầu nạp tiền (MB BANK: 245331 · Tự động khấu trừ 90% phí kích hoạt, cộng 10% vào ví)</h3>
       <div id="admin-deposit-list"></div>
     </div>
   </div>
@@ -323,7 +355,6 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
     </div>
   </div>
 
-  <!-- TAB 9: DANH SÁCH THÀNH VIÊN & LỊCH SỬ ĐÃ NẠP TIỀN -->
   <div class="tab-content" id="tab-deposited-users" hidden>
     <div class="panel">
       <div class="row" style="margin-bottom:14px">
@@ -511,6 +542,7 @@ let allUsersCache = {}, allDepositsCache = {}, allTasksCache = {}, allGiftcodesC
 let serverConfig = { isClosed: false, message: 'Hệ thống đang bảo trì nâng cấp tính năng. Vui lòng quay lại sau ít phút!', whitelistPhones: '' };
 let signupBonusEnabled = true;
 let globalWithdrawLocked = false;
+let sysParams = { minDeposit: 50000, minWithdraw: 50000, maxWithdrawDaily: 250000, activateWithdrawDeposit: 50000 };
 
 function renderPhoneOnlyList() {
   const phones = Object.keys(allUsersCache || {});
@@ -528,6 +560,24 @@ window.copyAllPhones = () => {
 
 function initAdmin() {
   $('conn-status').textContent = useFirebase ? '🟢 Firebase Cloud (xuvui-9175f)' : '🟡 Local Sync';
+
+  // ĐỒNG BỘ THÔNG SỐ NẠP / RÚT HỆ THỐNG
+  Store.onValue('system/params', val => {
+    if (val && typeof val === 'object') {
+      sysParams = {
+        minDeposit: Math.max(1000, Number(val.minDeposit) || 50000),
+        minWithdraw: Math.max(1000, Number(val.minWithdraw) || 50000),
+        maxWithdrawDaily: Math.max(10000, Number(val.maxWithdrawDaily) || 250000),
+        activateWithdrawDeposit: Math.max(0, Number(val.activateWithdrawDeposit ?? 50000))
+      };
+    }
+    if ($('sp-min-deposit')) $('sp-min-deposit').value = sysParams.minDeposit;
+    if ($('sp-min-withdraw')) $('sp-min-withdraw').value = sysParams.minWithdraw;
+    if ($('sp-max-withdraw')) $('sp-max-withdraw').value = sysParams.maxWithdrawDaily;
+    if ($('sp-activate-deposit')) $('sp-activate-deposit').value = sysParams.activateWithdrawDeposit;
+    renderUsers();
+    renderDepositedUsersList();
+  });
 
   Store.onValue('system/server', val => {
     if (val) serverConfig = { ...serverConfig, ...val };
@@ -548,7 +598,6 @@ function initAdmin() {
     }
   });
 
-  // LẮNG NGHE TRẠNG THÁI KHÓA / MỞ RÚT TIỀN TOÀN HỆ THỐNG
   Store.onValue('system/withdrawLocked', val => {
     globalWithdrawLocked = Boolean(val);
     const wBanner = $('withdraw-gate-banner');
@@ -556,7 +605,7 @@ function initAdmin() {
     if (!globalWithdrawLocked) {
       wBanner.className = 'server-banner online';
       $('wdr-gate-title').textContent = '💸 RÚT TIỀN: ĐANG MỞ';
-      $('wdr-gate-desc').textContent = 'Nạp ≥ 50k & hoàn thành 1 NV được rút.';
+      $('wdr-gate-desc').textContent = 'Kiểm soát cổng rút tiền toàn hệ thống.';
       wBtn.className = 'danger';
       wBtn.textContent = '🚫 Khóa rút tiền';
     } else {
@@ -581,7 +630,7 @@ function initAdmin() {
     } else {
       bBanner.className = 'server-banner bonus-off';
       $('bonus-title').textContent = '🔒 THƯỞNG TẠO TK: ĐÃ ĐÓNG';
-      $('bonus-desc').textContent = 'Không tặng 2k tân thủ · Rút tối thiểu 30k.';
+      $('bonus-desc').textContent = 'Không tặng 2k tân thủ.';
       bBtn.className = 'primary';
       bBtn.textContent = '🎁 Mở thưởng 2k';
     }
@@ -615,21 +664,23 @@ function initAdmin() {
     $('st-deposits').textContent = pendingCount;
     $('cnt-dep').textContent = pendingCount;
 
-    $('admin-deposit-list').innerHTML = items.length ? items.map(d => `
-      <div class="card">
+    $('admin-deposit-list').innerHTML = items.length ? items.map(d => {
+      const netCredit = Math.round(Number(d.amount) * 0.1);
+      return `<div class="card">
         <div class="row">
           <div>
-            <strong style="font-size:15px;color:var(--green)">Nạp ${money(d.amount)}</strong> — <b>${esc(d.userName)}</b> (${esc(d.phone)})<br>
+            <strong style="font-size:15px;color:var(--green)">Khách nạp ${money(d.amount)}</strong> (Thực cộng ví 10%: <b>+${money(netCredit)}</b>) — <b>${esc(d.userName)}</b> (${esc(d.phone)})<br>
             <small>Nội dung CK: <code>${esc(d.memo)}</code> · ${new Date(d.createdAt).toLocaleString('vi-VN')}</small>
           </div>
           <span class="badge ${d.status}">${d.status === 'verified' ? 'Đã duyệt' : d.status === 'rejected' ? 'Từ chối' : 'Chờ duyệt'}</span>
         </div>
         ${d.receipt ? `<div style="margin:10px 0"><a href="${d.receipt}" target="_blank"><img src="${d.receipt}" style="width:100px;height:100px;object-fit:cover;border-radius:10px;border:1px solid #ccc"></a></div>` : ''}
         ${d.status === 'pending' ? `<div style="display:flex;gap:8px;margin-top:10px">
-          <button class="primary" onclick="approveDeposit('${d.key}', '${d.phone}', ${d.amount})">✅ Duyệt nạp +${money(d.amount)} (Kích hoạt & VIP)</button>
+          <button class="primary" onclick="approveDeposit('${d.key}', '${d.phone}', ${d.amount})">✅ Duyệt (Cộng ${money(netCredit)} ví · Tích lũy ${money(d.amount)})</button>
           <button class="danger" onclick="rejectDeposit('${d.key}', '${d.phone}', ${d.amount})">❌ Từ chối</button>
         </div>` : ''}
-      </div>`).join('') : '<p style="color:var(--muted)">Chưa có yêu cầu nạp tiền nào.</p>';
+      </div>`;
+    }).join('') : '<p style="color:var(--muted)">Chưa có yêu cầu nạp tiền nào.</p>';
 
     renderDepositedUsersList();
   });
@@ -732,7 +783,24 @@ function initAdmin() {
   });
 }
 
-// KHÓA / MỞ RÚT TIỀN TOÀN HỆ THỐNG
+// LƯU THÔNG SỐ NẠP / RÚT TÙY CHỈNH
+$('sys-params-form').onsubmit = async e => {
+  e.preventDefault();
+  const minDeposit = Math.max(1000, Number($('sp-min-deposit').value) || 50000);
+  const minWithdraw = Math.max(1000, Number($('sp-min-withdraw').value) || 50000);
+  const maxWithdrawDaily = Math.max(minWithdraw, Number($('sp-max-withdraw').value) || 250000);
+  const activateWithdrawDeposit = Math.max(0, Number($('sp-activate-deposit').value) || 0);
+
+  await Store.set('system/params', {
+    minDeposit,
+    minWithdraw,
+    maxWithdrawDaily,
+    activateWithdrawDeposit,
+    updatedAt: Date.now()
+  });
+  alert(`✅ Đã cập nhật thông số hệ thống:\n- Nạp tối thiểu: ${money(minDeposit)}\n- Rút tối thiểu: ${money(minWithdraw)}\n- Rút tối đa/ngày: ${money(maxWithdrawDaily)}\n- Mốc nạp kích hoạt rút: ${money(activateWithdrawDeposit)}`);
+};
+
 window.toggleGlobalWithdrawGate = async () => {
   const nextVal = !globalWithdrawLocked;
   await Store.set('system/withdrawLocked', nextVal);
@@ -741,7 +809,6 @@ window.toggleGlobalWithdrawGate = async () => {
     : '✅ Đã MỞ lại cổng rút tiền cho toàn bộ thành viên!');
 };
 
-// KHÓA / MỞ RÚT TIỀN CHỦ ĐỘNG CHO TỪNG THÀNH VIÊN
 window.toggleUserWithdrawLock = async (phone, shouldLock) => {
   await Store.update('users/' + phone, { withdrawLocked: shouldLock });
   alert(shouldLock
@@ -754,21 +821,20 @@ window.toggleSignupBonus = async () => {
   await Store.set('system/signupBonusEnabled', nextVal);
   alert(nextVal
     ? '🎁 Đã MỞ thưởng tạo tài khoản mới (2.000đ tân thủ & rút lần đầu 5.000đ)!'
-    : '🔒 Đã ĐÓNG thưởng tạo tài khoản mới! Tất cả đều chuyển sang mức rút tối thiểu 30.000đ.');
+    : '🔒 Đã ĐÓNG thưởng tạo tài khoản mới!');
 };
 
-// RENDER TAB 9: DANH SÁCH THÀNH VIÊN ĐÃ NẠP TIỀN & LỊCH SỬ GIAO DỊCH NẠP
 function renderDepositedUsersList() {
   const allUsersArr = Object.values(allUsersCache || {});
   const allDepItems = Object.entries(allDepositsCache || {}).map(([k, v]) => ({ key: k, ...v }));
   const verifiedDeps = allDepItems.filter(d => d.status === 'verified').sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
-  // Gom những thành viên có totalDeposited > 0 hoặc có giao dịch nạp tiền đã duyệt
   const paidUsers = allUsersArr
     .filter(u => Number(u.totalDeposited || 0) > 0 || verifiedDeps.some(d => d.phone === u.phone))
     .sort((a, b) => Number(b.totalDeposited || 0) - Number(a.totalDeposited || 0));
 
   const totalDepositedSum = paidUsers.reduce((s, u) => s + Number(u.totalDeposited || 0), 0);
+  const actThreshold = sysParams.activateWithdrawDeposit || 50000;
 
   if ($('cnt-paid-users')) $('cnt-paid-users').textContent = paidUsers.length;
   if ($('deposited-users-summary')) {
@@ -779,7 +845,7 @@ function renderDepositedUsersList() {
   if (usersContainer) {
     usersContainer.innerHTML = paidUsers.length ? paidUsers.map((u, idx) => {
       const dep = Number(u.totalDeposited || 0);
-      const isActivated = dep >= 50000;
+      const isActivated = dep >= actThreshold;
       const curVipLv = Math.max(Number(u.vipLevel || 0), getVipLevelByDeposit(dep));
       const vipInfo = VIP_TIERS[curVipLv] || VIP_TIERS[0];
       const wdrLocked = Boolean(u.withdrawLocked);
@@ -790,7 +856,7 @@ function renderDepositedUsersList() {
             <span class="badge open">#${idx + 1}</span>
             <strong style="font-size:15px;margin-left:4px">${esc(u.name)}</strong> — SĐT: <code>${esc(u.phone)}</code>
             <span class="badge vip">${vipInfo.icon} ${vipInfo.name}</span>
-            ${isActivated ? '<span class="badge verified">✅ Đã kích hoạt rút (≥50k)</span>' : '<span class="badge pending">⚠️ Chưa đủ 50k rút</span>'}
+            ${isActivated ? `<span class="badge verified">✅ Đã kích hoạt rút (≥${money(actThreshold)})</span>` : `<span class="badge pending">⚠️ Chưa đủ ${money(actThreshold)} rút</span>`}
             ${wdrLocked ? '<span class="badge closed">🚫 ĐANG KHÓA RÚT</span>' : ''}
           </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -813,15 +879,16 @@ function renderDepositedUsersList() {
 
   const historyContainer = $('admin-verified-deposits-list');
   if (historyContainer) {
-    historyContainer.innerHTML = verifiedDeps.length ? verifiedDeps.map(d => `
-      <div class="card row">
+    historyContainer.innerHTML = verifiedDeps.length ? verifiedDeps.map(d => {
+      const netCredit = d.creditedAmount !== undefined ? Number(d.creditedAmount) : Math.round(Number(d.amount) * 0.1);
+      return `<div class="card row">
         <div>
-          <strong style="color:var(--green)">+${money(d.amount)}</strong> — <b>${esc(d.userName)}</b> (<code>${esc(d.phone)}</code>)<br>
+          <strong style="color:var(--green)">Khách nạp ${money(d.amount)}</strong> (Thực cộng ví: <b>+${money(netCredit)}</b>) — <b>${esc(d.userName)}</b> (<code>${esc(d.phone)}</code>)<br>
           <small>Nội dung CK: <code>${esc(d.memo)}</code> · Thời gian: ${new Date(d.createdAt).toLocaleString('vi-VN')}</small>
         </div>
-        <span class="badge verified">✅ Đã cộng tiền</span>
-      </div>
-    `).join('') : '<p style="color:var(--muted)">Chưa có giao dịch nạp tiền nào được duyệt.</p>';
+        <span class="badge verified">✅ Đã duyệt</span>
+      </div>`;
+    }).join('') : '<p style="color:var(--muted)">Chưa có giao dịch nạp tiền nào được duyệt.</p>';
   }
 }
 
@@ -1219,6 +1286,7 @@ function renderUsers() {
   const q = $('user-search').value.trim().toLowerCase();
   const onlyDupIp = $('filter-dup-ip') ? $('filter-dup-ip').checked : false;
   const allUsersArr = Object.values(allUsersCache);
+  const actThreshold = sysParams.activateWithdrawDeposit || 50000;
 
   const ipGroups = {};
   const devGroups = {};
@@ -1270,7 +1338,7 @@ function renderUsers() {
         <div>
           <strong style="font-size:15px">${esc(u.name)}</strong> — SĐT: <code>${esc(u.phone)}</code>${dupCount >= 2 ? `<span class="dup-ip-badge" title="Trùng IP/Thiết bị với SĐT: ${esc(otherPhones.join(', '))}">${dupCount}</span>` : ''} · MK: <code>${esc(u.password)}</code> · PIN: <code>${esc(u.pin)}</code>
           <span class="badge ${curVipLv > 0 ? 'vip' : 'pending'}">${vipInfo.icon} ${vipInfo.name} (${money(vipInfo.dailyRebate)}/ngày)</span>
-          ${dep >= 50000 ? '<span class="badge verified">✅ Đã kích hoạt rút</span>' : '<span class="badge pending">Chưa đủ 50k rút</span>'}
+          ${dep >= actThreshold ? `<span class="badge verified">✅ Đã kích hoạt rút</span>` : `<span class="badge pending">Chưa đủ ${money(actThreshold)} rút</span>`}
           ${wdrLocked ? '<span class="badge closed">🚫 KHÓA RÚT</span>' : ''}
           ${devBanned ? '<span class="badge banned-dev">🔒 KHÓA THIẾT BỊ</span>' : ''}
           ${u.locked ? '<span class="badge closed">ĐÃ KHÓA TK</span>' : ''}
@@ -1536,7 +1604,7 @@ window.openEditUserModal = (phone) => {
     </div>
     <div class="grid-3">
       <div><label>Số dư khả dụng (VNĐ)</label><input id="eu-balance" type="number" value="${Number(u.balance) || 0}"></div>
-      <div><label>Đã nạp (≥50k kích hoạt rút)</label><input id="eu-deposited" type="number" value="${Number(u.totalDeposited) || 0}"></div>
+      <div><label>Đã nạp (Kích hoạt & VIP)</label><input id="eu-deposited" type="number" value="${Number(u.totalDeposited) || 0}"></div>
       <div><label>Cấp bậc VIP (0-8)</label><select id="eu-vip-level">
         ${VIP_TIERS.map(t => `<option value="${t.level}" ${curVipLv === t.level ? 'selected' : ''}>${t.icon} ${t.name} (${money(t.dailyRebate)}/ngày)</option>`).join('')}
       </select></div>
@@ -1620,23 +1688,38 @@ window.deleteUserAccount = async (phone) => {
   $('modal-back').classList.remove('open');
 };
 
+// DUYỆT NẠP TIỀN: TỰ ĐỘNG KHẤU TRỪ 90% PHÍ KÍCH HOẠT NÔNG TRẠI (THỰC CỘNG 10% VÀO VÍ, ẨN KHÔNG HIỂN THỊ PHÍ VỚI KHÁCH)
+// TỔNG TÍCH LŨY NẠP (totalDeposited) VẪN TÍNH ĐỦ 100% SỐ TIỀN NẠP ĐỂ KÍCH HOẠT TÀI KHOẢN & LÊN CẤP VIP
 window.approveDeposit = async (key, phone, amount) => {
-  await Store.update('deposits/' + key, { status: 'verified' });
+  const fullAmt = Number(amount) || 0;
+  const creditedAmt = Math.round(fullAmt * 0.1); // Trừ 90%, thực cộng 10% vào ví
+
+  await Store.update('deposits/' + key, {
+    status: 'verified',
+    creditedAmount: creditedAmt,
+    approvedAt: Date.now()
+  });
+
   const u = await Store.get('users/' + phone);
   if (u) {
-    const newTotalDep = (u.totalDeposited || 0) + Number(amount);
+    const newTotalDep = (u.totalDeposited || 0) + fullAmt;
     const newVipLv = Math.max(Number(u.vipLevel || 0), getVipLevelByDeposit(newTotalDep));
     const tierInfo = VIP_TIERS[newVipLv] || VIP_TIERS[0];
 
     await Store.update('users/' + phone, {
-      balance: (u.balance || 0) + Number(amount),
+      balance: (u.balance || 0) + creditedAmt,
       totalDeposited: newTotalDep,
       vipLevel: newVipLv,
       vipCycleStart: Date.now()
     });
+
+    // Ghi lịch sử giao dịch cho khách hiển thị bình thường (ẩn thông tin khấu trừ)
     await Store.push('history/' + phone, {
-      title: 'Nạp tiền thành công (VietQR)', amount: `+${money(amount)}`, icon: '💳',
-      detail: `Tích lũy: ${money(newTotalDep)} (${tierInfo.name})${newTotalDep >= 50000 ? ' · Đã kích hoạt rút tiền' : ''}`, createdAt: Date.now()
+      title: 'Nạp tiền thành công (VietQR)',
+      amount: `+${money(creditedAmt)}`,
+      icon: '💳',
+      detail: `Tích lũy tài khoản: ${money(newTotalDep)} (${tierInfo.name})`,
+      createdAt: Date.now()
     });
   }
 };
