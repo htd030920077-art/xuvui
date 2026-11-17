@@ -519,7 +519,6 @@ function initAdmin() {
     }
   });
 
-  // LẮNG NGHE TRẠNG THÁI ĐÓNG / MỞ THƯỞNG TẠO TÀI KHOẢN
   Store.onValue('system/signupBonusEnabled', val => {
     signupBonusEnabled = val !== false;
     const bBanner = $('bonus-banner');
@@ -680,7 +679,6 @@ function initAdmin() {
   });
 }
 
-// BẬT / TẮT THƯỞNG TẠO TÀI KHOẢN
 window.toggleSignupBonus = async () => {
   const nextVal = !signupBonusEnabled;
   await Store.set('system/signupBonusEnabled', nextVal);
@@ -689,7 +687,6 @@ window.toggleSignupBonus = async () => {
     : '🔒 Đã ĐÓNG thưởng tạo tài khoản mới! Tất cả đều chuyển sang mức rút tối thiểu 30.000đ.');
 };
 
-// CHUYỂN ĐỔI GIAO DIỆN FORM TẠO GIFTCODE (1 MÃ / HÀNG LOẠT & CỐ ĐỊNH / NGẪU NHIÊN)
 $('gc-batch-mode').onchange = () => {
   const isBatch = $('gc-batch-mode').value === 'batch';
   $('gc-single-code-wrap').hidden = isBatch;
@@ -704,6 +701,7 @@ $('gc-reward-type').onchange = () => {
   $('gc-rand-max-wrap').hidden = !isRand;
 };
 
+// SỬA LỖI PATH RỖNG KHI TẠO GIFTCODE (CẬP NHẬT TRỰC TIẾP VÀO NODE 'giftcodes')
 $('new-gc-form').onsubmit = async e => {
   e.preventDefault();
   const btn = $('btn-create-gc');
@@ -727,7 +725,7 @@ $('new-gc-form').onsubmit = async e => {
     if (!isBatch) {
       const code = $('gc-code').value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
       if (!code) throw new Error('Vui lòng nhập mã Giftcode!');
-      updates['giftcodes/' + code] = {
+      updates[code] = {
         amount: isRandom ? minAmount : fixedAmount,
         isRandom,
         minAmount: isRandom ? minAmount : fixedAmount,
@@ -747,7 +745,7 @@ $('new-gc-form').onsubmit = async e => {
         let randPart = '';
         for (let j = 0; j < 5; j++) randPart += chars.charAt(Math.floor(Math.random() * chars.length));
         const code = `${prefix}${randPart}`;
-        updates['giftcodes/' + code] = {
+        updates[code] = {
           amount: isRandom ? minAmount : fixedAmount,
           isRandom,
           minAmount: isRandom ? minAmount : fixedAmount,
@@ -761,7 +759,7 @@ $('new-gc-form').onsubmit = async e => {
       }
     }
 
-    await Store.update('', updates);
+    await Store.update('giftcodes', updates);
 
     if (createdCodes.length > 1) {
       $('gc-batch-result').hidden = false;
@@ -792,8 +790,8 @@ window.deleteAllUsedGiftcodes = async () => {
   if (!toDelete.length) return alert('Không có mã nào đã hết lượt hoặc bị khóa.');
   if (!confirm(`Xóa ${toDelete.length} mã giftcode đã hết lượt?`)) return;
   const updates = {};
-  toDelete.forEach(([code]) => { updates['giftcodes/' + code] = null; });
-  await Store.update('', updates);
+  toDelete.forEach(([code]) => { updates[code] = null; });
+  await Store.update('giftcodes', updates);
   alert(`✅ Đã xóa ${toDelete.length} mã giftcode!`);
 };
 
