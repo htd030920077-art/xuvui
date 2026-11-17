@@ -47,9 +47,11 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
 .badge.banned-dev{background:#1e293b;color:#f8fafc}
 .dup-ip-badge{display:inline-flex;align-items:center;justify-content:center;background:#e04f33;color:#fff;font-weight:800;font-size:11px;min-width:22px;height:20px;padding:0 6px;border-radius:99px;margin-left:4px;vertical-align:middle;box-shadow:0 2px 6px #e04f3340;cursor:help}
 .info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;background:#f4f8ec;padding:10px 12px;border-radius:10px;margin:10px 0;font-size:11px}
-.server-banner{border-radius:16px;padding:18px;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;border:2px solid}
+.control-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px}
+.server-banner{border-radius:16px;padding:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border:2px solid}
 .server-banner.online{background:#ebf7e3;border-color:#9fd17b;color:#275914}
 .server-banner.offline{background:#fdecea;border-color:#eb9b91;color:#9c2b1e}
+.server-banner.bonus-off{background:#fff8e6;border-color:#f0d799;color:#8c6414}
 .plot-check-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;background:#f4f8ec;padding:12px;border-radius:12px;margin-bottom:14px}
 .plot-check-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;background:#fff;padding:8px;border-radius:8px;border:1px solid var(--line)}
 .plot-check-item input{width:16px;height:16px;margin:0}
@@ -66,7 +68,7 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
 .modal-back{position:fixed;inset:0;background:#1d342e80;backdrop-filter:blur(4px);z-index:60;display:none;align-items:center;justify-content:center;padding:14px}
 .modal-back.open{display:flex}
 .modal{background:#fff;border-radius:20px;padding:22px;width:620px;max-width:100%;max-height:92vh;overflow-y:auto}
-@media(max-width:850px){.stats{grid-template-columns:1fr 1fr}.grid-2,.grid-3,.gift-preset-grid,.vip-tier-select-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:850px){.stats{grid-template-columns:1fr 1fr}.grid-2,.grid-3,.control-grid,.gift-preset-grid,.vip-tier-select-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -92,14 +94,25 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
 </header>
 
 <div class="container">
-  <div class="server-banner online" id="server-banner">
-    <div>
-      <strong style="font-size:15px" id="srv-title">🟢 SERVER ĐANG MỞ HOẠT ĐỘNG BÌNH THƯỜNG</strong>
-      <div style="font-size:11px;margin-top:3px" id="srv-desc">Tất cả người chơi đều có thể truy cập và thao tác trên trang web.</div>
+  <!-- BẢNG ĐIỀU KHIỂN SERVER & THƯỞNG TÂN THỦ -->
+  <div class="control-grid">
+    <div class="server-banner online" id="server-banner">
+      <div>
+        <strong style="font-size:14px" id="srv-title">🟢 SERVER ĐANG MỞ BÌNH THƯỜNG</strong>
+        <div style="font-size:11px;margin-top:3px" id="srv-desc">Người chơi đang truy cập và làm nhiệm vụ bình thường.</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="secondary" onclick="openServerModal()">⚙ Cài đặt TB</button>
+        <button class="danger" id="btn-toggle-server" onclick="toggleServerStatus()">🛑 Đóng Server</button>
+      </div>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="secondary" onclick="openServerModal()">⚙ Cài đặt thông báo bảo trì</button>
-      <button class="danger" id="btn-toggle-server" onclick="toggleServerStatus()">🛑 Đóng Server (Bảo trì)</button>
+
+    <div class="server-banner online" id="bonus-banner">
+      <div>
+        <strong style="font-size:14px" id="bonus-title">🎁 THƯỞNG TẠO TÀI KHOẢN: ĐANG MỞ</strong>
+        <div style="font-size:11px;margin-top:3px" id="bonus-desc">TK đầu tiên nhận 2.000đ & được rút lần đầu 5.000đ.</div>
+      </div>
+      <button class="danger" id="btn-toggle-bonus" onclick="toggleSignupBonus()">🔒 Đóng thưởng (Về rút 30k)</button>
     </div>
   </div>
 
@@ -117,7 +130,7 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
     <button data-tab="tab-withdraws">3. Duyệt Rút Tiền <em id="cnt-wdr">0</em></button>
     <button data-tab="tab-tasks">4. Up & Dừng Nhiệm Vụ</button>
     <button data-tab="tab-users">5. Thành Viên & Tặng VIP 0-8</button>
-    <button data-tab="tab-giftcodes">6. Giftcode & Hệ Thống</button>
+    <button data-tab="tab-giftcodes">6. Giftcode (Hàng loạt & Ngẫu nhiên)</button>
     <button data-tab="tab-phone-list">7. Danh sách SĐT</button>
     <button data-tab="tab-dup-ip">8. Tài Khoản Trùng IP <em id="cnt-dup">0</em></button>
   </div>
@@ -203,15 +216,77 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
     </div>
   </div>
 
+  <!-- TAB 6: PHÁT HÀNH GIFTCODE HÀNG LOẠT & NGẪU NHIÊN -->
   <div class="tab-content" id="tab-giftcodes" hidden>
     <div class="panel">
-      <h3>Phát hành Giftcode mới</h3>
-      <form id="new-gc-form" class="grid-2">
-        <div><label>Mã Code</label><input id="gc-code" required placeholder="XUVUI2026" style="text-transform:uppercase"></div>
-        <div><label>Số tiền thưởng (VNĐ)</label><input id="gc-amount" type="number" required placeholder="5000"></div>
-        <div><label>Số lượt nhập tối đa</label><input id="gc-uses" type="number" required value="50"></div>
-        <div style="display:flex;align-items:flex-end"><button type="submit" class="primary" style="width:100%;margin-bottom:12px">Tạo mã Giftcode</button></div>
+      <h3>🎁 Phát hành Giftcode (Tạo 1 mã, Tạo hàng loạt & Tiền thưởng ngẫu nhiên)</h3>
+      <form id="new-gc-form">
+        <div class="grid-3">
+          <div>
+            <label>Chế độ tạo mã *</label>
+            <select id="gc-batch-mode">
+              <option value="single">Tạo 1 mã chỉ định</option>
+              <option value="batch">Tạo 1 loạt nhiều mã tự động</option>
+            </select>
+          </div>
+          <div id="gc-single-code-wrap">
+            <label>Tên mã Giftcode *</label>
+            <input id="gc-code" placeholder="XUVUI2026" style="text-transform:uppercase">
+          </div>
+          <div id="gc-batch-prefix-wrap" hidden>
+            <label>Tiền tố mã (VD: XUVUI)</label>
+            <input id="gc-prefix" value="XUVUI" placeholder="XUVUI" style="text-transform:uppercase">
+          </div>
+          <div id="gc-batch-qty-wrap" hidden>
+            <label>Số lượng mã muốn tạo (1 - 100)</label>
+            <input id="gc-qty" type="number" min="1" max="100" value="10">
+          </div>
+          <div>
+            <label>Số lượt nhập mỗi mã *</label>
+            <input id="gc-uses" type="number" required min="1" value="1">
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div>
+            <label>Kiểu tiền thưởng *</label>
+            <select id="gc-reward-type">
+              <option value="fixed">Số tiền cố định</option>
+              <option value="random">Số tiền ngẫu nhiên (Min → Max)</option>
+            </select>
+          </div>
+          <div id="gc-fixed-wrap">
+            <label>Số tiền thưởng cố định (VNĐ) *</label>
+            <input id="gc-amount" type="number" min="100" value="5000" placeholder="5000">
+          </div>
+          <div id="gc-rand-min-wrap" hidden>
+            <label>Tiền ngẫu nhiên Tối thiểu (VNĐ) *</label>
+            <input id="gc-min-amount" type="number" min="100" value="1000" placeholder="1000">
+          </div>
+          <div id="gc-rand-max-wrap" hidden>
+            <label>Tiền ngẫu nhiên Tối đa (VNĐ) *</label>
+            <input id="gc-max-amount" type="number" min="100" value="10000" placeholder="10000">
+          </div>
+        </div>
+
+        <button type="submit" class="primary" style="width:100%" id="btn-create-gc">✨ Phát hành Giftcode ngay</button>
       </form>
+
+      <!-- KHUNG HIỂN THỊ DANH SÁCH MÃ VỪA TẠO HÀNG LOẠT ĐỂ SAO CHÉP -->
+      <div id="gc-batch-result" hidden style="margin-top:16px;background:#f3f8e9;border:1.5px solid #b9d19b;border-radius:14px;padding:14px">
+        <div class="row" style="margin-bottom:8px">
+          <strong style="color:var(--green)" id="gc-batch-result-title">✅ Đã tạo thành công danh sách mã:</strong>
+          <button type="button" class="primary" style="padding:6px 12px" onclick="copyGeneratedCodes()">📋 Sao chép toàn bộ mã</button>
+        </div>
+        <textarea id="gc-batch-output" rows="4" readonly style="font-family:monospace;font-weight:700;margin:0;background:#fff"></textarea>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="row" style="margin-bottom:12px">
+        <h3 style="margin:0">Danh sách Giftcode đang có trên hệ thống</h3>
+        <button class="danger" onclick="deleteAllUsedGiftcodes()">🗑️ Xóa các mã đã hết lượt</button>
+      </div>
       <div id="admin-gc-list"></div>
     </div>
   </div>
@@ -226,7 +301,6 @@ input,select,textarea{width:100%;border:1px solid #d5dec9;border-radius:10px;pad
     </div>
   </div>
 
-  <!-- TAB 8: DANH SÁCH TẤT CẢ TÀI KHOẢN TRÙNG IP & KHÓA THIẾT BỊ -->
   <div class="tab-content" id="tab-dup-ip" hidden>
     <div class="panel">
       <div class="row" style="margin-bottom:14px">
@@ -405,8 +479,9 @@ document.querySelectorAll('#admin-tabs button').forEach(btn => {
   };
 });
 
-let allUsersCache = {}, allTasksCache = {}, bannedDevicesCache = {}, bannedIpsCache = {};
+let allUsersCache = {}, allTasksCache = {}, allGiftcodesCache = {}, bannedDevicesCache = {}, bannedIpsCache = {};
 let serverConfig = { isClosed: false, message: 'Hệ thống đang bảo trì nâng cấp tính năng. Vui lòng quay lại sau ít phút!', whitelistPhones: '' };
+let signupBonusEnabled = true;
 
 function renderPhoneOnlyList() {
   const phones = Object.keys(allUsersCache || {});
@@ -431,16 +506,36 @@ function initAdmin() {
     const btn = $('btn-toggle-server');
     if (serverConfig.isClosed) {
       banner.className = 'server-banner offline';
-      $('srv-title').textContent = '🔴 SERVER ĐANG ĐÓNG (CHẾ ĐỘ BẢO TRÌ)';
-      $('srv-desc').textContent = `Thông báo hiển thị cho khách: "${serverConfig.message}"`;
+      $('srv-title').textContent = '🔴 SERVER ĐANG ĐÓNG (BẢO TRÌ)';
+      $('srv-desc').textContent = `Thông báo: "${serverConfig.message}"`;
       btn.className = 'primary';
-      btn.textContent = '🟢 Mở lại Server ngay';
+      btn.textContent = '🟢 Mở Server';
     } else {
       banner.className = 'server-banner online';
-      $('srv-title').textContent = '🟢 SERVER ĐANG MỞ HOẠT ĐỘNG BÌNH THƯỜNG';
-      $('srv-desc').textContent = 'Tất cả thành viên đang truy cập và làm nhiệm vụ bình thường.';
+      $('srv-title').textContent = '🟢 SERVER ĐANG MỞ BÌNH THƯỜNG';
+      $('srv-desc').textContent = 'Người chơi đang truy cập và làm nhiệm vụ bình thường.';
       btn.className = 'danger';
-      btn.textContent = '🛑 Đóng Server (Bảo trì)';
+      btn.textContent = '🛑 Đóng Server';
+    }
+  });
+
+  // LẮNG NGHE TRẠNG THÁI ĐÓNG / MỞ THƯỞNG TẠO TÀI KHOẢN
+  Store.onValue('system/signupBonusEnabled', val => {
+    signupBonusEnabled = val !== false;
+    const bBanner = $('bonus-banner');
+    const bBtn = $('btn-toggle-bonus');
+    if (signupBonusEnabled) {
+      bBanner.className = 'server-banner online';
+      $('bonus-title').textContent = '🎁 THƯỞNG TẠO TÀI KHOẢN: ĐANG MỞ';
+      $('bonus-desc').textContent = 'TK đầu tiên nhận 2.000đ & được rút lần đầu 5.000đ.';
+      bBtn.className = 'danger';
+      bBtn.textContent = '🔒 Đóng thưởng (Về rút 30k)';
+    } else {
+      bBanner.className = 'server-banner bonus-off';
+      $('bonus-title').textContent = '🔒 THƯỞNG TẠO TÀI KHOẢN: ĐÃ ĐÓNG';
+      $('bonus-desc').textContent = 'Không tặng 2.000đ tân thủ · Tất cả đều rút tối thiểu 30.000đ.';
+      bBtn.className = 'primary';
+      bBtn.textContent = '🎁 Mở lại thưởng 2k';
     }
   });
 
@@ -565,22 +660,143 @@ function initAdmin() {
   });
 
   Store.onValue('giftcodes', val => {
-    const list = Object.entries(val || {});
-    $('admin-gc-list').innerHTML = list.map(([code, g]) => `
-      <div class="card row">
+    allGiftcodesCache = val || {};
+    const list = Object.entries(allGiftcodesCache).reverse();
+    $('admin-gc-list').innerHTML = list.map(([code, g]) => {
+      const rewardLabel = g.isRandom
+        ? `🎲 Ngẫu nhiên: ${money(g.minAmount)} – ${money(g.maxAmount)}`
+        : `💰 Cố định: ${money(g.amount)}`;
+      return `<div class="card row">
         <div>
-          <strong style="font-size:15px">${esc(code)}</strong> — Thưởng: <b>${money(g.amount)}</b> · Đã dùng: ${g.usedCount || 0}/${g.maxUses}
-          ${g.active ? '<span class="badge open">Đang mở</span>' : '<span class="badge closed">Đã khóa</span>'}
+          <strong style="font-size:15px">${esc(code)}</strong> — <b>${rewardLabel}</b> · Đã dùng: ${g.usedCount || 0}/${g.maxUses}
+          ${g.active && (g.usedCount || 0) < g.maxUses ? '<span class="badge open">Đang mở</span>' : '<span class="badge closed">Hết / Khóa</span>'}
         </div>
         <div style="display:flex;gap:6px">
           <button class="secondary" onclick="Store.update('giftcodes/${code}', {active: ${!g.active}})">${g.active ? 'Khóa mã' : 'Mở mã'}</button>
           <button class="danger" onclick="Store.set('giftcodes/${code}', null)">Xóa</button>
         </div>
-      </div>`).join('');
+      </div>`;
+    }).join('') || '<p style="color:var(--muted)">Chưa có mã giftcode nào.</p>';
   });
 }
 
-// HÀM KHÓA / MỞ KHÓA TẠO TÀI KHOẢN TRÊN TOÀN BỘ THIẾT BỊ (DEVICE + IP)
+// BẬT / TẮT THƯỞNG TẠO TÀI KHOẢN
+window.toggleSignupBonus = async () => {
+  const nextVal = !signupBonusEnabled;
+  await Store.set('system/signupBonusEnabled', nextVal);
+  alert(nextVal
+    ? '🎁 Đã MỞ thưởng tạo tài khoản mới (2.000đ tân thủ & rút lần đầu 5.000đ)!'
+    : '🔒 Đã ĐÓNG thưởng tạo tài khoản mới! Tất cả đều chuyển sang mức rút tối thiểu 30.000đ.');
+};
+
+// CHUYỂN ĐỔI GIAO DIỆN FORM TẠO GIFTCODE (1 MÃ / HÀNG LOẠT & CỐ ĐỊNH / NGẪU NHIÊN)
+$('gc-batch-mode').onchange = () => {
+  const isBatch = $('gc-batch-mode').value === 'batch';
+  $('gc-single-code-wrap').hidden = isBatch;
+  $('gc-batch-prefix-wrap').hidden = !isBatch;
+  $('gc-batch-qty-wrap').hidden = !isBatch;
+};
+
+$('gc-reward-type').onchange = () => {
+  const isRand = $('gc-reward-type').value === 'random';
+  $('gc-fixed-wrap').hidden = isRand;
+  $('gc-rand-min-wrap').hidden = !isRand;
+  $('gc-rand-max-wrap').hidden = !isRand;
+};
+
+$('new-gc-form').onsubmit = async e => {
+  e.preventDefault();
+  const btn = $('btn-create-gc');
+  btn.disabled = true;
+
+  try {
+    const isBatch = $('gc-batch-mode').value === 'batch';
+    const isRandom = $('gc-reward-type').value === 'random';
+    const maxUses = Math.max(1, Number($('gc-uses').value) || 1);
+
+    const fixedAmount = Number($('gc-amount').value) || 0;
+    const minAmount = Number($('gc-min-amount').value) || 0;
+    const maxAmount = Number($('gc-max-amount').value) || 0;
+
+    if (!isRandom && fixedAmount <= 0) throw new Error('Vui lòng nhập số tiền thưởng hợp lệ!');
+    if (isRandom && (minAmount <= 0 || maxAmount < minAmount)) throw new Error('Khoảng tiền ngẫu nhiên không hợp lệ (Tối đa phải >= Tối thiểu)!');
+
+    const createdCodes = [];
+    const updates = {};
+
+    if (!isBatch) {
+      const code = $('gc-code').value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+      if (!code) throw new Error('Vui lòng nhập mã Giftcode!');
+      updates['giftcodes/' + code] = {
+        amount: isRandom ? minAmount : fixedAmount,
+        isRandom,
+        minAmount: isRandom ? minAmount : fixedAmount,
+        maxAmount: isRandom ? maxAmount : fixedAmount,
+        maxUses,
+        usedCount: 0,
+        active: true,
+        createdAt: Date.now()
+      };
+      createdCodes.push(code);
+    } else {
+      const prefix = ($('gc-prefix').value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '')) || 'XV';
+      const qty = Math.min(100, Math.max(1, Number($('gc-qty').value) || 1));
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+
+      for (let i = 0; i < qty; i++) {
+        let randPart = '';
+        for (let j = 0; j < 5; j++) randPart += chars.charAt(Math.floor(Math.random() * chars.length));
+        const code = `${prefix}${randPart}`;
+        updates['giftcodes/' + code] = {
+          amount: isRandom ? minAmount : fixedAmount,
+          isRandom,
+          minAmount: isRandom ? minAmount : fixedAmount,
+          maxAmount: isRandom ? maxAmount : fixedAmount,
+          maxUses,
+          usedCount: 0,
+          active: true,
+          createdAt: Date.now()
+        };
+        createdCodes.push(code);
+      }
+    }
+
+    await Store.update('', updates);
+
+    if (createdCodes.length > 1) {
+      $('gc-batch-result').hidden = false;
+      $('gc-batch-result-title').textContent = `✅ Đã tạo thành công ${createdCodes.length} mã Giftcode:`;
+      $('gc-batch-output').value = createdCodes.join('\n');
+    } else {
+      $('gc-batch-result').hidden = true;
+      alert(`✅ Đã phát hành mã Giftcode: ${createdCodes[0]}`);
+    }
+    $('gc-code').value = '';
+  } catch (err) {
+    alert('❌ ' + err.message);
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+window.copyGeneratedCodes = () => {
+  const txt = $('gc-batch-output').value;
+  if (!txt) return;
+  navigator.clipboard?.writeText(txt);
+  alert('✅ Đã sao chép toàn bộ danh sách mã Giftcode!');
+};
+
+window.deleteAllUsedGiftcodes = async () => {
+  const entries = Object.entries(allGiftcodesCache || {});
+  const toDelete = entries.filter(([_, g]) => !g.active || (g.usedCount || 0) >= g.maxUses);
+  if (!toDelete.length) return alert('Không có mã nào đã hết lượt hoặc bị khóa.');
+  if (!confirm(`Xóa ${toDelete.length} mã giftcode đã hết lượt?`)) return;
+  const updates = {};
+  toDelete.forEach(([code]) => { updates['giftcodes/' + code] = null; });
+  await Store.update('', updates);
+  alert(`✅ Đã xóa ${toDelete.length} mã giftcode!`);
+};
+
 window.toggleBanDevice = async (phone, shouldBan) => {
   const u = allUsersCache[phone];
   if (!u) return;
@@ -600,7 +816,6 @@ window.toggleBanDevice = async (phone, shouldBan) => {
   }
 };
 
-// KHÓA HÀNG LOẠT TẤT CẢ TÀI KHOẢN TRONG CÙNG 1 NHÓM TRÙNG IP
 window.banAllAccountsInGroup = async (phonesCsv) => {
   const phones = phonesCsv.split(',').filter(Boolean);
   if (!phones.length) return;
@@ -621,7 +836,6 @@ function isDeviceBannedForUser(u) {
   return Boolean((u.deviceId && bannedDevicesCache[u.deviceId]) || (u.ipHash && bannedIpsCache[u.ipHash]));
 }
 
-// DANH SÁCH LIỆT KÊ TẤT CẢ CÁC NHÓM TÀI KHOẢN TRÙNG IP / THIẾT BỊ (TAB 8)
 function renderDuplicateIpList() {
   const allUsersArr = Object.values(allUsersCache || {});
   const clusters = [];
@@ -629,7 +843,6 @@ function renderDuplicateIpList() {
 
   allUsersArr.forEach(u => {
     if (visited.has(u.phone)) return;
-    // Tìm tất cả tài khoản liên thông cùng ipHash hoặc deviceId
     const group = [];
     const queue = [u];
     visited.add(u.phone);
@@ -1332,13 +1545,6 @@ window.rejectWithdraw = async (key, phone, amount) => {
     await Store.update('users/' + phone, { balance: (u.balance || 0) + Number(amount) });
     await Store.push('history/' + phone, { title: 'Hoàn tiền lệnh rút bị từ chối', amount: `+${money(amount)}`, icon: '↺', detail: reason, createdAt: Date.now() });
   }
-};
-
-$('new-gc-form').onsubmit = async e => {
-  e.preventDefault();
-  const code = $('gc-code').value.trim().toUpperCase();
-  await Store.set('giftcodes/' + code, { amount: Number($('gc-amount').value), maxUses: Number($('gc-uses').value), usedCount: 0, active: true });
-  $('new-gc-form').reset();
 };
 
 $('modal-back').onclick = e => { if (e.target.id === 'modal-back') $('modal-back').classList.remove('open'); };
