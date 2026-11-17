@@ -294,7 +294,7 @@ input[readonly]{background:#f1f5ea;font-weight:800;color:var(--green)}
 <div class="auth-screen" id="auth-screen">
   <div class="auth-card">
     <div class="brand" style="justify-content:center"><span class="brand-icon">✳</span>xu vui<span class="brand-dot">.</span></div>
-    <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:6px">Tặng ngay 2.000đ cho tài khoản đầu tiên · Tối đa 2 TK/máy</p>
+    <p style="text-align:center;font-size:11px;color:var(--muted);margin-top:6px">Nông trại 3x3 & Nhiệm vụ kiếm thưởng uy tín</p>
     <div class="auth-tabs">
       <button type="button" class="active" id="tab-login">Đăng nhập</button>
       <button type="button" id="tab-register">Đăng ký mới</button>
@@ -362,7 +362,7 @@ input[readonly]{background:#f1f5ea;font-weight:800;color:var(--green)}
         <div>
           <div class="eyebrow">XIN CHÀO, <span id="user-greeting">BẠN</span> · <span id="home-level-tag" style="color:var(--green)">LEVEL 1</span> · <span id="home-vip-tag" style="color:#b87b09">🌱 VIP 0</span></div>
           <h1>Cùng kiếm thưởng hôm nay nhé <span>☀</span></h1>
-          <p>Nhận thưởng 2.000đ tân thủ, hoàn thành 1 nhiệm vụ mở khóa rút tiền và nhận hoàn trả VIP mỗi ngày.</p>
+          <p>Hoàn thành 1 nhiệm vụ mở khóa rút tiền và nhận hoàn trả VIP mỗi ngày.</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="primary" data-view="deposit">+ Nạp tiền</button>
@@ -373,13 +373,13 @@ input[readonly]{background:#f1f5ea;font-weight:800;color:var(--green)}
 
       <div class="hero">
         <div class="hero-copy">
-          <span class="hero-kicker"><i></i> TẶNG TÂN THỦ 2.000Đ · RÚT LẦN ĐẦU 5.000Đ</span>
+          <span class="hero-kicker"><i></i> NHIỆM VỤ ĐA DẠNG · HOÀN TRẢ VIP 1 → VIP 8</span>
           <h2>Gieo hạt hôm nay,<br>nhận hoàn trả <span>mỗi ngày.</span></h2>
-          <p>Tài khoản đầu tiên nhận ngay 2.000đ. Hoàn thành 1 nhiệm vụ bất kỳ để mở khóa rút lần đầu 5.000đ và nhận hoàn trả VIP hằng ngày lên tới 700.000đ!</p>
+          <p>Hoàn thành 1 nhiệm vụ bất kỳ để mở khóa tính năng rút tiền. Tích lũy nạp lên VIP 1 – VIP 8 nhận hoàn trả hằng ngày lên tới 700.000đ!</p>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
             <button class="primary" data-view="tasks">▦ Làm nhiệm vụ ngay ↗</button>
             <button class="secondary" data-view="vip">👑 Hoàn trả VIP</button>
-            <button class="secondary" data-view="farm">🌱 Nông trại 3x3</button>
+            <button class="secondary" data-view="gift">🎁 Nhập Giftcode</button>
           </div>
         </div>
         <div class="hero-art" id="hero-art"></div>
@@ -584,8 +584,8 @@ input[readonly]{background:#f1f5ea;font-weight:800;color:var(--green)}
           <div class="panel withdrawal-rules">
             <h3>Quy định rút tiền</h3>
             <div><span>Điều kiện bắt buộc</span><b>Hoàn thành ít nhất 1 nhiệm vụ</b></div>
-            <div><span>Rút lần đầu (TK đầu tiên)</span><b>Cố định 5.000đ (1 lần)</b></div>
-            <div><span>Rút thường / TK thứ 2</span><b>Tối thiểu 30.000đ</b></div>
+            <div id="rule-first-withdraw-row"><span>Rút lần đầu (TK đầu tiên)</span><b>Cố định 5.000đ (1 lần)</b></div>
+            <div><span>Mức rút tối thiểu</span><b>30.000đ</b></div>
             <div><span>Rút tối đa / ngày</span><b>250.000đ</b></div>
             <div><span>Thời gian xử lý</span><b>5 - 30 phút</b></div>
           </div>
@@ -593,7 +593,6 @@ input[readonly]{background:#f1f5ea;font-weight:800;color:var(--green)}
         <div class="panel">
           <div class="panel-heading"><span class="small-icon">↗</span><div><h2>Tạo lệnh rút tiền</h2><p>Nhập chính xác thông tin tài khoản nhận tiền.</p></div></div>
           
-          <!-- CẢNH BÁO BẮT BUỘC HOÀN THÀNH 1 NHIỆM VỤ MỚI ĐƯỢC RÚT TIỀN -->
           <div class="task-req-banner" id="withdraw-task-req-banner" hidden>
             <div>
               <strong>🔒 CHƯA ĐỦ ĐIỀU KIỆN RÚT TIỀN</strong><br>
@@ -873,6 +872,16 @@ async function getPublicIpHash() {
   return '';
 }
 
+let signupBonusEnabled = true;
+
+Store.onValue('system/signupBonusEnabled', val => {
+  signupBonusEnabled = val !== false;
+  if (userData) {
+    renderUserDashboard();
+    updateWithdrawRulesUI();
+  }
+});
+
 Store.onValue('system/server', srv => {
   const screen = $('maintenance-screen');
   if (!screen) return;
@@ -1113,7 +1122,6 @@ let currentUser = null, userData = null, tasksList = [], myProofs = [], myWithdr
 let authMode = 'login', currentCategory = 'Tất cả', proofFilter = 'all', paymentKind = 'bank', selectedSeed = 'rice';
 let lastNotifiedHistoryId = null;
 
-// Kiểm tra xem user đã hoàn thành ít nhất 1 nhiệm vụ (verified) chưa
 function hasCompletedAtLeastOneTask() {
   return myProofs.some(p => p.status === 'verified');
 }
@@ -1159,6 +1167,13 @@ $('auth-form').onsubmit = async e => {
       const hwId = getHardwareFingerprint();
       const ipHash = await getPublicIpHash();
 
+      // KIỂM TRA XEM THIẾT BỊ HOẶC IP NÀY CÓ BỊ ADMIN KHÓA TẠO TÀI KHOẢN KHÔNG
+      const isDevBanned = await Store.get('banned_devices/' + hwId);
+      const isIpBanned = ipHash ? await Store.get('banned_ips/' + ipHash) : false;
+      if (isDevBanned || isIpBanned) {
+        throw new Error('Thiết bị của bạn đã bị khóa quyền tạo tài khoản mới!');
+      }
+
       const hwAccountsRaw = (await Store.get('devices/' + hwId)) || [];
       const hwAccounts = Array.isArray(hwAccountsRaw) ? hwAccountsRaw : Object.values(hwAccountsRaw);
 
@@ -1178,8 +1193,12 @@ $('auth-form').onsubmit = async e => {
         throw new Error('Số điện thoại này đã được đăng ký!');
       }
 
+      // KIỂM TRA CHẾ ĐỘ ĐÓNG / MỞ THƯỞNG TẠO TÀI KHOẢN TỪ ADMIN
+      const bonusFlag = await Store.get('system/signupBonusEnabled');
+      const isBonusOpen = bonusFlag !== false;
       const isFirstAccountOnDevice = matchedPhones.size === 0;
-      const welcomeBonus = isFirstAccountOnDevice ? 2000 : 0;
+      const giveWelcomePerk = isBonusOpen && isFirstAccountOnDevice;
+      const welcomeBonus = giveWelcomePerk ? 2000 : 0;
 
       const myCode = phone;
       const now = Date.now();
@@ -1187,7 +1206,7 @@ $('auth-form').onsubmit = async e => {
         phone, name, password: pass, pin, inviteCode: myCode,
         referredBy: refBy || '', f1Rewarded: false,
         balance: welcomeBonus,
-        firstWithdrawUsed: !isFirstAccountOnDevice,
+        firstWithdrawUsed: !giveWelcomePerk,
         accountOrderOnDevice: matchedPhones.size + 1,
         totalDeposited: 0,
         vipLevel: 0,
@@ -1209,10 +1228,10 @@ $('auth-form').onsubmit = async e => {
         await Store.set('ip_devices/' + ipHash, Array.from(matchedPhones));
       }
 
-      if (isFirstAccountOnDevice) {
-        await addHistory(phone, 'Thưởng chào mừng tài khoản đầu tiên', '+2.000đ', '🎁', 'Hoàn thành 1 nhiệm vụ để rút lần đầu 5.000đ');
+      if (giveWelcomePerk) {
+        await addHistory(phone, 'Thưởng chào mừng thành viên mới', '+2.000đ', '🎁', 'Hoàn thành 1 nhiệm vụ để rút lần đầu 5.000đ');
       } else {
-        await addHistory(phone, 'Đăng ký tài khoản thứ 2 trên thiết bị', '0đ', 'ℹ️', 'Tài khoản thứ 2 áp dụng mức rút tối thiểu 30.000đ');
+        await addHistory(phone, 'Tạo tài khoản thành công', '0đ', 'ℹ️', 'Mức rút tiền tối thiểu 30.000đ');
       }
 
       if (refBy) {
@@ -1224,10 +1243,10 @@ $('auth-form').onsubmit = async e => {
       localStorage.setItem('xv_logged_phone', phone);
       startApp(phone);
       setTimeout(() => {
-        if (isFirstAccountOnDevice) {
+        if (giveWelcomePerk) {
           toast('🎉 Đăng ký thành công! Bạn được tặng +2.000đ (Hoàn thành 1 nhiệm vụ để rút lần đầu 5.000đ)!');
         } else {
-          toast('Đăng ký tài khoản thứ 2 thành công! (Không nhận 2k tân thủ, mức rút tối thiểu 30.000đ)');
+          toast('Đăng ký tài khoản thành công! Mức rút tiền tối thiểu là 30.000đ.');
         }
       }, 500);
     }
@@ -1420,7 +1439,7 @@ function renderUserDashboard() {
   const curLv = Math.max(Number(userData.vipLevel || 0), getVipLevelByDeposit(totalDep));
   const curTier = VIP_TIERS[curLv] || VIP_TIERS[0];
   const nextTier = VIP_TIERS[curLv + 1] || null;
-  const isFirstWithdrawEligible = !userData.firstWithdrawUsed && myWithdrawals.length === 0;
+  const isFirstWithdrawEligible = signupBonusEnabled && !userData.firstWithdrawUsed && myWithdrawals.length === 0;
   const doneTask = hasCompletedAtLeastOneTask();
 
   $('user-greeting').textContent = userData.name.toUpperCase();
@@ -1837,17 +1856,22 @@ function renderProviders() {
   $('provider-select').innerHTML = list.map(n => `<option value="${n}">${n}</option>`).join('');
 }
 
-// CẬP NHẬT QUY ĐỊNH RÚT TIỀN: PHẢI HOÀN THÀNH ÍT NHẤT 1 NHIỆM VỤ + LẦN ĐẦU 5.000Đ (TK #1), LẦN 2 / TK #2 TỪ 30.000Đ - 250.000Đ/NGÀY
+// CẬP NHẬT QUY ĐỊNH RÚT TIỀN:
+// - Khi Admin ĐÓNG thưởng tạo tài khoản (signupBonusEnabled === false) -> Tất cả về mức rút 30.000đ luôn
+// - Phải hoàn thành ít nhất 1 nhiệm vụ mới được rút tiền
 function updateWithdrawRulesUI() {
   if (!userData) return;
   const doneTask = hasCompletedAtLeastOneTask();
-  const isFirstWithdraw = !userData.firstWithdrawUsed && myWithdrawals.length === 0;
+  const isFirstWithdraw = signupBonusEnabled && !userData.firstWithdrawUsed && myWithdrawals.length === 0;
   const amtInput = $('withdraw-amount');
   const taskReqBanner = $('withdraw-task-req-banner');
   const firstBanner = $('first-withdraw-banner');
+  const firstRuleRow = $('rule-first-withdraw-row');
   const quickBox = $('withdraw-quick-amounts');
   const label = $('withdraw-amt-label');
   const submitBtn = $('withdraw-submit');
+
+  if (firstRuleRow) firstRuleRow.hidden = !signupBonusEnabled;
 
   if (!doneTask) {
     taskReqBanner.hidden = false;
@@ -1885,7 +1909,7 @@ $('withdraw-form').onsubmit = async e => {
     return toast('❌ Bạn phải hoàn thành ít nhất 1 nhiệm vụ (Đã duyệt) mới được rút tiền!');
   }
 
-  const isFirstWithdraw = !userData.firstWithdrawUsed && myWithdrawals.length === 0;
+  const isFirstWithdraw = signupBonusEnabled && !userData.firstWithdrawUsed && myWithdrawals.length === 0;
   const amount = isFirstWithdraw ? 5000 : Number($('withdraw-amount').value);
   const pin = $('withdraw-pin').value.trim();
   const provider = $('provider-select').value;
@@ -1942,21 +1966,35 @@ function renderWithdrawals() {
   $('withdrawal-list').innerHTML = myWithdrawals.length ? myWithdrawals.map(w => `<div class="record"><div class="record-main"><span class="record-icon">↗</span><div><strong>${money(w.amount)} · ${esc(w.provider)}</strong> (${esc(w.destination)})<small>${new Date(w.createdAt).toLocaleString('vi-VN')}${w.note ? ' · ' + esc(w.note) : ''}</small></div></div><span class="status-pill ${w.status}">${w.status === 'paid' ? 'Đã chi trả' : w.status === 'rejected' ? 'Đã hoàn tiền' : 'Chờ xử lý'}</span></div>`).join('') : '<div class="empty-state">Chưa có lệnh rút tiền nào.</div>';
 }
 
+// NHẬP GIFTCODE (HỖ TRỢ CẢ MÃ CỐ ĐỊNH VÀ MÃ TIỀN NGẪU NHIÊN MIN - MAX)
 $('gift-form').onsubmit = async e => {
   e.preventDefault();
   const code = $('gift-code').value.trim().toUpperCase();
   if (!code) return;
   $('gift-submit').disabled = true;
   const gc = await Store.get('giftcodes/' + code);
-  if (!gc || !gc.active) { $('gift-submit').disabled = false; return toast('❌ Mã giftcode không tồn tại!'); }
-  if ((gc.usedCount || 0) >= gc.maxUses) { $('gift-submit').disabled = false; return toast('❌ Mã giftcode đã hết lượt!'); }
-  if (gc.usedBy && gc.usedBy[currentUser]) { $('gift-submit').disabled = false; return toast('❌ Bạn đã dùng mã này rồi!'); }
+  if (!gc || !gc.active) { $('gift-submit').disabled = false; return toast('❌ Mã giftcode không tồn tại hoặc đã bị khóa!'); }
+  if ((gc.usedCount || 0) >= gc.maxUses) { $('gift-submit').disabled = false; return toast('❌ Mã giftcode đã hết lượt sử dụng!'); }
+  if (gc.usedBy && gc.usedBy[currentUser]) { $('gift-submit').disabled = false; return toast('❌ Bạn đã nhập mã này rồi!'); }
 
-  await Store.update(`giftcodes/${code}`, { usedCount: (gc.usedCount || 0) + 1, [`usedBy/${currentUser}`]: Date.now() });
-  await Store.update('users/' + currentUser, { balance: (userData.balance || 0) + Number(gc.amount) });
-  await addHistory(currentUser, `Nhập Giftcode ${code}`, `+${money(gc.amount)}`, '♢', 'Quà tặng Giftcode');
+  let rewardAmt = Number(gc.amount) || 0;
+  if (gc.isRandom) {
+    const min = Number(gc.minAmount) || 1000;
+    const max = Math.max(min, Number(gc.maxAmount) || min);
+    // Sinh ngẫu nhiên làm tròn theo bội số 100đ trong khoảng [min, max]
+    const steps = Math.floor((max - min) / 100);
+    rewardAmt = min + Math.floor(Math.random() * (steps + 1)) * 100;
+  }
+
+  await Store.update(`giftcodes/${code}`, {
+    usedCount: (gc.usedCount || 0) + 1,
+    [`usedBy/${currentUser}`]: { at: Date.now(), won: rewardAmt }
+  });
+  await Store.update('users/' + currentUser, { balance: (userData.balance || 0) + rewardAmt });
+  await addHistory(currentUser, `Nhập Giftcode ${code}`, `+${money(rewardAmt)}`, '♢', gc.isRandom ? `Quà tặng Giftcode ngẫu nhiên` : 'Quà tặng Giftcode');
   $('gift-code').value = ''; $('gift-submit').disabled = false;
-  toast(`🎉 Nhận thành công +${money(gc.amount)}!`);
+  FarmAudio.sfxHarvest();
+  toast(`🎉 Chúc mừng! Bạn nhận được +${money(rewardAmt)} từ Giftcode ${code}!`);
 };
 
 function renderHistory() {
