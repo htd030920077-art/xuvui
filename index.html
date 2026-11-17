@@ -144,7 +144,7 @@ input[readonly]{background:#f1f5ea;font-weight:800;color:var(--green)}
 .level-badge{background:#d5f19a;color:#1e4430;font-weight:800;padding:5px 12px;border-radius:20px;font-size:12px;display:inline-flex;align-items:center;gap:6px}
 .exp-bar-wrap{background:#ffffff25;height:10px;border-radius:10px;overflow:hidden;position:relative;margin:6px 0}
 .exp-bar-fill{background:linear-gradient(90deg,#a6e259,#f6dc7d);height:100%;border-radius:10px;transition:width .5s ease}
-.vip-status-banner{background:#fff8e6;border:1px solid #f0d799;color:#8c6414;border-radius:14px;padding:12px 14px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.vip-status-banner{background:#fdecea;border:1.5px solid #f2b8b0;color:#992b1d;border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .vip-status-banner.unlocked{background:#ebf7e3;border-color:#bfe0a8;color:#2e6318}
 
 .farm-scene{position:relative;border-radius:22px;overflow:hidden;border:2px solid #b8d48e;background:linear-gradient(180deg,#cbeefa 0%,#e9f6d8 32%,#95c462 33%,#739e46 100%);margin-bottom:18px;padding:14px 12px 18px}
@@ -177,7 +177,7 @@ input[readonly]{background:#f1f5ea;font-weight:800;color:var(--green)}
 .seed-card.selected{border-color:#244d37;background:#eef6e0;box-shadow:0 6px 16px #244d3718}
 .seed-card.vip-tier{background:linear-gradient(180deg,#fffdf5,#fcf6e3);border-color:#ebd698}
 .seed-card.vip-tier.selected{border-color:#c99426;box-shadow:0 6px 18px #c9942630}
-.seed-card.locked-seed{opacity:.78}
+.seed-card.locked-seed{opacity:.72}
 .seed-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .seed-icon-box{width:44px;height:44px;border-radius:12px;background:#fff;border:1px solid #e8eedc;display:grid;place-items:center;flex-shrink:0;animation:floatIcon 3s ease-in-out infinite}
 @keyframes floatIcon{50%{transform:translateY(-3px)}}
@@ -336,9 +336,9 @@ input[readonly]{background:#f1f5ea;font-weight:800;color:var(--green)}
     <button class="nav" data-view="history"><span>◷</span>Lịch sử giao dịch</button>
   </nav>
   <div class="side-gift">
-    <span>👑</span><strong>Hoàn trả VIP mỗi ngày</strong>
-    <p>Lên VIP nhận hoàn trả tự động lên đến 700.000đ mỗi ngày!</p>
-    <button data-view="vip">Xem bảng VIP <b>↗</b></button>
+    <span>🌾</span><strong>Nông trại 9 ô vuông</strong>
+    <p>Nạp tối thiểu 20.000đ để tham gia trồng trọt & thu hoạch mỗi ngày!</p>
+    <button data-view="farm">Vào nông trại <b>↗</b></button>
   </div>
   <div class="side-footer">✳ Xu Vui Platform · 2026</div>
 </aside>
@@ -362,7 +362,7 @@ input[readonly]{background:#f1f5ea;font-weight:800;color:var(--green)}
         <div>
           <div class="eyebrow">XIN CHÀO, <span id="user-greeting">BẠN</span> · <span id="home-level-tag" style="color:var(--green)">LEVEL 1</span> · <span id="home-vip-tag" style="color:#b87b09">🌱 VIP 0</span></div>
           <h1>Cùng kiếm thưởng hôm nay nhé <span>☀</span></h1>
-          <p>Hoàn thành 1 nhiệm vụ mở khóa rút tiền và nhận hoàn trả VIP mỗi ngày.</p>
+          <p>Nạp từ 20.000đ tham gia Nông trại 3x3, hoàn thành 1 nhiệm vụ mở khóa rút tiền và nhận hoàn trả VIP.</p>
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="primary" data-view="deposit">+ Nạp tiền</button>
@@ -373,12 +373,12 @@ input[readonly]{background:#f1f5ea;font-weight:800;color:var(--green)}
 
       <div class="hero">
         <div class="hero-copy">
-          <span class="hero-kicker"><i></i> NHIỆM VỤ ĐA DẠNG · HOÀN TRẢ VIP 1 → VIP 8</span>
+          <span class="hero-kicker"><i></i> NÔNG TRẠI SINH LỜI · HOÀN TRẢ VIP 1 → VIP 8</span>
           <h2>Gieo hạt hôm nay,<br>nhận hoàn trả <span>mỗi ngày.</span></h2>
-          <p>Hoàn thành 1 nhiệm vụ bất kỳ để mở khóa tính năng rút tiền. Tích lũy nạp lên VIP 1 – VIP 8 nhận hoàn trả hằng ngày lên tới 700.000đ!</p>
+          <p>Nạp tối thiểu 20.000đ để tham gia Nông trại 3x3 với 9 cấp độ cây trồng. Hoàn thành 1 nhiệm vụ bất kỳ để mở khóa rút tiền!</p>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
-            <button class="primary" data-view="tasks">▦ Làm nhiệm vụ ngay ↗</button>
-            <button class="secondary" data-view="vip">👑 Hoàn trả VIP</button>
+            <button class="primary" data-view="farm">🌱 Vào nông trại ↗</button>
+            <button class="secondary" data-view="tasks">▦ Làm nhiệm vụ</button>
             <button class="secondary" data-view="gift">🎁 Nhập Giftcode</button>
           </div>
         </div>
@@ -387,7 +387,7 @@ input[readonly]{background:#f1f5ea;font-weight:800;color:var(--green)}
 
       <div class="metrics">
         <div class="metric featured"><span>Số dư khả dụng <i>◈</i></span><strong data-stat="balance">0đ</strong><small id="home-withdraw-hint">Cần hoàn thành 1 nhiệm vụ để rút</small></div>
-        <div class="metric"><span>Tích lũy VIP (Chu kỳ 5 ngày) <i>👑</i></span><strong data-stat="vipProgress">0đ</strong><small id="vip-metric-note">VIP 0 · Nạp 200.000đ lên VIP 1</small></div>
+        <div class="metric"><span>Tích lũy VIP / Nông trại <i>👑</i></span><strong data-stat="vipProgress">0đ</strong><small id="vip-metric-note">Nạp tối thiểu 20.000đ mở Nông trại</small></div>
         <div class="metric"><span>Đã rút thành công <i>↗</i></span><strong data-stat="withdrawn">0đ</strong><small>Hạn mức rút 250.000đ / ngày</small></div>
       </div>
 
@@ -441,10 +441,10 @@ input[readonly]{background:#f1f5ea;font-weight:800;color:var(--green)}
 
     <section class="view" id="farm">
       <div class="page-heading">
-        <div><div class="eyebrow">NÔNG TRẠI 3X3</div><h1>Khu vườn & Kho báu <span>🌱</span></h1><p>Free Ô 1 · Lên LV2 tặng Ô 2 · Lên LV10 tặng Ô 3 · Mở thêm tối đa 9 ô.</p></div>
+        <div><div class="eyebrow">NÔNG TRẠI 3X3 (YÊU CẦU NẠP ≥ 20.000Đ)</div><h1>Khu vườn & Kho báu <span>🌱</span></h1><p>Free Ô 1 · Lên LV2 tặng Ô 2 · Lên LV10 tặng Ô 3 · Mở thêm tối đa 9 ô.</p></div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <button class="secondary" id="btn-toggle-music">🔇 Bật nhạc nền</button>
-          <button class="primary" data-view="deposit">+ Nạp mở gói VIP</button>
+          <button class="primary" data-view="deposit">+ Nạp mở Nông trại</button>
         </div>
       </div>
 
@@ -463,10 +463,11 @@ input[readonly]{background:#f1f5ea;font-weight:800;color:var(--green)}
         </div>
       </div>
 
+      <!-- BANNER ĐIỀU KIỆN NẠP TỐI THIỂU 20.000Đ ĐỂ THAM GIA NÔNG TRẠI -->
       <div class="vip-status-banner" id="vip-banner">
         <div>
-          <strong id="vip-banner-title">🔒 Gói từ Đồng trở lên đang khóa</strong>
-          <div style="font-size:11px;margin-top:2px" id="vip-banner-desc">Bạn cần nạp tối thiểu <b>20.000đ</b> vào tài khoản để mở khóa trồng Đồng, Bạc, Vàng, Kim Cương, Platinum & Super Platinum.</div>
+          <strong id="vip-banner-title">🔒 Nông trại 3x3 đang khóa (Yêu cầu nạp tối thiểu 20.000đ)</strong>
+          <div style="font-size:11px;margin-top:3px" id="vip-banner-desc">Bạn đã nạp <b>0đ</b>. Vui lòng nạp tối thiểu <b>20.000đ</b> vào tài khoản để tham gia trồng trọt toàn bộ 9 loại cây và khoáng sản!</div>
         </div>
         <button class="gold-btn" data-view="deposit" id="vip-banner-btn">Nạp ngay (Từ 20k) ↗</button>
       </div>
@@ -483,14 +484,14 @@ input[readonly]{background:#f1f5ea;font-weight:800;color:var(--green)}
 
       <div class="panel">
         <div class="section-heading">
-          <div><h2>🛒 Cửa hàng hạt giống & Kho báu (9 loại)</h2><p>Chạm chọn 1 gói bên dưới rồi bấm "Gieo" ở ô đất trống phía trên</p></div>
+          <div><h2>🛒 Cửa hàng hạt giống & Kho báu (9 loại)</h2><p>Nạp tối thiểu 20.000đ để mở khóa gieo trồng toàn bộ 9 loại bên dưới</p></div>
         </div>
         <div class="seed-grid" id="seed-grid"></div>
       </div>
 
       <div class="panel">
         <div class="section-heading">
-          <div><h2>📅 Điểm danh nhận vốn miễn phí</h2><p>Điểm danh mỗi ngày để tích vốn trồng cây</p></div>
+          <div><h2>📅 Điểm danh nhận vốn miễn phí</h2><p>Điểm danh mỗi ngày để tích vốn</p></div>
           <button class="primary" id="btn-checkin">Điểm danh hôm nay</button>
         </div>
         <div class="checkin-grid" id="checkin-grid"></div>
@@ -499,16 +500,16 @@ input[readonly]{background:#f1f5ea;font-weight:800;color:var(--green)}
 
     <section class="view" id="deposit">
       <div class="page-heading">
-        <div><div class="eyebrow">NẠP VỐN & THĂNG CẤP VIP</div><h1>Nạp tiền vào tài khoản <span>💳</span></h1><p>Tích lũy nạp lên cấp VIP 1 – VIP 8 để nhận hoàn trả tiền mỗi ngày.</p></div>
+        <div><div class="eyebrow">NẠP VỐN · MỞ NÔNG TRẠI & THĂNG CẤP VIP</div><h1>Nạp tiền vào tài khoản <span>💳</span></h1><p>Nạp tối thiểu 20.000đ để tham gia Nông trại 3x3 và tích lũy lên VIP 1 – VIP 8.</p></div>
       </div>
       <div class="wallet-layout">
         <div class="panel">
           <div class="panel-heading"><span class="small-icon">💳</span><div><h2>Tạo lệnh nạp tiền</h2><p>Chọn số tiền và quét mã VietQR để nạp nhanh</p></div></div>
           <form id="deposit-form">
             <label>Số tiền muốn nạp (Tối thiểu 20.000đ)</label>
-            <input id="deposit-amount" type="number" min="20000" step="1000" value="200000" required>
+            <input id="deposit-amount" type="number" min="20000" step="1000" value="20000" required>
             <div class="quick-amounts">
-              <button type="button" data-dep-amt="20000">20.000đ</button>
+              <button type="button" data-dep-amt="20000">20.000đ (Mở Nông trại)</button>
               <button type="button" data-dep-amt="200000">200k (VIP 1)</button>
               <button type="button" data-dep-amt="500000">500k (VIP 2)</button>
               <button type="button" data-dep-amt="1000000">1Tr (VIP 3)</button>
@@ -534,7 +535,7 @@ input[readonly]{background:#f1f5ea;font-weight:800;color:var(--green)}
 
         <div class="panel">
           <h2>Lịch sử nạp tiền của bạn</h2>
-          <p style="font-size:11px;color:var(--muted)">Sau khi Admin xác nhận, số tiền nạp sẽ cộng vào ví và tự động tính vào tích lũy thăng cấp VIP.</p>
+          <p style="font-size:11px;color:var(--muted)">Sau khi Admin xác nhận, số tiền nạp sẽ cộng vào ví, mở khóa Nông trại (≥20.000đ) và tính vào tích lũy thăng cấp VIP.</p>
           <div id="deposit-history-list"></div>
         </div>
       </div>
@@ -936,10 +937,11 @@ const FarmAudio = {
 };
 $('btn-toggle-music').onclick = () => FarmAudio.toggleMusic();
 
+// TẤT CẢ 9 LOẠI CÂY / KHOÁNG SẢN ĐỀU YÊU CẦU NẠP TỐI THIỂU 20.000Đ ĐỂ THAM GIA NÔNG TRẠI
 const FARM_CROPS = {
-  rice: { id: 'rice', name: 'Lúa nước', tier: 'basic', requireDeposit: false, seconds: 150, timeLabel: '2,5 phút', cost: 1000, reward: 1200, exp: 15 },
-  corn: { id: 'corn', name: 'Ngô ngọt', tier: 'basic', requireDeposit: false, seconds: 600, timeLabel: '10 phút', cost: 2500, reward: 3000, exp: 35 },
-  wheat: { id: 'wheat', name: 'Lúa mì vàng', tier: 'basic', requireDeposit: false, seconds: 1800, timeLabel: '30 phút', cost: 5000, reward: 5700, exp: 70 },
+  rice: { id: 'rice', name: 'Lúa nước', tier: 'basic', requireDeposit: true, seconds: 150, timeLabel: '2,5 phút', cost: 1000, reward: 1200, exp: 15 },
+  corn: { id: 'corn', name: 'Ngô ngọt', tier: 'basic', requireDeposit: true, seconds: 600, timeLabel: '10 phút', cost: 2500, reward: 3000, exp: 35 },
+  wheat: { id: 'wheat', name: 'Lúa mì vàng', tier: 'basic', requireDeposit: true, seconds: 1800, timeLabel: '30 phút', cost: 5000, reward: 5700, exp: 70 },
   bronze: { id: 'bronze', name: 'Cây Đồng', tier: 'vip', requireDeposit: true, seconds: 3600, timeLabel: '60 phút', cost: 10000, reward: 11000, exp: 140 },
   silver: { id: 'silver', name: 'Cây Bạc', tier: 'vip', requireDeposit: true, seconds: 5 * 3600, timeLabel: '5 giờ', cost: 20000, reward: 25000, exp: 300 },
   gold: { id: 'gold', name: 'Cây Vàng', tier: 'vip', requireDeposit: true, seconds: 12 * 3600, timeLabel: '12 giờ', cost: 50000, reward: 60000, exp: 750 },
@@ -1126,6 +1128,10 @@ function hasCompletedAtLeastOneTask() {
   return myProofs.some(p => p.status === 'verified');
 }
 
+function hasUnlockedFarm() {
+  return Number(userData?.totalDeposited || 0) >= 20000;
+}
+
 const urlRef = new URLSearchParams(location.search).get('ref');
 if (urlRef) localStorage.setItem('xv_saved_ref', urlRef.trim());
 
@@ -1167,7 +1173,6 @@ $('auth-form').onsubmit = async e => {
       const hwId = getHardwareFingerprint();
       const ipHash = await getPublicIpHash();
 
-      // KIỂM TRA XEM THIẾT BỊ HOẶC IP NÀY CÓ BỊ ADMIN KHÓA TẠO TÀI KHOẢN KHÔNG
       const isDevBanned = await Store.get('banned_devices/' + hwId);
       const isIpBanned = ipHash ? await Store.get('banned_ips/' + ipHash) : false;
       if (isDevBanned || isIpBanned) {
@@ -1193,7 +1198,6 @@ $('auth-form').onsubmit = async e => {
         throw new Error('Số điện thoại này đã được đăng ký!');
       }
 
-      // KIỂM TRA CHẾ ĐỘ ĐÓNG / MỞ THƯỞNG TẠO TÀI KHOẢN TỪ ADMIN
       const bonusFlag = await Store.get('system/signupBonusEnabled');
       const isBonusOpen = bonusFlag !== false;
       const isFirstAccountOnDevice = matchedPhones.size === 0;
@@ -1470,9 +1474,9 @@ function renderUserDashboard() {
       : 'Rút từ 30.000đ – 250.000đ/ngày';
   }
 
-  $('vip-metric-note').textContent = nextTier
-    ? `${curTier.name} · Cần ${money(nextTier.minDeposit)} lên ${nextTier.name}`
-    : `${curTier.name} · Hoàn trả ${money(curTier.dailyRebate)}/ngày`;
+  $('vip-metric-note').textContent = totalDep < 20000
+    ? 'Nạp tối thiểu 20.000đ mở Nông trại'
+    : (nextTier ? `${curTier.name} · Cần ${money(nextTier.minDeposit)} lên ${nextTier.name}` : `${curTier.name} · Hoàn trả ${money(curTier.dailyRebate)}/ngày`);
 
   const refParam = userData.phone || currentUser;
   $('my-ref-code').textContent = refParam;
@@ -1499,7 +1503,7 @@ function renderFarm() {
   const pct = Math.min(100, Math.round((exp / nextExp) * 100));
   const bonusPct = (level - 1) * 5;
   const totalDep = Number(userData.totalDeposited || 0);
-  const isVipUnlocked = totalDep >= 20000;
+  const isFarmUnlocked = totalDep >= 20000;
   const purchasedPlots = userData.purchasedPlots || {};
 
   $('farm-lv-badge').textContent = `⭐ LEVEL ${level}`;
@@ -1509,20 +1513,20 @@ function renderFarm() {
   $('farm-total-earned').textContent = money(userData.farmEarned || 0);
 
   const banner = $('vip-banner');
-  if (isVipUnlocked) {
+  if (isFarmUnlocked) {
     banner.classList.add('unlocked');
-    $('vip-banner-title').textContent = `👑 ĐÃ MỞ KHÓA TOÀN BỘ HẠT GIỐNG VIP (Tích lũy: ${money(totalDep)})`;
-    $('vip-banner-desc').textContent = 'Bạn đã đủ điều kiện gieo trồng từ gói Đồng, Bạc, Vàng, Kim Cương, Platinum & Super Platinum!';
+    $('vip-banner-title').textContent = `🔓 NÔNG TRẠI 3X3 ĐÃ MỞ KHÓA (Đã nạp ${money(totalDep)})`;
+    $('vip-banner-desc').textContent = 'Bạn đã đủ điều kiện tham gia trồng trọt & thu hoạch toàn bộ 9 loại cây và khoáng sản!';
     $('vip-banner-btn').hidden = true;
   } else {
     banner.classList.remove('unlocked');
-    $('vip-banner-title').textContent = '🔒 Gói từ Đồng trở lên đang khóa';
-    $('vip-banner-desc').innerHTML = `Bạn đã nạp <b>${money(totalDep)}</b>. Cần nạp tối thiểu <b>20.000đ</b> để mở khóa Đồng, Bạc, Vàng, Kim Cương, Platinum & Super Platinum.`;
+    $('vip-banner-title').textContent = '🔒 Nông trại 3x3 đang khóa (Yêu cầu nạp tối thiểu 20.000đ)';
+    $('vip-banner-desc').innerHTML = `Bạn đã nạp <b>${money(totalDep)}</b>. Bạn phải nạp ít nhất <b>20.000đ</b> mới có thể tham gia trồng trọt trên nông trại!`;
     $('vip-banner-btn').hidden = false;
   }
 
   $('seed-grid').innerHTML = Object.values(FARM_CROPS).map(c => {
-    const locked = c.requireDeposit && !isVipUnlocked;
+    const locked = !isFarmUnlocked;
     const finalReward = Math.round(c.reward * (1 + bonusPct / 100));
     const profit = finalReward - c.cost;
     return `<button type="button" class="seed-card ${c.tier === 'vip' ? 'vip-tier' : ''} ${selectedSeed === c.id ? 'selected' : ''} ${locked ? 'locked-seed' : ''}" data-seed="${c.id}">
@@ -1570,12 +1574,20 @@ function renderFarm() {
         <span class="plot-num">Ô #${idx}</span>
         <div class="plot-stage" style="font-size:20px">🔒</div>
         <div class="plot-timer" style="color:#6c7d5e">Mở rộng đất</div>
-        <button class="farm-action buy-plot" data-buy-plot="${idx}">Mở 50.000đ</button>
+        <button class="farm-action buy-plot" data-buy-plot="${idx}" ${!isFarmUnlocked ? 'disabled' : ''}>${isFarmUnlocked ? 'Mở 50.000đ' : '🔒 Nạp ≥20k'}</button>
       </div>`;
     }
 
     const p = plots['p' + idx];
     if (!p) {
+      if (!isFarmUnlocked) {
+        return `<div class="farm-plot locked-plot">
+          <span class="plot-num">Ô #${idx}</span>
+          <div class="plot-stage" style="font-size:18px">🔒</div>
+          <div class="plot-timer" style="color:#b53b2a">Nạp ≥ 20k</div>
+          <button class="farm-action" disabled>Chưa mở khóa</button>
+        </div>`;
+      }
       return `<div class="farm-plot">
         <span class="plot-num">Ô #${idx}</span>
         <div class="plot-stage"><div class="soil-disc"></div><span style="position:relative;z-index:2;font-size:18px;color:#fff;font-weight:800">+</span></div>
@@ -1856,9 +1868,6 @@ function renderProviders() {
   $('provider-select').innerHTML = list.map(n => `<option value="${n}">${n}</option>`).join('');
 }
 
-// CẬP NHẬT QUY ĐỊNH RÚT TIỀN:
-// - Khi Admin ĐÓNG thưởng tạo tài khoản (signupBonusEnabled === false) -> Tất cả về mức rút 30.000đ luôn
-// - Phải hoàn thành ít nhất 1 nhiệm vụ mới được rút tiền
 function updateWithdrawRulesUI() {
   if (!userData) return;
   const doneTask = hasCompletedAtLeastOneTask();
@@ -1966,7 +1975,6 @@ function renderWithdrawals() {
   $('withdrawal-list').innerHTML = myWithdrawals.length ? myWithdrawals.map(w => `<div class="record"><div class="record-main"><span class="record-icon">↗</span><div><strong>${money(w.amount)} · ${esc(w.provider)}</strong> (${esc(w.destination)})<small>${new Date(w.createdAt).toLocaleString('vi-VN')}${w.note ? ' · ' + esc(w.note) : ''}</small></div></div><span class="status-pill ${w.status}">${w.status === 'paid' ? 'Đã chi trả' : w.status === 'rejected' ? 'Đã hoàn tiền' : 'Chờ xử lý'}</span></div>`).join('') : '<div class="empty-state">Chưa có lệnh rút tiền nào.</div>';
 }
 
-// NHẬP GIFTCODE (HỖ TRỢ CẢ MÃ CỐ ĐỊNH VÀ MÃ TIỀN NGẪU NHIÊN MIN - MAX)
 $('gift-form').onsubmit = async e => {
   e.preventDefault();
   const code = $('gift-code').value.trim().toUpperCase();
@@ -1981,7 +1989,6 @@ $('gift-form').onsubmit = async e => {
   if (gc.isRandom) {
     const min = Number(gc.minAmount) || 1000;
     const max = Math.max(min, Number(gc.maxAmount) || min);
-    // Sinh ngẫu nhiên làm tròn theo bội số 100đ trong khoảng [min, max]
     const steps = Math.floor((max - min) / 100);
     rewardAmt = min + Math.floor(Math.random() * (steps + 1)) * 100;
   }
@@ -2035,6 +2042,7 @@ document.addEventListener('click', async e => {
   if (el.dataset.depAmt) { $('deposit-amount').value = el.dataset.depAmt; updateDepositQr(); }
 
   if (el.dataset.buyPlot) {
+    if (!hasUnlockedFarm()) return toast('🔒 Bạn cần nạp tối thiểu 20.000đ để tham gia Nông trại!');
     const idx = Number(el.dataset.buyPlot);
     if (idx < 4 || idx > 9) return;
     if ((userData.balance || 0) < 50000) return toast('Số dư không đủ 50.000đ để mở khóa ô đất này!');
@@ -2046,10 +2054,8 @@ document.addEventListener('click', async e => {
   }
 
   if (el.dataset.seed) {
-    const crop = FARM_CROPS[el.dataset.seed];
-    const isVipUnlocked = Number(userData.totalDeposited || 0) >= 20000;
-    if (crop.requireDeposit && !isVipUnlocked) {
-      toast(`🔒 Gói "${crop.name}" yêu cầu nạp tối thiểu 20.000đ để mở khóa!`);
+    if (!hasUnlockedFarm()) {
+      toast('🔒 Bạn cần nạp tối thiểu 20.000đ để tham gia Nông trại!');
       return;
     }
     selectedSeed = el.dataset.seed;
@@ -2057,6 +2063,7 @@ document.addEventListener('click', async e => {
   }
 
   if (el.dataset.farmAct) {
+    if (!hasUnlockedFarm()) return toast('🔒 Bạn cần nạp tối thiểu 20.000đ để tham gia Nông trại!');
     const act = el.dataset.farmAct, idx = Number(el.dataset.plot), pKey = 'p' + idx;
     const plot = (userData.plots || {})[pKey];
     const level = userData.farmLevel || 1;
@@ -2065,8 +2072,6 @@ document.addEventListener('click', async e => {
     if (act === 'plant') {
       if (!isPlotUnlocked(idx, level, purchasedPlots)) return toast('Ô đất này chưa được mở khóa!');
       const crop = FARM_CROPS[selectedSeed];
-      const isVipUnlocked = Number(userData.totalDeposited || 0) >= 20000;
-      if (crop.requireDeposit && !isVipUnlocked) return toast(`🔒 Bạn cần nạp tối thiểu 20.000đ để trồng gói ${crop.name}!`);
       if ((userData.balance || 0) < crop.cost) return toast(`Số dư không đủ ${money(crop.cost)} để mua hạt giống ${crop.name}!`);
 
       await Store.update('users/' + currentUser, { balance: userData.balance - crop.cost });
